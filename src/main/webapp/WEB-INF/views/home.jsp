@@ -6,12 +6,14 @@
 		display: flex;
 		flex-flow : column nowrap;
 		height: 100%;
+		background-repeat: no-repeat;
+		background-size: cover;
+		background-image: url("resources/image/sample_back.png");
 	}
 	
 	.head{
 		width : 100%;
 		height : 50px;
-		background: #CCC;
 	}
 	
 	.play-ground{
@@ -22,16 +24,17 @@
 	.footer{
 		width : 100%;
 		height : 100px;
-		background: #CCC;
 	}
 	
 	.candy{
 		position: absolute;
 		display : inline-block;
-		width : 20px;
-		height: 20px;
+		width : 50px;
+		height: 50px;
 		border-radius : 20px;
-		background: #000;
+		background-repeat: no-repeat;
+		background-size: contain;
+		background-image: url("resources/image/sample_candy.png");
 	}
 </style>
 
