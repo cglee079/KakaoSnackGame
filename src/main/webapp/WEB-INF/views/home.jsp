@@ -71,7 +71,9 @@
 			var toTop = top + 10;
 			tg.offset({ "top": toTop });
 			
-			if(toTop > endY){
+			
+			// 사탕이 다떨어지는 순간
+			if(toTop >= endY){ 
 				tg.remove();
 				var index = tg.find(".index").val();
 				clearInterval(candyFallings[index]); //쓰레드종료
