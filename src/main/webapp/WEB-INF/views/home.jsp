@@ -42,8 +42,8 @@
 	var candyIndex = 0; //사탕 인덱스값
 	
 	var startX;
-	var endX;
 	var startY;
+	var endX;
 	var endY;
 	
 	
@@ -70,7 +70,6 @@
 			var top = tg.offset().top;
 			var toTop = top + 10;
 			tg.offset({ "top": toTop });
-			
 			
 			// 사탕이 다떨어지는 순간
 			if(toTop >= endY){ 
