@@ -44,20 +44,20 @@
 		var candy = $("<div>", { "class" : "candy"});
 		candy.appendTo(playGround);
 		
-		//candy의 X(좌,우)좌표를 랜덤하게 생성한다. 
-		var startX 	= playGround.offset().left;
+		//candy의 X(좌,우)좌표를 랜덤하게 지정한다. 
+		var startX 	= playGround.offset().left; 
 		var endX	= startX + playGround.width();
-		var candyX 	=Math.random() * (endX - startX) + startX;
-		
+		var candyX 	= Math.random() * (endX - startX) + startX;
 		candy.offset({ "left": candyX });
 		
+		
+		//사탕이 떨어지는 쓰레드
 		var candyFalling = setInterval(function(){
 			doFallCandy(candy);
 		}, 100);
 		
 		candyFallings.push(candyFalling);
 		
-		//사탕이 떨어지는 쓰레드
 		function doFallCandy(tg){
 			var tg = candy;
 			var top = tg.offset().top;
