@@ -61,7 +61,6 @@
 		function doFallCandy(tg){
 			var tg = candy;
 			var top = tg.offset().top;
-			
 			var toTop = top + fallingSpeed;
 			tg.offset({ "top": toTop });
 		}
