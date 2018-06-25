@@ -7,8 +7,10 @@
 <!-- lib-js -->
 <script src="${pageContext.request.contextPath}/resources/js/lib/jquery-3.2.1.min.js"></script>
 
-<script>
+<!-- common-css -->
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common.css" />
 
+<script>
 /* context Path */
 var contextPath = "${pageContext.request.contextPath}";
 function getContextPath(){ return contextPath; }
