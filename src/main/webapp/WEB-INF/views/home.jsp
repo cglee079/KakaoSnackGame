@@ -16,7 +16,7 @@
 	
 	.play-ground{
 		flex : 1;
-			
+		position: relative;
 	}
 	
 	.footer{
@@ -26,48 +26,71 @@
 	}
 	
 	.candy{
+		position: absolute;
 		display : inline-block;
-		width : 10px;
-		height: 10px;
+		width : 20px;
+		height: 20px;
+		border-radius : 20px;
 		background: #000;
 	}
 </style>
 
 <script>
-	var candyMakeRate = 1000 // 사탕이 생성되는 간격 , 1000 = 1초
+	var candyMakeRate = 1000; // 사탕이 생성되는 간격 , 1000 = 1초
 	var candyFallings = []; // 쓰레드 보관
-	var fallingSpeed = 3; // 사탕이 떨어지는 속도
+	var fallingSpeed = 100; // 사탕이 떨어지는 속도
+	var candyIndex = 0; //사탕 인덱스값
+	
+	var startX;
+	var endX;
+	var startY;
+	var endY;
+	
 	
 	//사탕을 만들어 떨어트림
 	function makeCandy(){
 		var playGround = $(".play-ground");
 		var candy = $("<div>", { "class" : "candy"});
 		candy.appendTo(playGround);
+		candy.append($("<input>", {"class" : "index", type : "hidden", value : candyIndex++})); //인덱스부여
 		
 		//candy의 X(좌,우)좌표를 랜덤하게 지정한다. 
-		var startX 	= playGround.offset().left; 
-		var endX	= startX + playGround.width();
 		var candyX 	= Math.random() * (endX - startX) + startX;
 		candy.offset({ "left": candyX });
-		
 		
 		//사탕이 떨어지는 쓰레드
 		var candyFalling = setInterval(function(){
 			doFallCandy(candy);
-		}, 100);
+		}, fallingSpeed);
 		
 		candyFallings.push(candyFalling);
 		
 		function doFallCandy(tg){
 			var tg = candy;
 			var top = tg.offset().top;
-			var toTop = top + fallingSpeed;
+			var toTop = top + 10;
 			tg.offset({ "top": toTop });
+			
+			if(toTop > endY){
+				tg.remove();
+				var index = tg.find(".index").val();
+				clearInterval(candyFallings[index]); //쓰레드종료
+			}
 		}
 	}
 	
 	$(document).ready(function(){
-		//
+
+		//초기화 (좌표)
+		init();
+		function init(){
+			var playGround = $(".play-ground");
+			startX 	= playGround.offset().left; 
+			startY	= playGround.offset().top;
+			endX	= startX + playGround.width();
+			endY	= startY + playGround.height();
+		}
+		
 		setInterval(function (){
 			makeCandy();
 		}, candyMakeRate);
