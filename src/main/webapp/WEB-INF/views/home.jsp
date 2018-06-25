@@ -34,8 +34,9 @@
 </style>
 
 <script>
-	var candyFallings = [];
-	var speed = 3;
+	var candyMakeRate = 1000 // 사탕이 생성되는 간격 , 1000 = 1초
+	var candyFallings = []; // 쓰레드 보관
+	var fallingSpeed = 3; // 사탕이 떨어지는 속도
 	
 	//사탕을 만들어 떨어트림
 	function makeCandy(){
@@ -50,7 +51,6 @@
 		
 		candy.offset({ "left": candyX });
 		
-		
 		var candyFalling = setInterval(function(){
 			doFallCandy(candy);
 		}, 100);
@@ -62,16 +62,16 @@
 			var tg = candy;
 			var top = tg.offset().top;
 			
-			var toTop = top + speed;
+			var toTop = top + fallingSpeed;
 			tg.offset({ "top": toTop });
 		}
 	}
 	
 	$(document).ready(function(){
-		//테스트로 캔디를 10개 생성해보자~
-		for(var i = 0; i < 10; i++){
+		//
+		setInterval(function (){
 			makeCandy();
-		}
+		}, candyMakeRate);
 	})
 	
 </script>
