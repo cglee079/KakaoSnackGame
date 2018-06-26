@@ -64,6 +64,29 @@ html, body, .wrapper {
 	background-size: contain;
 	background-image: url("resources/image/sample_candy.png");
 }
+
+.candyRemove {
+	position: absolute;
+	display: inline-block;
+	z-index: 1;
+	border-radius: 20px;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("resources/image/effect.gif");
+}
+
+.gameOver {
+	margin : auto;
+	top:20%;
+	width:500px;
+	height:100%;
+	display: inline-block;
+	z-index: 2;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("resources/image/sample_gameover.jpg");
+}
+
 </style>
 
 <script>
@@ -77,17 +100,43 @@ html, body, .wrapper {
 	var endX;
 	var endY;
 	
+	
 	var candyMakeRate 	= 1000; // 사탕이 생성되는 간격 , 1000 = 1초
 	var fallingSpeed 	= 100; 	// 사탕이 떨어지는 속도
 	var totalScore		= 0; 	// 점수
 	var candies			= [];	// 사탕 배열
 	var candyIndex 		= 0; 	// 사탕 인덱스값
 	
+	var makeCandyThread;
+	
+	//클릭시 소리
+	var removeSound = new Audio();
+	removeSound.src = "resources/audio/sample_remove_sound.wav";
+	removeSound.preLoad = true;
+	removeSound.controls = true;
+	removeSound.autoPlay = false;
+
+	
+/* 	//난이도 조절
+	setInterval(function() {
+		candyMakeRate = candyMakeRate * 0.5;
+		fallingSpeed = fallingSpeed * 0.5;
+	}, 2000); */
+	
+	
 	//캔디 삭제 - 터치했을때, 다 떨어졌을때.
 	function removeCandy(tg){
-		tg.remove();
+		removeSound.play();
+		removeSound.currentTime = 0;
+
+		tg.removeClass('candy').addClass('candyRemove');
+		setTimeout(function(){
+			tg.remove();
+		},300);
+		
 		var intervalId = tg.find(".intervalID").val();
 		var index = candies.indexOf(tg);
+
 		if (index > -1) {
 			candies.splice(index, 1);
 		}
@@ -95,8 +144,22 @@ html, body, .wrapper {
 		clearInterval(intervalId); //쓰레드종료
 	}
 	
+
+	//모든 캔디 삭제
+	function removeAllCandy(callback) {
+		candies.forEach(function(candy) {
+			candy.removeClass('candy');
+			var intervalId = candy.find(".intervalID").val();
+			clearInterval(intervalId); //쓰레드종료	
+		})
+		
+		callback();
+	}
+	
+	
 	//사탕을 만들어 떨어트림
 	function makeCandy(){
+		
 		var playGround = $(".play-ground");
 		var candy = $("<div>", { "class" : "candy"});
 		candies.push(candy);
@@ -122,9 +185,26 @@ html, body, .wrapper {
 			
 			// 사탕이 다떨어지는 순간
 			if(toTop - CANDY_HEIGHT >= endY){  
-				removeCandy(tg);
+				//removeCandy(tg);
+				gameover();
 			}
 		}
+	}
+	
+	//동기화를 위한 메소드
+	var clearIntervalCallback = function(callback) {
+		clearInterval(makeCandyThread);
+		callback();
+	};
+	
+	//게임 종료
+	function gameover() {
+		$(".play-ground").addClass("gameover");
+		clearIntervalCallback(function(){
+			removeAllCandy(function() {
+				candies = [];
+			});
+		});
 	}
 	
 	//점수 증가
@@ -147,9 +227,10 @@ html, body, .wrapper {
 		}
 		
 		//사탕 생성 쓰레드
-		setInterval(function (){
+			makeCandyThread = setInterval(function (){
 			makeCandy();
 		}, candyMakeRate);
+		
 		
 		//터치이벤트 
 		$(".play-ground").on("click", function(event){
@@ -158,6 +239,7 @@ html, body, .wrapper {
 			
 			for(var i = 0; i < candies.length; i++){
 				var candy = candies[i];
+				
 				var candySX = candy.offset().left; 	//startX
 				var candySY = candy.offset().top;	//startY
 				var candyEX	= candySX + candy.width(); // endX
@@ -172,6 +254,8 @@ html, body, .wrapper {
 			
 			
 		})
+		
+
 	})
 	
 </script>

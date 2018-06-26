@@ -26,4 +26,9 @@ public class HomeController {
 		return "home";
 	}
 	
+	@RequestMapping(value = "/init", method = RequestMethod.GET)
+	public String init(Locale locale, Model model) {
+		return "init";
+	}
+	
 }
