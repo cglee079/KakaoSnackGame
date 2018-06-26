@@ -40,11 +40,7 @@ html, body, .wrapper {
 }
 
 .score {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
+	font-size : 2rem;
 	font-weight: bold;
 	text-align: center;
 }
@@ -71,21 +67,21 @@ html, body, .wrapper {
 </style>
 
 <script>
-	//CONST
-	var CANDY_MAKE_RATE = 1000; // 사탕이 생성되는 간격 , 1000 = 1초
-	var FALLING_SPEED 	= 100; 	// 사탕이 떨어지는 속도
-	var PER_SCORE		= 10; 	// 캔디 하나당 점수
-	var CANDY_WIDTH		= 50;	// 캔디 넓이
-	var CANDY_HEIGHT	= 50;	// 캔디 높이
+	//FINAL
+	const PER_SCORE		= 10; 	// 캔디 하나당 점수
+	const CANDY_WIDTH	= 50;	// 캔디 넓이
+	const CANDY_HEIGHT	= 50;	// 캔디 높이
 	
 	var startX;
 	var startY;
 	var endX;
 	var endY;
 	
-	var totalScore = 0; //점수
-	var candies	= [];	
-	var candyIndex 	= 0; //사탕 인덱스값
+	var candyMakeRate 	= 1000; // 사탕이 생성되는 간격 , 1000 = 1초
+	var fallingSpeed 	= 100; 	// 사탕이 떨어지는 속도
+	var totalScore		= 0; 	// 점수
+	var candies			= [];	// 사탕 배열
+	var candyIndex 		= 0; 	// 사탕 인덱스값
 	
 	//캔디 삭제 - 터치했을때, 다 떨어졌을때.
 	function removeCandy(tg){
@@ -115,7 +111,7 @@ html, body, .wrapper {
 		//사탕이 떨어지는 쓰레드
 		var candyFalling = setInterval(function(){
 			doFallCandy(candy);
-		}, FALLING_SPEED);
+		}, fallingSpeed);
 		candy.append($("<input>", {"class" : "intervalID", type : "hidden", value : candyFalling})); //쓰레드ID
 		
 		function doFallCandy(tg){
@@ -153,7 +149,7 @@ html, body, .wrapper {
 		//사탕 생성 쓰레드
 		setInterval(function (){
 			makeCandy();
-		}, CANDY_MAKE_RATE);
+		}, candyMakeRate);
 		
 		//터치이벤트 
 		$(".play-ground").on("click", function(event){
@@ -191,8 +187,7 @@ html, body, .wrapper {
 			</div>
 			<div></div>
 		</div>
-		<div class="play-ground">
-		</div>
+		<div class="play-ground"></div>
 		<div class="footer"></div>
 	</div>
 </body>
