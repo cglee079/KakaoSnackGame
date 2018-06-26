@@ -60,22 +60,9 @@ html, body, .wrapper {
 	height: 100px;
 }
 
-.touch-place {
-	position: absolute;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	height: 100px;
-	z-index: 2;
-	background: #000;
-	opacity: 0.7;
-}
-
 .candy {
 	position: absolute;
 	display: inline-block;
-	width: 50px;
-	height: 50px;
 	z-index: 1;
 	border-radius: 20px;
 	background-repeat: no-repeat;
@@ -85,24 +72,32 @@ html, body, .wrapper {
 </style>
 
 <script>
-	var candyMakeRate = 1000; // 사탕이 생성되는 간격 , 1000 = 1초
-	var candyFallings = []; // 쓰레드 보관
-	var candies	= [];		
-	var fallingSpeed = 100; // 사탕이 떨어지는 속도
-	var candyIndex = 0; //사탕 인덱스값
+	//CONST
+	var CANDY_MAKE_RATE = 1000; // 사탕이 생성되는 간격 , 1000 = 1초
+	var FALLING_SPEED 	= 100; 	// 사탕이 떨어지는 속도
+	var PER_SCORE		= 10; 	// 캔디 하나당 점수
+	var CANDY_WIDTH		= 50;	// 캔디 넓이
+	var CANDY_HEIGHT	= 50;	// 캔디 높이
 	
 	var startX;
 	var startY;
 	var endX;
 	var endY;
 	
-	var totalScore = 0; //점수 
+	var totalScore = 0; //점수
+	var candies	= [];	
+	var candyIndex 	= 0; //사탕 인덱스값
 	
 	//캔디 삭제 - 터치했을때, 다 떨어졌을때.
 	function removeCandy(tg){
 		tg.remove();
-		var index = tg.find(".index").val();
-		clearInterval(candyFallings[index]); //쓰레드종료
+		var intervalId = tg.find(".intervalID").val();
+		var index = candies.indexOf(tg);
+		if (index > -1) {
+			candies.splice(index, 1);
+		}
+		
+		clearInterval(intervalId); //쓰레드종료
 	}
 	
 	//사탕을 만들어 떨어트림
@@ -111,18 +106,18 @@ html, body, .wrapper {
 		var candy = $("<div>", { "class" : "candy"});
 		candies.push(candy);
 		candy.appendTo(playGround);
-		candy.append($("<input>", {"class" : "index", type : "hidden", value : candyIndex++})); //인덱스부여
+		candy.css("width", CANDY_WIDTH);
+		candy.css("height", CANDY_HEIGHT);
 		
 		//candy의 X(좌,우)좌표를 랜덤하게 지정한다. 
-		var candyX 	= Math.random() * (endX - startX) + startX;
+		var candyX 	= Math.random() * ((endX - CANDY_WIDTH) - startX) + startX;
 		candy.offset({ "left": candyX });
 		
 		//사탕이 떨어지는 쓰레드
 		var candyFalling = setInterval(function(){
 			doFallCandy(candy);
-		}, fallingSpeed);
-		
-		candyFallings.push(candyFalling);
+		}, FALLING_SPEED);
+		candy.append($("<input>", {"class" : "intervalID", type : "hidden", value : candyFalling})); //쓰레드ID
 		
 		function doFallCandy(tg){
 			var tg = candy;
@@ -131,30 +126,16 @@ html, body, .wrapper {
 			tg.offset({ "top": toTop });
 			
 			// 사탕이 다떨어지는 순간
-			if(toTop >= endY){ 
+			if(toTop - CANDY_HEIGHT >= endY){  
 				removeCandy(tg);
 			}
 		}
 	}
 	
-	//점수판 만들고 초기화함
-	function initScore(){
-		var scoreBoard = $(".score-board");
-		var score = $("<div>", { "class" : "score"});
-		score.appendTo(scoreBoard);
-		score.text(totalScore);
-	}
-	
 	//점수 증가
-	function addScore(){
+	function gainScore(){
 		 var score = $(".score");
-	
-		 //속도, 아이템 등 반영한 점수 증가 폭 설정 
-		 var scoreInterval = function(){
-			 return 10;
-		 };
-		 
-		 totalScore =totalScore + scoreInterval();
+		 totalScore = totalScore + PER_SCORE;
 		 score.text(totalScore);
 	}
 	
@@ -170,25 +151,13 @@ html, body, .wrapper {
 			endY	= startY + playGround.height();
 		}
 		
-		//점수 초기화
-		initScore();
-		
-		//배경음악 설정
-	    setBGM();
-		function setBGM(){
-	        var backMusicSourceBoard = $(".back-music-source-board");
-			var backMusicSource = $("<embed>", { "class" : "back-music-source", src : "${pageContext.request.contextPath}/resources/bgm/sample_back_music.mp3", 
-				hidden : "true",height: "0", width : "0", loop : "true", Autostart : "true" });
-			backMusicSource.appendTo(backMusicSourceBoard); 
-		} 
-	
 		//사탕 생성 쓰레드
 		setInterval(function (){
 			makeCandy();
-		}, candyMakeRate);
+		}, CANDY_MAKE_RATE);
 		
 		//터치이벤트 
-		$(".touch-place").on("click", function(event){
+		$(".play-ground").on("click", function(event){
 			var x = event.pageX;
 			var y = event.pageY;
 			
@@ -201,8 +170,7 @@ html, body, .wrapper {
 				
 				if( x > candySX && x < candyEX 	&& y > candySY 	&& y < candyEY){
 					removeCandy(candy);
-					addScore();
-					console.log("점수 UP!!");
+					gainScore();
 					break;
 				}				
 			}
@@ -213,15 +181,17 @@ html, body, .wrapper {
 	
 </script>
 <body>
-
-
 	<div class="wrapper">
 		<div class="head">
-			<div class="back-music-source-board"></div>
-			<div class="score-board"></div>
+			<div class="back-music-source-board">
+				<embed class="back-music-source" src="${pageContext.request.contextPath}/resources/bgm/sample_back_music.mp3"
+					autostart="true" hidden="true" loop="true" >
+			</div>
+			<div class="score-board">
+				<div class="score">0</div>
+			</div>
 		</div>
 		<div class="play-ground">
-			<div class="touch-place"></div>
 		</div>
 		<div class="footer"></div>
 	</div>
