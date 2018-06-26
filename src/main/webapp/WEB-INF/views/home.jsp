@@ -184,7 +184,7 @@ html, body, .wrapper {
 	<div class="wrapper">
 		<div class="head">
 			<div class="back-music-source-board">
-				<embed class="back-music-source" src="${pageContext.request.contextPath}/resources/bgm/sample_back_music.mp3"
+				<embed class="back-music-source" src="${pageContext.request.contextPath}/resources/audio/sample_bgm.mp3"
 					autostart="true" hidden="true" loop="true" >
 			</div>
 			<div class="score-board">
