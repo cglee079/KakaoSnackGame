@@ -19,15 +19,14 @@ html, body, .wrapper {
 .head {
 	width: 100%;
 	height: 50px;
+	display: flex;
+	justify-content: space-between;
+	
 }
 
-.back-music-source-board {
+.bgm-source-board {
 	width: 50px;
 	height: 100%;
-	position: absolute;
-	left: 0;
-	top: 0;
-	display: inline-block;
 	background-repeat: no-repeat;
 	background-size: contain;
 	background-image: url("resources/image/sample_music_button.png");
@@ -183,13 +182,14 @@ html, body, .wrapper {
 <body>
 	<div class="wrapper">
 		<div class="head">
-			<div class="back-music-source-board">
+			<div class="bgm-source-board">
 				<embed class="back-music-source" src="${pageContext.request.contextPath}/resources/audio/sample_bgm.mp3"
 					autostart="true" hidden="true" loop="true" >
 			</div>
 			<div class="score-board">
 				<div class="score">0</div>
 			</div>
+			<div></div>
 		</div>
 		<div class="play-ground">
 		</div>
