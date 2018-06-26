@@ -1,58 +1,87 @@
-<%@ page pageEncoding="UTF-8" %>
+<%@ page pageEncoding="UTF-8"%>
 <html>
 <head>
-<%@ include file="/WEB-INF/views/included/included_head.jsp" %>
+<%@ include file="/WEB-INF/views/included/included_head.jsp"%>
 <style>
-	html, body, .wrapper{
-		overflow-x : hidden;
-	}
-	
-	.wrapper{
-		display: flex;
-		flex-flow : column nowrap;
-		height: 100%;
-		background-repeat: no-repeat;
-		background-size: cover;
-		background-image: url("resources/image/sample_back.png");
-	}
-	
-	.head{
-		width : 100%;
-		height : 50px;
-	}
-	
-	.play-ground{
-		flex : 1;
-		position: relative;
-	}
-	
-	.footer{
-		width : 100%;
-		height : 100px;
-	}
-	
-	.touch-place{
-		position: absolute;
-		left : 0;
-		right : 0;
-		bottom : 0;
-		height : 100px;
-		z-index: 2;
-		background : #000;
-		opacity: 0.7;
-	}
-	
-	.candy{
-		position: absolute;
-		display : inline-block;
-		width : 50px;
-		height: 50px;
-		z-index : 1;
-		border-radius : 20px;
-		background-repeat: no-repeat;
-		background-size: contain;
-		background-image: url("resources/image/sample_candy.png");
-	}
+html, body, .wrapper {
+	overflow-x: hidden;
+}
+
+.wrapper {
+	display: flex;
+	flex-flow: column nowrap;
+	height: 100%;
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-image: url("resources/image/sample_back.png");
+}
+
+.head {
+	width: 100%;
+	height: 50px;
+}
+
+.back-music-source-board {
+	width: 50px;
+	height: 100%;
+	position: absolute;
+	left: 0;
+	top: 0;
+	display: inline-block;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("resources/image/sample_music_button.png");
+}
+
+.score-board {
+	width: 100px;
+	height: 50px;
+	margin: auto;
+	display: inline-block;
+}
+
+.score {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	font-weight: bold;
+	text-align: center;
+}
+
+.play-ground {
+	flex: 1;
+	position: relative;
+}
+
+.footer {
+	width: 100%;
+	height: 100px;
+}
+
+.touch-place {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 100px;
+	z-index: 2;
+	background: #000;
+	opacity: 0.7;
+}
+
+.candy {
+	position: absolute;
+	display: inline-block;
+	width: 50px;
+	height: 50px;
+	z-index: 1;
+	border-radius: 20px;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("resources/image/sample_candy.png");
+}
 </style>
 
 <script>
@@ -67,6 +96,7 @@
 	var endX;
 	var endY;
 	
+	var totalScore = 0; //점수 
 	
 	//캔디 삭제 - 터치했을때, 다 떨어졌을때.
 	function removeCandy(tg){
@@ -107,6 +137,27 @@
 		}
 	}
 	
+	//점수판 만들고 초기화함
+	function initScore(){
+		var scoreBoard = $(".score-board");
+		var score = $("<div>", { "class" : "score"});
+		score.appendTo(scoreBoard);
+		score.text(totalScore);
+	}
+	
+	//점수 증가
+	function addScore(){
+		 var score = $(".score");
+	
+		 //속도, 아이템 등 반영한 점수 증가 폭 설정 
+		 var scoreInterval = function(){
+			 return 10;
+		 };
+		 
+		 totalScore =totalScore + scoreInterval();
+		 score.text(totalScore);
+	}
+	
 	$(document).ready(function(){
 
 		//초기화 (좌표)
@@ -119,6 +170,18 @@
 			endY	= startY + playGround.height();
 		}
 		
+		//점수 초기화
+		initScore();
+		
+		//배경음악 설정
+	    setBGM();
+		function setBGM(){
+	        var backMusicSourceBoard = $(".back-music-source-board");
+			var backMusicSource = $("<embed>", { "class" : "back-music-source", src : "${pageContext.request.contextPath}/resources/bgm/sample_back_music.mp3", 
+				hidden : "true",height: "0", width : "0", loop : "true", Autostart : "true" });
+			backMusicSource.appendTo(backMusicSourceBoard); 
+		} 
+	
 		//사탕 생성 쓰레드
 		setInterval(function (){
 			makeCandy();
@@ -138,10 +201,13 @@
 				
 				if( x > candySX && x < candyEX 	&& y > candySY 	&& y < candyEY){
 					removeCandy(candy);
+					addScore();
 					console.log("점수 UP!!");
 					break;
 				}				
 			}
+			
+			
 		})
 	})
 	
@@ -149,12 +215,15 @@
 <body>
 
 
-<div class="wrapper">
-	<div class="head"></div>
-	<div class="play-ground">
-		<div class="touch-place"></div>
+	<div class="wrapper">
+		<div class="head">
+			<div class="back-music-source-board"></div>
+			<div class="score-board"></div>
+		</div>
+		<div class="play-ground">
+			<div class="touch-place"></div>
+		</div>
+		<div class="footer"></div>
 	</div>
-	<div class="footer"></div>
-</div>
 </body>
 </html>
