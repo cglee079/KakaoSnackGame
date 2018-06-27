@@ -41,7 +41,6 @@ html, body, .wrapper {
 	background-size: contain;
 	z-index : 1;
 	background-image: url("resources/image/sample_start_button.png");
-
 }
 
 
@@ -55,11 +54,8 @@ html, body, .wrapper {
 <script>
 
 	$(document).ready(function(){
-		$(".start-button").addClass("start_button");
-		
 		$(".start-button").click(function() {
 			$("#start").submit();
-			
 		});
 
 	})
@@ -72,11 +68,10 @@ html, body, .wrapper {
 				<embed class="back-music-source" src="${pageContext.request.contextPath}/resources/audio/sample_bgm.mp3"
 					autostart="true" hidden="true" loop="true" >
 			</div>
-			<form id="start" action="${pageContext.request.contextPath}/" method="get">
-			<div class="start-button">
-			</div>
+			
+			<form id="start" action="${pageContext.request.contextPath}/play" method="post">
+				<div class="start-button"></div>
 			</form>
-			<div></div>
 		</div>
 
 		<div class="footer"></div>

@@ -21,14 +21,14 @@ public class HomeController {
 	/**
 	 * Simply selects the home view to render by returning its name.
 	 */
-	@RequestMapping(value = "/", method = RequestMethod.GET)
+	@RequestMapping(value = "/")
 	public String home(Locale locale, Model model) {
-		return "home";
+		return "intro";
 	}
 	
-	@RequestMapping(value = "/init", method = RequestMethod.GET)
+	@RequestMapping(value = "/play")
 	public String init(Locale locale, Model model) {
-		return "init";
+		return "play";
 	}
 	
 }
