@@ -32,23 +32,25 @@ html, body, .wrapper {
 	background-image: url("resources/image/sample_music_button.png");
 }
 
+.contents{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
 .start-button {
-	position:relative;
-	width: 300px;
+	width: 50px;
 	height:100%;
-	top:80%;
 	background-repeat: no-repeat;
 	background-size: contain;
 	z-index : 1;
 	background-image: url("resources/image/sample_start_button.png");
 }
 
-
 .footer {
 	width: 100%;
 	height: 100px;
 }
-
 </style>
 
 <script>
@@ -68,7 +70,9 @@ html, body, .wrapper {
 				<embed class="back-music-source" src="${pageContext.request.contextPath}/resources/audio/sample_bgm.mp3"
 					autostart="true" hidden="true" loop="true" >
 			</div>
-			
+		</div>
+		
+		<div class="contents">
 			<form id="start" action="${pageContext.request.contextPath}/play" method="post">
 				<div class="start-button"></div>
 			</form>
