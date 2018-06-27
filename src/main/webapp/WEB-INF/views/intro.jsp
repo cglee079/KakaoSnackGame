@@ -18,7 +18,6 @@ html, body, .wrapper {
 
 .head {
 	width: 100%;
-	height: 100%;
 	display: flex;
 	justify-content: space-between;
 	
@@ -26,13 +25,14 @@ html, body, .wrapper {
 
 .bgm-source-board {
 	width: 50px;
-	height: 100%;
+	height: 50px;
 	background-repeat: no-repeat;
 	background-size: contain;
 	background-image: url("resources/image/sample_music_button.png");
 }
 
 .contents{
+	flex : 1;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -40,17 +40,19 @@ html, body, .wrapper {
 
 .start-button {
 	width: 50px;
-	height:100%;
+	height: 50px;
 	background-repeat: no-repeat;
 	background-size: contain;
 	z-index : 1;
 	background-image: url("resources/image/sample_start_button.png");
 }
 
+
 .footer {
 	width: 100%;
 	height: 100px;
 }
+
 </style>
 
 <script>
