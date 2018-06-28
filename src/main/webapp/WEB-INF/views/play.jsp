@@ -93,6 +93,7 @@ html, body, .wrapper {
 	const PER_SCORE				= 10; 	// 캔디 하나당 점수
 	const CANDY_WIDTH			= 50;	// 캔디 넓이
 	const CANDY_HEIGHT			= 50;	// 캔디 높이
+	const TOUCH_PADDING			= 10;
 	const ITEM_CREATE_PERCENT	= 0.1;  // 아이템 생성 확률
 	
 	const ID_ITEM_001 = "ITM_001"; // 모두 지우기
@@ -104,12 +105,15 @@ html, body, .wrapper {
 	var endX;
 	var endY;
 	
-	var candyMakeRate 	= 1000; // 사탕이 생성되는 간격 , 1000 = 1초
-	var fallingSpeed 	= 100; 	// 사탕이 떨어지는 속도
-	var totalScore		= 0; 	// 점수
-	var candies			= [];	// 사탕 배열
-	var candyIndex 		= 0; 	// 사탕 인덱스값
+	var candyMakeRate 		= 1000; 	// 사탕이 생성되는 간격 , 1000 = 1초
+	var candyMakeRateSaved	= undefined;// 잠깐 멈추는 아이템을 위해 현재속도를 잠시 저장.
+	var fallingSpeed 		= 100; 		// 사탕이 떨어지는 속도
+	var totalScore			= 0; 		// 점수
+	var candies				= [];		// 사탕 배열
+	var candyIndex 			= 0; 		// 사탕 인덱스값
 	var makeCandyThread;
+	var fallingSpeedUpThread;
+	var fallingDistance = 10;
 	
 	//클릭시 소리
 	var removeSound = new Audio();
@@ -139,8 +143,16 @@ html, body, .wrapper {
 				removeAllCandy(true);
 			}
 			
-			function doItem002(){ // 잠깐! 멈추기
+			function doItem002(){ // 떨어지는속도, 캔디 생성 잠깐 멈추기
+				fallingDistance 	= 0;
+				candyMakeRateSaved 	= candyMakeRate; //생성속도 잠시 저장
+				candyMakeRate 		= 99999999999; //무한
 				
+				setTimeout(function(){
+					fallingDistance 	= 10;
+					candyMakeRate		= candyMakeRateSaved; //생성속도 복구!
+					candyMakeRateSaved 	= undefined;
+				}, 2000);
 			}
 			
 			function doItem003(){ // ??
@@ -205,7 +217,7 @@ html, body, .wrapper {
 			candy.addClass("item");
 		
 			//어떤 아이템을 부여할지 랜덤으로~ 일단 코딩안함
-			candy.append($("<input>", {"class" : "item-id", type : "hidden", value : ID_ITEM_001}));
+			candy.append($("<input>", {"class" : "item-id", type : "hidden", value : ID_ITEM_002}));
 		}
 		
 		//candy의 X(좌,우)좌표를 랜덤하게 지정한다. 
@@ -221,7 +233,7 @@ html, body, .wrapper {
 		function doFallCandy(tg){
 			var tg = candy;
 			var top = tg.offset().top;
-			var toTop = top + 10;
+			var toTop = top + fallingDistance;
 			tg.offset({ "top": toTop });
 			
 			// 사탕이 다떨어지는 순간
@@ -236,7 +248,7 @@ html, body, .wrapper {
 		$(".play-ground").addClass("gameover");
 		
 		removeAllCandy(false)// 모든 캔디 삭제
-		clearInterval(makeCandyThread); // 사탕 생성 중지
+		clearTimeout(makeCandyThread); // 사탕 생성 중지
 	}
 	
 	//점수 증가
@@ -247,7 +259,6 @@ html, body, .wrapper {
 	}
 	
 	$(document).ready(function(){
-
 		//초기화 (좌표)
 		initXY();
 		function initXY(){
@@ -259,9 +270,17 @@ html, body, .wrapper {
 		}
 		
 		//사탕 생성 쓰레드
-		makeCandyThread = setInterval(function (){
+		loop();
+		function loop() {
 			makeCandy();
-		}, candyMakeRate);
+			makeCandyThread = setTimeout(loop, candyMakeRate);
+		}
+
+		//떨어지는 스피드 UP 쓰레드, 사탕이 빨리 떨어질수록, 캐디 만드는 속도는 빨라지도록
+		fallingSpeedUpThread = setInterval(function(){
+			fallingSpeed *= 0.9; 
+			candyMakeRate *= 0.9;
+		}, 1000);
 		
 		//터치이벤트 
 		$(".play-ground").on("click", function(event){
@@ -276,7 +295,10 @@ html, body, .wrapper {
 				var candyEX	= candySX + candy.width(); // endX
 				var candyEY	= candySY + candy.height(); // endY
 				
-				if( x > candySX && x < candyEX 	&& y > candySY 	&& y < candyEY){ //사탕 맟출?먹을? 경우
+				if( x - TOUCH_PADDING > candySX 
+						&& x + TOUCH_PADDING < candyEX
+						&& y - TOUCH_PADDING > candySY 	
+						&& y + TOUCH_PADDING < candyEY){ //사탕 맟출?먹을? 경우
 					doTouchCandy(candy);
 					break;
 				}				
