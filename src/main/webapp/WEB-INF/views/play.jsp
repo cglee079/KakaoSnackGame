@@ -311,8 +311,8 @@ html, body, .wrapper {
 
 		//난이도UP 쓰레드 - 사탕이 빨리 떨어질수록, 캐디 만드는 속도는 빨라지도록
 		fallingSpeedUpThread = setInterval(function(){
-			fallingSpeed *= 0.9; 
-			candyMakeRate *= 0.9;
+			fallingSpeed *= 0.95; 
+			candyMakeRate *= 0.95;
 		}, 1000);
 		
 		//터치이벤트 
