@@ -52,20 +52,29 @@ html, body, .wrapper {
 
 .gameover{
 	width : 300px;
-	height : 300px;
+	height : 400px;
 	background: #FFF;
 	border-radius: 10px;
 	box-shadow: 0px 10px 20px #222;
 	display: flex;
+	flex-flow : column nowrap;
 	justify-content: center;
 	align-items: center;
+}
+
+.gameover .icon{
+	width : 150px;
+	height : 150px;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-position: center;
+	margin-bottom: 10px;
 }
 
 .gameover .message{
 	font-size: 2rem;
 	font-weight: bold;
 }
-
 
 .head {
 	width: 100%;
@@ -345,6 +354,7 @@ html, body, .wrapper {
 		<div class="wrap-fg"></div>
 		<div class="wrap-gameover">
 			<div class="gameover">
+				<div class="icon" style="background-image: url('${pageContext.request.contextPath}/resources/image/icon_play_gameover.gif');"></div>
 				<div class="message">GAME OVER</div>
 			</div>
 		</div>
