@@ -156,8 +156,6 @@ html, body, .wrapper {
 	var candyMakeRateSaved	= undefined;// 잠깐 멈추는 아이템을 위해 현재속도를 잠시 저장.
 	var fallingSpeed 		= 100; 		// 사탕이 떨어지는 속도
 	var totalScore			= 0; 		// 점수
-	var candies				= [];		// 사탕 배열
-	var candyIndex 			= 0; 		// 사탕 인덱스값
 	var makeCandyThread;
 	var fallingSpeedUpThread;
 	var fallingDistance = 10;
@@ -170,6 +168,8 @@ html, body, .wrapper {
 	removeSound.autoPlay = false;
 
 	function doTouchCandy(candy){
+		var candy = $(candy);
+		
 		if(candy.hasClass("item")){ //캔디가 아이템을 가진 경우
 	
 			var itemID = candy.find(".item-id").val();
@@ -205,28 +205,24 @@ html, body, .wrapper {
 	}
 	
 	//캔디 삭제 - 터치했을때, 다 떨어졌을때.
-	function removeCandy(tg){
+	function removeCandy(candy){
 		//소리 효과
 		removeSound.play();
 		removeSound.currentTime = 0;
 
-		tg.addClass('removed'); //이미지 변경
+		candy.addClass('removed'); //이미지 변경
 		setTimeout(function(){
-			tg.remove();
+			candy.remove();
 		}, 300); 
 		
-		var index = candies.indexOf(tg);
-		if (index > -1) {
-			candies.splice(index, 1);
-		}
-		
-		var intervalId = tg.find(".intervalID").val();
+		var intervalId = candy.find(".intervalID").val();
 		clearInterval(intervalId); //쓰레드종료
 	}
 	
 	//모든 캔디 삭제 
 	function removeAllCandy(doEffect) {
-		$(candies).each(function(){
+		var candies = $(".candy");
+		candies.each(function(){
 			var tg = $(this);
 			if(doEffect){
 				tg.addClass('removed'); //이미지 변경
@@ -241,14 +237,16 @@ html, body, .wrapper {
 			clearInterval(intervalId); //쓰레드종료
 		});
 		
-		candies.splice(0, candies);
 	}
 
 	//사탕을 만들어 떨어트림
 	function makeCandy(){
 		var playGround = $(".play-ground");
 		var candy = $("<div>", { "class" : "candy"});
-		candies.push(candy);
+		//candies.push(candy);
+		candy.on("click", function(){
+			doTouchCandy(this);
+		});
 		candy.appendTo(playGround);
 		candy.css("width", CANDY_WIDTH);
 		candy.css("height", CANDY_HEIGHT);
@@ -320,32 +318,10 @@ html, body, .wrapper {
 
 		//난이도UP 쓰레드 - 사탕이 빨리 떨어질수록, 캐디 만드는 속도는 빨라지도록
 		fallingSpeedUpThread = setInterval(function(){
-			fallingSpeed *= 0.95; 
-			candyMakeRate *= 0.95;
+			fallingSpeed 	*= 0.95; 
+			candyMakeRate 	*= 0.95;
 		}, 1000);
 		
-		//터치이벤트 
-		$(".play-ground").on("click", function(event){
-			var x = event.pageX;
-			var y = event.pageY;
-			
-			for(var i = 0; i < candies.length; i++){
-				var candy = candies[i];
-				
-				var candySX = candy.offset().left; 	//startX
-				var candySY = candy.offset().top;	//startY
-				var candyEX	= candySX + candy.width(); // endX
-				var candyEY	= candySY + candy.height(); // endY
-				
-				if( x - TOUCH_PADDING > candySX 
-						&& x + TOUCH_PADDING < candyEX
-						&& y - TOUCH_PADDING > candySY 	
-						&& y + TOUCH_PADDING < candyEY){ //사탕 맟출?먹을? 경우
-					doTouchCandy(candy);
-					break;
-				}				
-			}
-		})
 	})
 	
 </script>
