@@ -8,6 +8,7 @@ html, body, .wrapper {
 }
 
 .wrapper {
+	position : relative;
 	display: flex;
 	flex-flow: column nowrap;
 	height: 100%;
@@ -16,6 +17,55 @@ html, body, .wrapper {
 	background-size: cover;
 	background-image: url("resources/image/sample_back.png");
 }
+
+.wrapper .wrap-fg{
+	display : none;
+	z-index: 1;
+	position : absolute;
+	left : 0;
+	right : 0;
+	top :0;
+	bottom : 0;
+	background: rgba(0,0,0,0.6);
+}
+
+.wrapper .wrap-fg.on{
+	display : block;
+}
+
+.wrapper .wrap-gameover{
+	display : none;
+	z-index: 3;
+	position : absolute;
+	left : 0;
+	right : 0;
+	top :0;
+	bottom : 0;
+	background: rgba(0,0,0,0);
+	justify-content: center;
+	align-items: center;
+}
+
+.wrapper .wrap-gameover.on{
+	display: flex;
+}
+
+.gameover{
+	width : 300px;
+	height : 300px;
+	background: #FFF;
+	border-radius: 10px;
+	box-shadow: 0px 10px 20px #222;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.gameover .message{
+	font-size: 2rem;
+	font-weight: bold;
+}
+
 
 .head {
 	width: 100%;
@@ -74,18 +124,6 @@ html, body, .wrapper {
 	background-image: url("resources/image/effect.gif");
 }
 
-.gameOver {
-	margin : auto;
-	top:20%;
-	width:500px;
-	height:100%;
-	display: inline-block;
-	z-index: 2;
-	background-repeat: no-repeat;
-	background-size: contain;
-	background-image: url("resources/image/sample_gameover.jpg");
-}
-
 </style>
 
 <script>
@@ -94,11 +132,11 @@ html, body, .wrapper {
 	const CANDY_WIDTH			= 50;	// 캔디 넓이
 	const CANDY_HEIGHT			= 50;	// 캔디 높이
 	const TOUCH_PADDING			= 10;
-	const ITEM_CREATE_PERCENT	= 0.1;  // 아이템 생성 확률
-	
-	const ID_ITEM_001 = "ITM_001"; // 모두 지우기
-	const ID_ITEM_002 = "ITM_002"; // 잠깐 멈추기
-	const ID_ITEM_003 = "ITM_003"; // 뭘로하지
+	const ITEM_CREATE_PERCENT	= 0.2;  // 아이템 생성 확률
+
+	//001 모두지우기
+	//002 잠깐 멈추기
+	const ITEMS = ["001", "002"]; 
 	
 	var startX;
 	var startY;
@@ -122,21 +160,13 @@ html, body, .wrapper {
 	removeSound.controls = true;
 	removeSound.autoPlay = false;
 
-	
-/* 	//난이도 조절
-	setInterval(function() {
-		candyMakeRate = candyMakeRate * 0.5;
-		fallingSpeed = fallingSpeed * 0.5;
-	}, 2000); */
-	
 	function doTouchCandy(candy){
 		if(candy.hasClass("item")){ //캔디가 아이템을 가진 경우
 	
 			var itemID = candy.find(".item-id").val();
 			switch(itemID){
-			case ID_ITEM_001: doItem001(); break;
-			case ID_ITEM_002: doItem002(); break;
-			case ID_ITEM_003: doItem003(); break;
+			case ITEMS[0]: doItem001(); break;
+			case ITEMS[1]: doItem002(); break;
 			}
 			
 			function doItem001(){ // 모두 삭제
@@ -158,6 +188,7 @@ html, body, .wrapper {
 			function doItem003(){ // ??
 					
 			}
+			
 		} else{
 			removeCandy(candy);
 			gainScore();			
@@ -217,7 +248,8 @@ html, body, .wrapper {
 			candy.addClass("item");
 		
 			//어떤 아이템을 부여할지 랜덤으로~ 일단 코딩안함
-			candy.append($("<input>", {"class" : "item-id", type : "hidden", value : ID_ITEM_002}));
+			var item = Math.floor(Math.random() * ITEMS.length);
+			candy.append($("<input>", {"class" : "item-id", type : "hidden", value : ITEMS[item]}));
 		}
 		
 		//candy의 X(좌,우)좌표를 랜덤하게 지정한다. 
@@ -245,10 +277,11 @@ html, body, .wrapper {
 	
 	//게임 오버
 	function gameover() {
-		$(".play-ground").addClass("gameover");
-		
 		removeAllCandy(false)// 모든 캔디 삭제
 		clearTimeout(makeCandyThread); // 사탕 생성 중지
+		
+		$(".wrap-fg").addClass("on");
+		$(".wrap-gameover").addClass("on");
 	}
 	
 	//점수 증가
@@ -276,7 +309,7 @@ html, body, .wrapper {
 			makeCandyThread = setTimeout(loop, candyMakeRate);
 		}
 
-		//떨어지는 스피드 UP 쓰레드, 사탕이 빨리 떨어질수록, 캐디 만드는 속도는 빨라지도록
+		//난이도UP 쓰레드 - 사탕이 빨리 떨어질수록, 캐디 만드는 속도는 빨라지도록
 		fallingSpeedUpThread = setInterval(function(){
 			fallingSpeed *= 0.9; 
 			candyMakeRate *= 0.9;
@@ -309,6 +342,13 @@ html, body, .wrapper {
 </script>
 <body>
 	<div class="wrapper">
+		<div class="wrap-fg"></div>
+		<div class="wrap-gameover">
+			<div class="gameover">
+				<div class="message">GAME OVER</div>
+			</div>
+		</div>
+		
 		<div class="head">
 			<div class="bgm-source-board">
 				<embed class="back-music-source" src="${pageContext.request.contextPath}/resources/audio/sample_bgm.mp3"
