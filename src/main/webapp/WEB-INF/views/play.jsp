@@ -169,7 +169,6 @@ html, body, .wrapper {
 
 	function doTouchCandy(candy){
 		var candy = $(candy);
-		
 		if(candy.hasClass("item")){ //캔디가 아이템을 가진 경우
 	
 			var itemID = candy.find(".item-id").val();
@@ -199,9 +198,10 @@ html, body, .wrapper {
 			}
 			
 		} else{
-			removeCandy(candy);
 			gainScore();			
 		}
+		
+		removeCandy(candy);
 	}
 	
 	//캔디 삭제 - 터치했을때, 다 떨어졌을때.
