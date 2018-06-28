@@ -277,7 +277,9 @@ html, body, .wrapper {
 			
 			// 사탕이 다떨어지는 순간
 			if(toTop - CANDY_HEIGHT >= endY){  
-				gameover();
+				if(!tg.hasClass("item")){
+					gameover();
+				}
 			}
 		}
 	}
