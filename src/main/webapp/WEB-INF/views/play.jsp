@@ -138,8 +138,8 @@ html, body, .wrapper {
 <script>
 	//FINAL
 	const PER_SCORE				= 10; 	// 타겟 하나당 점수
-	const TG_WIDTH			= 50;	// 타겟 넓이
-	const TG_HEIGHT			= 50;	// 타겟 높이
+	const TG_WIDTH				= 50;	// 타겟 넓이
+	const TG_HEIGHT				= 50;	// 타겟 높이
 	const TOUCH_PADDING			= 10;
 	const ITEM_CREATE_PERCENT	= 0.2;  // 아이템 생성 확률
 
@@ -153,12 +153,11 @@ html, body, .wrapper {
 	var endY;
 	
 	var targetMakeRate 		= 1000; 	// 타겟이 생성되는 간격 , 1000 = 1초
-	var targetMakeRateSaved	= undefined;// 잠깐 멈추는 아이템을 위해 현재속도를 잠시 저장.
 	var fallingSpeed 		= 100; 		// 타겟이 떨어지는 속도
 	var totalScore			= 0; 		// 점수
 	var makeTargetThread;
 	var fallingSpeedUpThread;
-	var fallingDistance = 10;
+	var fallingDistance 	= 10;
 	
 	//클릭시 소리
 	var removeSound = new Audio();
@@ -167,6 +166,7 @@ html, body, .wrapper {
 	removeSound.controls = true;
 	removeSound.autoPlay = false;
 
+	//타겟 삭제 - 터치했을때
 	function doTouchTarget(target){
 		var target = $(target);
 		if(target.hasClass("item")){ //타겟이 아이템을 가진 경우
@@ -177,42 +177,42 @@ html, body, .wrapper {
 			case ITEMS[1]: doItem002(); break;
 			}
 			
-			function doItem001(){ // 모두 삭제
+			function doItem001(){ // 모든 사탕 삭제, 아이템은 삭제X
 				removeAllCandy(true);
 			}
 			
 			function doItem002(){ // 떨어지는속도, 타겟 생성 잠깐 멈추기
-				fallingDistance 	= 0;
-				targetMakeRateSaved 	= targetMakeRate; //생성속도 잠시 저장
-				targetMakeRate 		= 99999999999; //무한
+				fallingDistance = 0; // 속도 멈춤
+				stopMakeTarget(); // 생성 중지
 				
 				setTimeout(function(){
-					fallingDistance 	= 10;
-					targetMakeRate		= targetMakeRateSaved; //생성속도 복구!
-					targetMakeRateSaved 	= undefined;
+					fallingDistance = 10;
+					startMakeTarget();
 				}, 2000);
 			}
 			
 			function doItem003(){ // ??
 					
 			}
+			
 		} else{
 			gainScore();			
 		}
 		
-		removeTarget(target);
+		removeTarget(target, true);
 	}
 	
-	//타겟 삭제 - 터치했을때, 다 떨어졌을때.
-	function removeTarget(target){
+	function removeTarget(target, doEffect){
 		//소리 효과
-		removeSound.play();
-		removeSound.currentTime = 0;
-
-		target.addClass('removed'); //이미지 변경
-		setTimeout(function(){
-			target.remove();
-		}, 300); 
+		if(doEffect){
+			removeSound.play();
+			removeSound.currentTime = 0;
+	
+			target.addClass('removed'); //이미지 변경
+			setTimeout(function(){
+				target.remove();
+			}, 300); 
+		}
 		
 		var intervalId = target.find(".intervalID").val();
 		clearInterval(intervalId); //쓰레드종료
@@ -223,19 +223,17 @@ html, body, .wrapper {
 		var candies = $(".candy");
 		candies.each(function(){
 			var target = $(this);
-			if(doEffect){
-				target.addClass('removed'); //이미지 변경
-				setTimeout(function(){
-					target.remove();
-				}, 300); 
-			} else{
-				target.remove();
-			}
-			
-			var intervalId = target.find(".intervalID").val();
-			clearInterval(intervalId); //쓰레드종료
+			removeTarget(target, doEffect);
 		});
-		
+	}
+	
+	//모든 타겟 삭제
+	function removeAllTarget(doEffect) {
+		var targets = $(".target");
+		targets.each(function(){
+			var target = $(this);
+			removeTarget(target, doEffect);
+		});
 	}
 
 	//타겟을 만들어 떨어트림
@@ -252,9 +250,7 @@ html, body, .wrapper {
 		
 		if(Math.random() < ITEM_CREATE_PERCENT){ //아이템 타겟 생성
 			target.addClass("item");
-		
-			//어떤 아이템을 부여할지 랜덤으로~ 일단 코딩안함
-			var item = Math.floor(Math.random() * ITEMS.length);
+			var item = Math.floor(Math.random() * ITEMS.length); //어떤 아이템을 부여할지 랜덤으로
 			target.append($("<input>", {"class" : "item-id", type : "hidden", value : ITEMS[item]}));
 		} else{
 			target.addClass("candy");
@@ -287,7 +283,7 @@ html, body, .wrapper {
 	
 	//게임 오버
 	function gameover() {
-		removeAllCandy(false)// 모든 타겟 삭제
+		removeAllTarget(false)// 모든 타겟 삭제
 		clearTimeout(makeTargetThread); // 타겟 생성 중지
 		
 		$(".wrap-fg").addClass("on");
@@ -299,6 +295,15 @@ html, body, .wrapper {
 		 var score = $(".score");
 		 totalScore = totalScore + PER_SCORE;
 		 score.text(totalScore);
+	}
+	
+	function startMakeTarget() {
+		makeTarget();
+		makeTargetThread = setTimeout(startMakeTarget, targetMakeRate);
+	}
+	
+	function stopMakeTarget() {
+		clearTimeout(makeTargetThread);
 	}
 	
 	$(document).ready(function(){
@@ -313,11 +318,7 @@ html, body, .wrapper {
 		}
 		
 		//타겟 생성 쓰레드
-		loop();
-		function loop() {
-			makeTarget();
-			makeTargetThread = setTimeout(loop, targetMakeRate);
-		}
+		startMakeTarget();
 
 		//난이도UP 쓰레드 - 타겟이 빨리 떨어질수록, 타겟 만드는 속도는 빨라지도록
 		fallingSpeedUpThread = setInterval(function(){
