@@ -62,7 +62,7 @@ html, body, .wrapper {
 	align-items: center;
 }
 
-.gameover .icon{
+.gameover .gameover-icon{
 	width : 150px;
 	height : 150px;
 	background-repeat: no-repeat;
@@ -71,7 +71,7 @@ html, body, .wrapper {
 	margin-bottom: 10px;
 }
 
-.gameover .message{
+.gameover .gameover-message{
 	font-size: 2rem;
 	font-weight: bold;
 }
@@ -117,31 +117,33 @@ html, body, .wrapper {
 
 .target {
 	position: absolute;
-	display: inline-block;
 	z-index: 1;
-	border-radius: 20px;
+	display: flex;
+	justify-content: center;
+	align-items: center;	
+	background: rgba(0,0,0,0);
+}
+
+.target .target-icon{
+	width : 80%;
+	height : 80%;
 	background-repeat: no-repeat;
 	background-size: contain;
 	background-image: url("resources/image/sample_candy.png");
 }
 
-.target.item {
-	background-image: url("resources/image/sample_candy_item.png");
-}
-
-.target.removed{
-	background-image: url("resources/image/effect.gif");
-}
+.target.item .target-icon{  background-image: url("resources/image/sample_candy_item.png"); }
+.target.removed .target-icon{ background-image: url("resources/image/effect.gif"); }
 
 </style>
 
 <script>
 	//FINAL
 	const PER_SCORE				= 10; 	// 타겟 하나당 점수
-	const TARGET_WIDTH			= 50;	// 타겟 넓이
-	const TARGET_HEIGHT			= 50;	// 타겟 높이
+	const TARGET_WIDTH			= 60;	// 타겟 넓이
+	const TARGET_HEIGHT			= 60;	// 타겟 높이
 	const TOUCH_PADDING			= 10;
-	const ITEM_CREATE_PERCENT	= 0.2;  // 아이템 생성 확률
+	const ITEM_CREATE_PERCENT	= 0.1;  // 아이템 생성 확률
 
 	//001 모두지우기
 	//002 잠깐 멈추기
@@ -245,6 +247,7 @@ html, body, .wrapper {
 		//candies.push(target);
 		target.on("click", function(){ doTouchTarget(this); });
 		target.appendTo(playGround);
+		target.append($("<div>", {"class" : "target-icon"}));
 		target.css("width", TARGET_WIDTH);
 		target.css("height", TARGET_HEIGHT);
 		
@@ -272,8 +275,7 @@ html, body, .wrapper {
 			var toTop = top + fallingDistance;
 			target.offset({ "top": toTop });
 			
-			// 타겟이 다떨어지는 순간
-			if(toTop - TARGET_HEIGHT >= endY){  
+			if(toTop - TARGET_HEIGHT >= endY){  // 타겟이 다떨어지는 순간
 				if(!target.hasClass("item")){
 					gameover();
 				}
@@ -284,7 +286,7 @@ html, body, .wrapper {
 	//게임 오버
 	function gameover() {
 		removeAllTarget(false)// 모든 타겟 삭제
-		clearTimeout(makeTargetThread); // 타겟 생성 중지
+		stopMakeTarget(); // 타겟 생성 중지
 		
 		$(".wrap-fg").addClass("on");
 		$(".wrap-gameover").addClass("on");
@@ -298,6 +300,7 @@ html, body, .wrapper {
 	}
 	
 	function startMakeTarget() {
+		makeTarget();
 		makeTargetThread = setTimeout(startMakeTarget, targetMakeRate);
 	}
 	
@@ -317,13 +320,12 @@ html, body, .wrapper {
 		}
 		
 		//타겟 생성 쓰레드
-		makeTarget();
 		startMakeTarget();
 
 		//난이도UP 쓰레드 - 타겟이 빨리 떨어질수록, 타겟 만드는 속도는 빨라지도록
 		fallingSpeedUpThread = setInterval(function(){
-			fallingSpeed 	*= 0.97; 
-			targetMakeRate 	*= 0.95;
+			fallingSpeed 	*= 0.9; 
+			targetMakeRate 	*= 0.9;
 		}, 1000);
 		
 	})
@@ -334,8 +336,8 @@ html, body, .wrapper {
 		<div class="wrap-fg"></div>
 		<div class="wrap-gameover">
 			<div class="gameover">
-				<div class="icon" style="background-image: url('${pageContext.request.contextPath}/resources/image/icon_play_gameover.gif');"></div>
-				<div class="message">GAME OVER</div>
+				<div class="gameover-icon" style="background-image: url('${pageContext.request.contextPath}/resources/image/icon_play_gameover.gif');"></div>
+				<div class="gameover-message">GAME OVER</div>
 			</div>
 		</div>
 		
