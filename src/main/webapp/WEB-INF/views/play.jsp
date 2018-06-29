@@ -138,8 +138,8 @@ html, body, .wrapper {
 <script>
 	//FINAL
 	const PER_SCORE				= 10; 	// 타겟 하나당 점수
-	const TG_WIDTH				= 50;	// 타겟 넓이
-	const TG_HEIGHT				= 50;	// 타겟 높이
+	const TARGET_WIDTH			= 50;	// 타겟 넓이
+	const TARGET_HEIGHT			= 50;	// 타겟 높이
 	const TOUCH_PADDING			= 10;
 	const ITEM_CREATE_PERCENT	= 0.2;  // 아이템 생성 확률
 
@@ -212,6 +212,8 @@ html, body, .wrapper {
 			setTimeout(function(){
 				target.remove();
 			}, 300); 
+		} else{
+			target.remove();
 		}
 		
 		var intervalId = target.find(".intervalID").val();
@@ -241,12 +243,10 @@ html, body, .wrapper {
 		var playGround = $(".play-ground");
 		var target = $("<div>", {"class" : "target"});
 		//candies.push(target);
-		target.on("click", function(){
-			doTouchTarget(this);
-		});
+		target.on("click", function(){ doTouchTarget(this); });
 		target.appendTo(playGround);
-		target.css("width", TG_WIDTH);
-		target.css("height", TG_HEIGHT);
+		target.css("width", TARGET_WIDTH);
+		target.css("height", TARGET_HEIGHT);
 		
 		if(Math.random() < ITEM_CREATE_PERCENT){ //아이템 타겟 생성
 			target.addClass("item");
@@ -257,7 +257,7 @@ html, body, .wrapper {
 		}
 		
 		//target의 X(좌,우)좌표를 랜덤하게 지정한다. 
-		var targetX = Math.random() * ((endX - TG_WIDTH) - startX) + startX;
+		var targetX = Math.random() * ((endX - TARGET_WIDTH) - startX) + startX;
 		target.offset({ "left": targetX });
 		
 		//타겟이 떨어지는 쓰레드
@@ -273,7 +273,7 @@ html, body, .wrapper {
 			target.offset({ "top": toTop });
 			
 			// 타겟이 다떨어지는 순간
-			if(toTop - TG_HEIGHT >= endY){  
+			if(toTop - TARGET_HEIGHT >= endY){  
 				if(!target.hasClass("item")){
 					gameover();
 				}
@@ -298,7 +298,6 @@ html, body, .wrapper {
 	}
 	
 	function startMakeTarget() {
-		makeTarget();
 		makeTargetThread = setTimeout(startMakeTarget, targetMakeRate);
 	}
 	
@@ -318,11 +317,12 @@ html, body, .wrapper {
 		}
 		
 		//타겟 생성 쓰레드
+		makeTarget();
 		startMakeTarget();
 
 		//난이도UP 쓰레드 - 타겟이 빨리 떨어질수록, 타겟 만드는 속도는 빨라지도록
 		fallingSpeedUpThread = setInterval(function(){
-			fallingSpeed 	*= 0.95; 
+			fallingSpeed 	*= 0.97; 
 			targetMakeRate 	*= 0.95;
 		}, 1000);
 		
