@@ -15,7 +15,7 @@ html, body, .wrapper {
 	max-width : 500px;
 	background-repeat: no-repeat;
 	background-size: cover;
-	background-image: url("resources/image/sample_back.png");
+	background-image: url("resources/image/bg_play.jpg");
 }
 
 .wrapper .wrap-fg{
@@ -113,6 +113,7 @@ html, body, .wrapper {
 .footer {
 	width: 100%;
 	height: 100px;
+	background: #000;
 }
 
 .target {
@@ -205,8 +206,7 @@ html, body, .wrapper {
 	}
 	
 	function removeTarget(target, doEffect){
-		//소리 효과
-		if(doEffect){
+		if(doEffect){ //소리, 제거 효과
 			removeSound.play();
 			removeSound.currentTime = 0;
 	
@@ -275,7 +275,7 @@ html, body, .wrapper {
 			var toTop = top + fallingDistance;
 			target.offset({ "top": toTop });
 			
-			if(toTop - TARGET_HEIGHT >= endY){  // 타겟이 다떨어지는 순간
+			if(toTop + TARGET_HEIGHT >= endY){  // 타겟이 다떨어지는 순간
 				if(!target.hasClass("item")){
 					gameover();
 				}
