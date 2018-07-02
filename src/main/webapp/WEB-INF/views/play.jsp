@@ -139,6 +139,16 @@ html, body, .wrapper {
 	background-size: contain;
 }
 
+.targeting-area {
+	position: absolute;
+	width: 100px;
+	height: 100px;
+	top: 50%;
+	left: 50%;
+	background: red;
+	backface-visibility: hidden;
+}
+
 .target.candy 	.target-icon{ background-image: url("resources/image/sample_candy.png");}
 .target.item 	.target-icon{ background-image: url("resources/image/sample_candy_item.png"); }
 .target.removed .target-icon{ background-image: url("resources/image/effect.gif"); }
@@ -169,6 +179,10 @@ html, body, .wrapper {
 	var makeTargetThread;
 	var fallingSpeedUpThread;
 	var moveDistance 	= 5;
+	
+	//targeting 범위
+	var touchAreaWidth = 150;
+	var touchAreaHieght = 150;
 	
 	//클릭시 소리
 	var removeSound = new Audio();
@@ -256,9 +270,9 @@ html, body, .wrapper {
 	function makeTarget(){
 		var playGround = $(".play-ground");
 		var target = $("<div>", {"class" : "target"});
-		target.on("click", function(){
+		/* target.on("click", function(){
 			doTouchTarget(this);
-		});
+		}); */
 		target.append($("<div>", {"class" : "target-icon"}));
 		target.append($("<input>", {"class" : "randAngleThreadID", type : "hidden"}));
 		target.append($("<input>", {"class" : "moveTargetThreadID", type : "hidden"}));
@@ -393,6 +407,51 @@ html, body, .wrapper {
 		//타겟 생성 쓰레드
 		startMakeTarget();
 
+		//마우스 클릭 범위 표시 
+		$('.play-ground').mousemove(function (e) {
+		
+			var targetingArea = $('.targeting-area');
+			
+			var left= targetingArea.offset().left;
+			var top = targetingArea.offset().top;
+			
+			//길이 높이 지정
+			targetingArea.width(touchAreaWidth);
+			targetingArea.height(touchAreaHieght);
+			
+			//위치 지정
+			targetingArea.offset({ "left": e.pageX - (touchAreaWidth/2)});
+			targetingArea.offset({ "top": e.pageY - (touchAreaHieght/2)});
+		});
+		
+		
+		//화면 클릭 이벤트
+		 $(document).on("click",".play-ground",function(e) {
+		   
+		        checkTargetArea(e);
+		        function checkTargetArea(e){
+		    		
+		        	var xpos = e.pageX;
+		        	var ypos = e.pageY;
+		        		        	
+		        	var targetingAreaXpos = xpos - (touchAreaWidth/2);
+		        	var targetingAreaYpos = ypos - (touchAreaHieght/2);
+		    			        
+		        	//범위 안에 있는지 검사
+		        	var targets = $(".target");
+		    		targets.each(function(){
+		    			
+		    			if($(this).offset().left + TARGET_WIDTH >= targetingAreaXpos && $(this).offset().left <= targetingAreaXpos + touchAreaWidth){
+			    				if($(this).offset().top + TARGET_HEIGHT >= targetingAreaYpos && $(this).offset().top <= targetingAreaYpos + touchAreaHieght){	
+		    						//타겟팅 범위 안에 있다면 해당 타켓 삭제
+			    					doTouchTarget(this);
+		   						}
+		  					}
+		    			
+		    		}); 		
+		    	}
+		    });
+		
 		//난이도UP 쓰레드 - 타겟이 빨리 떨어질수록, 타겟 만드는 속도는 빨라지도록
 		/* fallingSpeedUpThread = setInterval(function(){
 			fallingSpeed 	*= 0.97; 
@@ -405,6 +464,7 @@ html, body, .wrapper {
 <body>
 	<div class="wrapper">
 		<div class="wrap-fg"></div>
+		<div class="targeting-area"></div>
 		<div class="wrap-gameover">
 			<div class="gameover">
 				<div class="gameover-icon" style="background-image: url('${pageContext.request.contextPath}/resources/image/icon_play_gameover.gif');"></div>
