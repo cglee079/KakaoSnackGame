@@ -109,6 +109,7 @@ html, body, .wrapper {
 .play-ground {
 	flex: 1;
 	position: relative;
+	overflow: hidden;
 }
 
 .footer {
@@ -118,7 +119,7 @@ html, body, .wrapper {
 }
 
 .target .target-icon{
-	background-image: url("resources/image/test.gif") !important;
+	background-image: url("resources/image/600.jpg") !important;
 }
 
 .target {
@@ -128,7 +129,7 @@ html, body, .wrapper {
 	justify-content: center;
 	align-items: center;	
 	background: rgba(0,0,0,0);
-	transition: transform 2s cubic-bezier(0.215, 0.61, 0.355, 1);
+	transition: transform 0s cubic-bezier(0.215, 0.61, 0.355, 1);
 }
 
 .target .target-icon{
@@ -149,6 +150,7 @@ html, body, .wrapper {
 	const PER_SCORE				= 10; 	// 타겟 하나당 점수
 	const TARGET_WIDTH			= 50;	// 타겟 넓이
 	const TARGET_HEIGHT			= 50;	// 타겟 높이
+	const HIDDEN_PADDING		= 50;	// 타겟 높이
 	const TOUCH_PADDING			= 10;
 	const ITEM_CREATE_PERCENT	= 0.05;  // 아이템 생성 확률
 
@@ -275,23 +277,23 @@ html, body, .wrapper {
 		
 		switch(startLine){
 		case 0://왼쪽, 상하랜덤
-			left= startX;
+			left= startX - HIDDEN_PADDING;
 			top =  Math.random() * ((endY - TARGET_HEIGHT) - startY) + startY;
 			deg	= 90;
 			break;
 		case 1://오른쪽, 상하랜덤
-			left= endX - TARGET_WIDTH; 
+			left= endX - TARGET_WIDTH + HIDDEN_PADDING; 
 			top =  Math.random() * ((endY - TARGET_HEIGHT) - startY) + startY;
 			deg	= 270;
 			break;
 		case 2://위쪽, 좌우랜덤
 			left=  Math.random() * ((endX - TARGET_WIDTH) - startX) + startX;
-			top = startY;
+			top = startY - HIDDEN_PADDING;
 			deg	= 180;
-			break
+			break;
 		case 3://아래쪽, 좌우랜덤
 			left=  Math.random() * ((endX - TARGET_WIDTH) - startX) + startX;
-			top = endY - TARGET_HEIGHT;
+			top = endY - TARGET_HEIGHT + HIDDEN_PADDING;
 			deg	= 0;
 			break;
 		}
@@ -316,6 +318,7 @@ html, body, .wrapper {
 			target.find(".toTopDistance").val(toTopDistance);
 			
 			var randAngleThreadID = setTimeout(function(){ randAngle(target)}, randAngleTime);
+			target.find(".randAngleThreadID").val(randAngleThreadID);
 		}
 		
 		moveTarget(target);
@@ -329,10 +332,10 @@ html, body, .wrapper {
 			top = top + toTopDistance;
 			
 			//범위를 넘어간경우
-			if(left < startX
-					||left > endX - TARGET_WIDTH
-					|| top < startY
-					|| top > endY - TARGET_HEIGHT) {
+			if(left < startX - HIDDEN_PADDING
+					||left > endX - TARGET_WIDTH + HIDDEN_PADDING
+					|| top < startY - HIDDEN_PADDING
+					|| top > endY - TARGET_HEIGHT + HIDDEN_PADDING) {
 				var randAngleThreadID = target.find(".randAngleThreadID").val();
 				var moveTargetThreadID = target.find(".moveTargetThreadID").val();
 				
@@ -381,10 +384,10 @@ html, body, .wrapper {
 		initXY();
 		function initXY(){
 			var playGround = $(".play-ground");
-			startX 	= playGround.offset().left;
-			startY	= playGround.offset().top;
-			endX	= startX + playGround.width();
-			endY	= startY + playGround.height();
+			startX 	= playGround.offset().left -HIDDEN_PADDING;
+			startY	= playGround.offset().top - HIDDEN_PADDING;
+			endX	= startX + playGround.width() + HIDDEN_PADDING;
+			endY	= startY + playGround.height() + HIDDEN_PADDING;
 		}
 		
 		//타겟 생성 쓰레드
