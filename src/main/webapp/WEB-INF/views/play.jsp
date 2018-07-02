@@ -16,7 +16,7 @@ html, body, .wrapper {
 	max-width : 500px;
 	background-repeat: no-repeat;
 	background-size: cover;
-	background-image: url("resources/image/bg_play.jpg");
+	/* background-image: url("resources/image/bg_play.jpg"); */
 }
 
 .wrapper .wrap-fg{
@@ -114,6 +114,11 @@ html, body, .wrapper {
 .footer {
 	width: 100%;
 	height: 100px;
+	background: red;
+}
+
+.target .target-icon{
+	background-image: url("resources/image/test.gif") !important;
 }
 
 .target {
@@ -123,6 +128,7 @@ html, body, .wrapper {
 	justify-content: center;
 	align-items: center;	
 	background: rgba(0,0,0,0);
+	transition: transform 2s cubic-bezier(0.215, 0.61, 0.355, 1);
 }
 
 .target .target-icon{
@@ -141,8 +147,8 @@ html, body, .wrapper {
 <script>
 	//FINAL
 	const PER_SCORE				= 10; 	// 타겟 하나당 점수
-	const TARGET_WIDTH			= 70;	// 타겟 넓이
-	const TARGET_HEIGHT			= 70;	// 타겟 높이
+	const TARGET_WIDTH			= 50;	// 타겟 넓이
+	const TARGET_HEIGHT			= 50;	// 타겟 높이
 	const TOUCH_PADDING			= 10;
 	const ITEM_CREATE_PERCENT	= 0.05;  // 아이템 생성 확률
 
@@ -155,12 +161,12 @@ html, body, .wrapper {
 	var endX;
 	var endY;
 	
-	var targetMakeRate 		= 1000; 	// 타겟이 생성되는 간격 , 1000 = 1초
-	var fallingSpeed 		= 100; 		// 타겟이 떨어지는 속도
-	var totalScore			= 0; 		// 점수
+	var targetMakeRate 		= 500; 	// 타겟이 생성되는 간격 , 1000 = 1초
+	var randAngleTime		= 5000; // 타겟이 이동방향을 바꾸는 쓰레드 간격.
+	var totalScore			= 0; 	// 점수
 	var makeTargetThread;
 	var fallingSpeedUpThread;
-	var fallingDistance 	= 10;
+	var moveDistance 	= 5;
 	
 	//클릭시 소리
 	var removeSound = new Audio();
@@ -238,6 +244,12 @@ html, body, .wrapper {
 		});
 	}
 
+	function makeItem(){
+		target.addClass("item");
+		var item = Math.floor(Math.random() * ITEMS.length); //어떤 아이템을 부여할지 랜덤으로
+		target.append($("<input>", {"class" : "item-id", type : "hidden", value : ITEMS[item]}));
+	}
+	
 	//타겟을 만들어 떨어트림
 	function makeTarget(){
 		var playGround = $(".play-ground");
@@ -246,38 +258,94 @@ html, body, .wrapper {
 			doTouchTarget(this);
 		});
 		target.append($("<div>", {"class" : "target-icon"}));
-		target.append($("<input>", {"class" : "threadID", type : "hidden"}));
+		target.append($("<input>", {"class" : "randAngleThreadID", type : "hidden"}));
+		target.append($("<input>", {"class" : "moveTargetThreadID", type : "hidden"}));
+		target.append($("<input>", {"class" : "angle", type : "hidden"}));
+		target.append($("<input>", {"class" : "toLeftDistance", type : "hidden"}));
+		target.append($("<input>", {"class" : "toTopDistance", type : "hidden"}));
 		target.appendTo(playGround);
 		target.css("width", TARGET_WIDTH);
 		target.css("height", TARGET_HEIGHT);
 		
-		if(Math.random() < ITEM_CREATE_PERCENT){ //아이템 타겟 생성
-			target.addClass("item");
-			var item = Math.floor(Math.random() * ITEMS.length); //어떤 아이템을 부여할지 랜덤으로
-			target.append($("<input>", {"class" : "item-id", type : "hidden", value : ITEMS[item]}));
-		} else{
-			target.addClass("candy");
+		//벌레가 나오는 위치 선정
+		var startLine = Math.floor(Math.random() * 4);
+		var left = 0;
+		var top	 = 0;
+		var deg	 = 0;
+		
+		switch(startLine){
+		case 0://왼쪽, 상하랜덤
+			left= startX;
+			top =  Math.random() * ((endY - TARGET_HEIGHT) - startY) + startY;
+			deg	= 90;
+			break;
+		case 1://오른쪽, 상하랜덤
+			left= endX - TARGET_WIDTH; 
+			top =  Math.random() * ((endY - TARGET_HEIGHT) - startY) + startY;
+			deg	= 270;
+			break;
+		case 2://위쪽, 좌우랜덤
+			left=  Math.random() * ((endX - TARGET_WIDTH) - startX) + startX;
+			top = startY;
+			deg	= 180;
+			break
+		case 3://아래쪽, 좌우랜덤
+			left=  Math.random() * ((endX - TARGET_WIDTH) - startX) + startX;
+			top = endY - TARGET_HEIGHT;
+			deg	= 0;
+			break;
 		}
 		
-		//target의 X(좌,우)좌표를 랜덤하게 지정한다. 
-		var targetX = Math.random() * ((endX - TARGET_WIDTH) - startX) + startX;
-		target.offset({ "left": targetX });
-		
-		doFallTarget(target);
-		function doFallTarget(target){
-			var top = target.offset().top;
-			var toTop = top + fallingDistance;
-			target.offset({ "top": toTop });
+		target.offset({ "left": left });
+		target.offset({ "top": top });
+		target.css("transform", "rotate(" + deg + "deg)");
+	
+		randAngle(target);
+		function randAngle(target){
+			var toLeftDistance 	= Math.floor(Math.random() * 2 * moveDistance) - moveDistance;
+			var toTopDistance  	= Math.floor(Math.random() * 2 * moveDistance) - moveDistance;
+			var tangentAngle	= toTopDistance/toLeftDistance 
+			var angle			= Math.atan(tangentAngle) * 180;
 			
-			if(toTop + TARGET_HEIGHT >= endY){  // 타겟이 다떨어지는 순간
-				if(target.hasClass("candy")){
-					gameover();
-				}
+			target.css("transform", "rotate(" + angle + "deg)");
+			
+			//재귀를 이용한 Interval
+			target.find(".randAngleThreadID").val(randAngleThreadID);
+			target.find(".angle").val(angle);
+			target.find(".toLeftDistance").val(toLeftDistance);
+			target.find(".toTopDistance").val(toTopDistance);
+			
+			var randAngleThreadID = setTimeout(function(){ randAngle(target)}, randAngleTime);
+		}
+		
+		moveTarget(target);
+		function moveTarget(target){
+			var left= target.offset().left;
+			var top = target.offset().top;
+			var toLeftDistance = parseInt(target.find(".toLeftDistance").val());
+			var toTopDistance = parseInt(target.find(".toTopDistance").val());
+			
+			left= left + toLeftDistance;
+			top = top + toTopDistance;
+			
+			//범위를 넘어간경우
+			if(left < startX
+					||left > endX - TARGET_WIDTH
+					|| top < startY
+					|| top > endY - TARGET_HEIGHT) {
+				var randAngleThreadID = target.find(".randAngleThreadID").val();
+				var moveTargetThreadID = target.find(".moveTargetThreadID").val();
+				
+				clearTimeout(randAngleThreadID);
+				randAngle(target);
+			}  else{
+				target.offset({ "left": left + toLeftDistance});
+				target.offset({ "top": top + toTopDistance});
 			}
 			
 			//재귀를 이용한 Interval
-			var fallingThreadID = setTimeout(function(){ doFallTarget(target)}, fallingSpeed);
-			target.find(".threadID").val(fallingThreadID);
+			var moveTargetThreadID = setTimeout(function(){ moveTarget(target)}, 100);
+			target.find(".moveTargetThreadID").val(moveTargetThreadID);
 		}
 		
 	}
@@ -313,7 +381,7 @@ html, body, .wrapper {
 		initXY();
 		function initXY(){
 			var playGround = $(".play-ground");
-			startX 	= playGround.offset().left; 
+			startX 	= playGround.offset().left;
 			startY	= playGround.offset().top;
 			endX	= startX + playGround.width();
 			endY	= startY + playGround.height();
@@ -323,10 +391,10 @@ html, body, .wrapper {
 		startMakeTarget();
 
 		//난이도UP 쓰레드 - 타겟이 빨리 떨어질수록, 타겟 만드는 속도는 빨라지도록
-		fallingSpeedUpThread = setInterval(function(){
+		/* fallingSpeedUpThread = setInterval(function(){
 			fallingSpeed 	*= 0.97; 
 			targetMakeRate 	*= 0.97;
-		}, 1000);
+		}, 1000); */
 		
 	})
 	
