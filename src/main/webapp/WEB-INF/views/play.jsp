@@ -156,9 +156,9 @@ html, body, .wrapper {
 <script>
 	//FINAL
 	const PER_SCORE				= 10; 	// 타겟 하나당 점수
-	const TARGET_WIDTH			= 50;	// 타겟 넓이
-	const TARGET_HEIGHT			= 50;	// 타겟 높이
-	const HIDDEN_PADDING		= 50;	// 타겟 높이
+	const TARGET_WIDTH			= 80;	// 타겟 넓이
+	const TARGET_HEIGHT			= 80;	// 타겟 높이
+	const HIDDEN_PADDING		= 50;	// 숨겨진 공간
 	const TOUCH_PADDING			= 10;
 	const ITEM_CREATE_PERCENT	= 0.05;  // 아이템 생성 확률
 	const RIGHT_ANGLE = 90;
@@ -172,7 +172,7 @@ html, body, .wrapper {
 	var endX;
 	var endY;
 	
-	var targetMakeRate 		= 100; 	// 타겟이 생성되는 간격 , 1000 = 1초
+	var targetMakeRate 		= 1000; 	// 타겟이 생성되는 간격 , 1000 = 1초
 	var randAngleTime		= 5000; // 타겟이 이동방향을 바꾸는 쓰레드 간격.
 	var totalScore			= 0; 	// 점수
 	var makeTargetThread;
@@ -232,6 +232,8 @@ html, body, .wrapper {
 			removeSound.currentTime = 0;
 	
 			target.addClass('removed'); //이미지 변경
+			target.find(".toLeftDistance").val(0);
+			target.find(".toTopDistance").val(5);
 			setTimeout(function(){
 				target.remove();
 			}, 300); 
