@@ -172,7 +172,7 @@ html, body, .wrapper {
 	var endX;
 	var endY;
 	
-	var targetMakeRate 		= 1000; 	// 타겟이 생성되는 간격 , 1000 = 1초
+	var targetMakeRate 		= 100; 	// 타겟이 생성되는 간격 , 1000 = 1초
 	var randAngleTime		= 5000; // 타겟이 이동방향을 바꾸는 쓰레드 간격.
 	var totalScore			= 0; 	// 점수
 	var makeTargetThread;
@@ -311,7 +311,7 @@ html, body, .wrapper {
 			break;
 		}
 		
-		target.css("left", left);
+		target.css("left", top);
 		target.css("top", top);
 		target.css("transform", "rotate(" + angle + "deg)");
 		target.find(".angle").val(angle);
@@ -469,11 +469,9 @@ html, body, .wrapper {
 			var attacker = $(".attacker");
 			attacker.addClass("on");
 			
-        	var x = e.pageX;
-        	var y = e.pageY;
+        	var x = e.pageX - $(".play-ground").offset().left;
+        	var y = e.pageY - $(".play-ground").offset().top;
         	
-        	console.log(x + "," + y);
-        		        
         	var attackStartX = x - (attackAreaWidth/2);
         	var attackStartY = y - (attackAreaHeight/2);
         	var attackEndX = x + (attackAreaWidth/2);
@@ -486,9 +484,9 @@ html, body, .wrapper {
         	//범위 안에 있는지 검사
         	var targets = $(".target");
     		targets.each(function(){
-    			var targetStartX= $(this).offset().left;
+    			var targetStartX= parseInt($(this).css("left"));
+    			var targetStartY= parseInt($(this).css("top"));
     			var targetEndX	= targetStartX + TARGET_WIDTH;
-    			var targetStartY= $(this).offset().top;
     			var targetEndY 	= targetStartY + TARGET_HEIGHT;
     			
     			if(targetStartX > attackStartX 
