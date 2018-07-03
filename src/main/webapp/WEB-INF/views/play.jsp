@@ -155,11 +155,10 @@ html, body, .wrapper {
 
 <script>
 	//FINAL
-	const PER_SCORE				= 10; 	// 타겟 하나당 점수
+	const PER_SCORE				= 1000; 	// 타겟 하나당 점수
 	const TARGET_WIDTH			= 50;	// 타겟 넓이
 	const TARGET_HEIGHT			= 50;	// 타겟 높이
-	const HIDDEN_PADDING		= 50;	// 숨겨진 공간
-	const TOUCH_PADDING			= 10;
+	const HIDDEN_PADDING		= 0;	// 숨겨진 공간
 	const ITEM_CREATE_PERCENT	= 0.05;  // 아이템 생성 확률
 	const RIGHT_ANGLE = 90;
 
@@ -172,7 +171,7 @@ html, body, .wrapper {
 	var endX;
 	var endY;
 	
-	var targetMakeRate 		= 1000; 	// 타겟이 생성되는 간격 , 1000 = 1초
+	var targetMakeRate 		= 1000000; 	// 타겟이 생성되는 간격 , 1000 = 1초
 	var randAngleTime		= 5000; // 타겟이 이동방향을 바꾸는 쓰레드 간격.
 	var totalScore			= 0; 	// 점수
 	var makeTargetThread;
@@ -293,18 +292,22 @@ html, body, .wrapper {
 		case 0://왼쪽, 상하랜덤
 			left	= startX - HIDDEN_PADDING;
 			top 	=  Math.random() * ((endY - TARGET_HEIGHT) - startY) + startY;
+			angle 	= 90;
 			break;
 		case 1://오른쪽, 상하랜덤
 			left	= endX - TARGET_WIDTH + HIDDEN_PADDING; 
 			top 	=  Math.random() * ((endY - TARGET_HEIGHT) - startY) + startY;
+			angle 	= 270;
 			break;
 		case 2://위쪽, 좌우랜덤
 			left	=  Math.random() * ((endX - TARGET_WIDTH) - startX) + startX;
 			top 	= startY - HIDDEN_PADDING;
+			angle 	= 180;
 			break;
 		case 3://아래쪽, 좌우랜덤
 			left	=  Math.random() * ((endX - TARGET_WIDTH) - startX) + startX;
 			top 	= endY - TARGET_HEIGHT + HIDDEN_PADDING;
+			angle 	= 0;
 			break;
 		}
 		
@@ -371,9 +374,17 @@ html, body, .wrapper {
 				angle = 3 * RIGHT_ANGLE + (RIGHT_ANGLE - angle % RIGHT_ANGLE);
 			}
 			
+			/* if(Math.abs(toTopDistance) > moveDistance){
+				console.log("1 " + toTopDistance + ", " + toLeftDistance + "===>");
+				var ratio = Math.abs(toTopDistance/moveDistance);
+				toTopDistance = 10;
+				toLeftDistance /= ratio;
+				console.log("2 " + ratio + "===>" + toTopDistance + ", " + toLeftDistance);
+				console.log(" ");
+			}		 */	
+			
 			target.css("transform", "rotate(" + angle + "deg)");
 			
-			//재귀를 이용한 Interval
 			target.find(".angle").val(angle);
 			target.find(".toLeftDistance").val(toLeftDistance);
 			target.find(".toTopDistance").val(toTopDistance);
