@@ -118,10 +118,6 @@ html, body, .wrapper {
 	background: red;
 }
 
-.target .target-icon{
-	background-image: url("resources/image/600.jpg") !important;
-}
-
 .target {
 	position: absolute;
 	z-index: 2;
@@ -130,7 +126,7 @@ html, body, .wrapper {
 	align-items: center;	
 	background: rgba(0,0,0,0);
 	transform-origin : 50% 50%;
-	/* transition: transform 0s cubic-bezier(0.215, 0.61, 0.355, 1); */
+	transition: transform 1s cubic-bezier(0.215, 0.61, 0.355, 1);
 }
 
 .target .target-icon{
@@ -138,15 +134,12 @@ html, body, .wrapper {
 	height : 80%;
 	background-repeat: no-repeat;
 	background-size: contain;
-}
-
-.targeting-area {
-	
+	background-image: url("resources/image/sample_target.png");
 }
 
 .target.candy 	.target-icon{ background-image: url("resources/image/sample_candy.png");}
 .target.item 	.target-icon{ background-image: url("resources/image/sample_candy_item.png"); }
-.target.removed .target-icon{ background-image: url("resources/image/effect.gif"); }
+.target.removed .target-icon{ background-image: url("resources/image/sample_target_removed.png"); }
 
 .attacker {
 	position: absolute;
@@ -165,9 +158,10 @@ html, body, .wrapper {
 	const PER_SCORE				= 10; 	// 타겟 하나당 점수
 	const TARGET_WIDTH			= 50;	// 타겟 넓이
 	const TARGET_HEIGHT			= 50;	// 타겟 높이
-	const HIDDEN_PADDING		= 0;	// 타겟 높이
+	const HIDDEN_PADDING		= 50;	// 타겟 높이
 	const TOUCH_PADDING			= 10;
 	const ITEM_CREATE_PERCENT	= 0.05;  // 아이템 생성 확률
+	const RIGHT_ANGLE = 90;
 
 	//001 모두지우기
 	//002 잠깐 멈추기
@@ -178,12 +172,12 @@ html, body, .wrapper {
 	var endX;
 	var endY;
 	
-	var targetMakeRate 		= 500000; 	// 타겟이 생성되는 간격 , 1000 = 1초
+	var targetMakeRate 		= 1000; 	// 타겟이 생성되는 간격 , 1000 = 1초
 	var randAngleTime		= 5000; // 타겟이 이동방향을 바꾸는 쓰레드 간격.
 	var totalScore			= 0; 	// 점수
 	var makeTargetThread;
 	var fallingSpeedUpThread;
-	var moveDistance 	= 5;
+	var moveDistance 	= 10;
 	
 	//targeting 범위
 	var attackAreaWidth = 150;
@@ -298,49 +292,90 @@ html, body, .wrapper {
 		case 0://왼쪽, 상하랜덤
 			left	= startX - HIDDEN_PADDING;
 			top 	=  Math.random() * ((endY - TARGET_HEIGHT) - startY) + startY;
+			angle	= 90;
 			break;
 		case 1://오른쪽, 상하랜덤
 			left	= endX - TARGET_WIDTH + HIDDEN_PADDING; 
 			top 	=  Math.random() * ((endY - TARGET_HEIGHT) - startY) + startY;
+			angle	= 270;
 			break;
 		case 2://위쪽, 좌우랜덤
 			left	=  Math.random() * ((endX - TARGET_WIDTH) - startX) + startX;
 			top 	= startY - HIDDEN_PADDING;
+			angle	= 180;
 			break;
 		case 3://아래쪽, 좌우랜덤
 			left	=  Math.random() * ((endX - TARGET_WIDTH) - startX) + startX;
 			top 	= endY - TARGET_HEIGHT + HIDDEN_PADDING;
+			angle	= 0;
 			break;
 		}
 		
-		target.offset({ "left": left});
-		target.offset({ "top": top});
+		target.css("left", left);
+		target.css("top", top);
 		target.css("transform", "rotate(" + angle + "deg)");
+		target.find(".angle").val(angle);
+	
 		randAngle(target);
 		function randAngle(target){
-			var toLeftDistance 	= Math.floor(Math.random() * 2 * moveDistance) - moveDistance;
-			var toTopDistance  	= Math.floor(Math.random() * 2 * moveDistance) - moveDistance;
-			var tangent			= toTopDistance/toLeftDistance;
-			var angle			= Math.atan(tangent)/ 3.14 * 180;
+			var currentAngle = 	target.find(".angle").val();
+			var angle 	= (Math.floor(Math.random() * 90) + currentAngle) % 360;
+			var tangent	=  Math.abs(Math.tan(angle * (3.14/180)).toFixed(2)) ;
+			var toLeftDistance;
+			var toTopDistance;
 			
-			console.log(toTopDistance + " , " + toLeftDistance + " >>>>  " + tangent + " , " + angle);
-			//
-			if(toLeftDistance > 0 && toTopDistance > 0){
-				
-			}
-			
-			if(toLeftDistance > 0 && toTopDistance < 0){
-							
-			}
-						
-			if(toLeftDistance < 0 && toTopDistance < 0){
-				
+			//x + , y +  
+			if(angle == 0){
+				toLeftDistance = 0;
+				toTopDistance = moveDistance * -1;
 			}
 			
-			if(toLeftDistance < 0 && toTopDistance > 0){
-				
+			if(angle > 0 &&  angle < 1 * RIGHT_ANGLE){
+				// left, top 양수	
+				toLeftDistance = moveDistance;
+				toTopDistance = tangent * moveDistance * -1;
+				angle = 1 * RIGHT_ANGLE - angle;
 			}
-						
+			
+			if(angle == 1 * RIGHT_ANGLE){
+				toLeftDistance = moveDistance;
+				toTopDistance = 0;
+			}
+			
+			//x + , y - 
+			if(angle > 1 * RIGHT_ANGLE && angle < 2 * RIGHT_ANGLE ){
+				// left 양수, top 음수
+				toLeftDistance = moveDistance;
+				toTopDistance = tangent * -1 * moveDistance * -1;
+				angle = 1 * RIGHT_ANGLE + (RIGHT_ANGLE - angle % RIGHT_ANGLE);
+			}
+			
+			if(angle == 2 * RIGHT_ANGLE){
+				toLeftDistance = 0;
+				toTopDistance = moveDistance;
+			}
+			
+			//x - , y - 			
+			if(angle > 2 * RIGHT_ANGLE && angle < 3 * RIGHT_ANGLE){
+				// left 음수, top 음수
+				toLeftDistance = -1 * moveDistance;
+				toTopDistance = tangent * -1 * moveDistance * -1;
+				angle = 2 * RIGHT_ANGLE + (RIGHT_ANGLE - angle % RIGHT_ANGLE);
+			}
+			
+			if(angle == 3 * RIGHT_ANGLE){
+				toLeftDistance = moveDistance * -1;
+				toTopDistance = 0;
+			}
+			
+			//x - , y + 
+			if(angle > 3 * RIGHT_ANGLE && angle < 4 * RIGHT_ANGLE){
+				// left 음수, top 양수
+				toLeftDistance = -1 * moveDistance;
+				toTopDistance = tangent * moveDistance * -1;
+				angle = 3 * RIGHT_ANGLE + (RIGHT_ANGLE - angle % RIGHT_ANGLE);
+			}
+			
 			target.css("transform", "rotate(" + angle + "deg)");
 			
 			//재귀를 이용한 Interval
@@ -355,8 +390,8 @@ html, body, .wrapper {
 		
 		moveTarget(target);
 		function moveTarget(target){
-			var left= target.offset().left;
-			var top = target.offset().top;
+			var left= parseInt(target.css("left"));
+			var top = parseInt(target.css("top"));
 			var toLeftDistance = parseInt(target.find(".toLeftDistance").val());
 			var toTopDistance = parseInt(target.find(".toTopDistance").val());
 			
@@ -364,18 +399,18 @@ html, body, .wrapper {
 			top = top + toTopDistance;
 			
 			//범위를 넘어간경우
-			if(left < startX - HIDDEN_PADDING
-					||left > endX - TARGET_WIDTH + HIDDEN_PADDING
-					|| top < startY - HIDDEN_PADDING
-					|| top > endY - TARGET_HEIGHT + HIDDEN_PADDING) {
+			if(left < (startX - HIDDEN_PADDING)
+					|| left > (endX - TARGET_WIDTH + HIDDEN_PADDING)
+					|| top < (startY - HIDDEN_PADDING)
+					|| top > (endY - TARGET_HEIGHT + HIDDEN_PADDING)) {
 				var randAngleThreadID = target.find(".randAngleThreadID").val();
 				var moveTargetThreadID = target.find(".moveTargetThreadID").val();
 				
 				clearTimeout(randAngleThreadID);
 				randAngle(target);
 			}  else{
-				target.offset({ "left": left + toLeftDistance});
-				target.offset({ "top": top + toTopDistance});
+				target.css("left", left);
+				target.css("top", top);
 			}
 			
 			//재귀를 이용한 Interval
@@ -420,10 +455,10 @@ html, body, .wrapper {
 		initXY();
 		function initXY(){
 			var playGround = $(".play-ground");
-			startX 	= playGround.offset().left -HIDDEN_PADDING;
-			startY	= playGround.offset().top - HIDDEN_PADDING;
-			endX	= startX + playGround.width() + HIDDEN_PADDING;
-			endY	= startY + playGround.height() + HIDDEN_PADDING;
+			startX 	= 0 - HIDDEN_PADDING;
+			startY	= 0 - HIDDEN_PADDING;
+			endX	= playGround.width() + HIDDEN_PADDING;
+			endY	= playGround.height() + HIDDEN_PADDING;
 		}
 		
 		//타겟 생성 쓰레드
@@ -436,14 +471,16 @@ html, body, .wrapper {
 			
         	var x = e.pageX;
         	var y = e.pageY;
+        	
+        	console.log(x + "," + y);
         		        
         	var attackStartX = x - (attackAreaWidth/2);
         	var attackStartY = y - (attackAreaHeight/2);
         	var attackEndX = x + (attackAreaWidth/2);
         	var attackEndY = y + (attackAreaHeight/2);
         	
-        	attacker.offset({"left" : attackStartX});
-        	attacker.offset({"top" : attackStartY});
+        	attacker.css("left", attackStartX);
+        	attacker.css("top", attackStartY);
         	setTimeout(function(){attacker.removeClass("on")}, 100);
     			        
         	//범위 안에 있는지 검사
