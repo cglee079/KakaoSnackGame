@@ -9,70 +9,70 @@ html, body, .wrapper {
 }
 
 .wrapper {
-	position : relative;
+	position: relative;
 	display: flex;
 	flex-flow: column nowrap;
 	height: 100%;
-	max-width : 500px;
+	max-width: 500px;
 	background-repeat: no-repeat;
 	background-size: cover;
 	/* background-image: url("resources/image/bg_play.jpg"); */
 }
 
-.wrapper .wrap-fg{
-	display : none;
+.wrapper .wrap-fg {
+	display: none;
 	z-index: 1;
-	position : absolute;
-	left : 0;
-	right : 0;
-	top :0;
-	bottom : 0;
-	background: rgba(0,0,0,0.6);
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.6);
 }
 
-.wrapper .wrap-fg.on{
-	display : block;
+.wrapper .wrap-fg.on {
+	display: block;
 }
 
-.wrapper .wrap-gameover{
-	display : none;
+.wrapper .wrap-gameover {
+	display: none;
 	z-index: 3;
-	position : absolute;
-	left : 0;
-	right : 0;
-	top :0;
-	bottom : 0;
-	background: rgba(0,0,0,0);
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0);
 	justify-content: center;
 	align-items: center;
 }
 
-.wrapper .wrap-gameover.on{
+.wrapper .wrap-gameover.on {
 	display: flex;
 }
 
-.gameover{
-	width : 300px;
-	height : 400px;
+.gameover {
+	width: 300px;
+	height: 400px;
 	background: #FFF;
 	border-radius: 10px;
 	box-shadow: 0px 10px 20px #222;
 	display: flex;
-	flex-flow : column nowrap;
+	flex-flow: column nowrap;
 	justify-content: center;
 	align-items: center;
 }
 
-.gameover .gameover-icon{
-	width : 150px;
-	height : 150px;
+.gameover .gameover-icon {
+	width: 150px;
+	height: 150px;
 	background-repeat: no-repeat;
 	background-size: contain;
 	background-position: center;
 	margin-bottom: 10px;
 }
 
-.gameover .gameover-message{
+.gameover .gameover-message {
 	font-size: 2rem;
 	font-weight: bold;
 }
@@ -82,7 +82,6 @@ html, body, .wrapper {
 	height: 50px;
 	display: flex;
 	justify-content: space-between;
-	
 }
 
 .bgm-source-board {
@@ -101,7 +100,7 @@ html, body, .wrapper {
 }
 
 .score {
-	font-size : 2rem;
+	font-size: 2rem;
 	font-weight: bold;
 	text-align: center;
 }
@@ -123,33 +122,41 @@ html, body, .wrapper {
 	z-index: 2;
 	display: flex;
 	justify-content: center;
-	align-items: center;	
-	background: rgba(0,0,0,0);
-	transform-origin : 50% 50%;
+	align-items: center;
+	background: rgba(0, 0, 0, 0);
+	transform-origin: 50% 50%;
 	/* transition: transform 1s cubic-bezier(0.215, 0.61, 0.355, 1); */
 }
 
-.target .target-icon{
-	width : 100%;
-	height : 100%;
+.target .target-icon {
+	width: 100%;
+	height: 100%;
 	background-repeat: no-repeat;
 	background-size: contain;
 	background-image: url("resources/image/sample_target.png");
 }
 
-.target.candy 	.target-icon{ background-image: url("resources/image/sample_candy.png");}
-.target.item 	.target-icon{ background-image: url("resources/image/sample_candy_item.png"); }
-.target.removed .target-icon{ background-image: url("resources/image/sample_target_removed.png"); }
+.target.candy 	.target-icon {
+	background-image: url("resources/image/sample_candy.png");
+}
+
+.target.item 	.target-icon {
+	background-image: url("resources/image/sample_candy_item.png");
+}
+
+.target.removed .target-icon {
+	background-image: url("resources/image/sample_target_removed.png");
+}
 
 .attacker {
 	position: absolute;
 	background: red;
-	z-index :4;
+	z-index: 4;
 	display: none;
 }
 
-.attacker.on{
-	display : block;
+.attacker.on {
+	display: block;
 }
 </style>
 
@@ -171,12 +178,13 @@ html, body, .wrapper {
 	var endX;
 	var endY;
 	
-	var targetMakeRate 		= 1000000; 	// 타겟이 생성되는 간격 , 1000 = 1초
+	var targetMakeRate 		= 600; 	// 타겟이 생성되는 간격 , 1000 = 1초
 	var randAngleTime		= 5000; // 타겟이 이동방향을 바꾸는 쓰레드 간격.
 	var totalScore			= 0; 	// 점수
 	var makeTargetThread;
 	var fallingSpeedUpThread;
 	var moveDistance 	= 10;
+	var maxTargetNumber = 5; //최대 타겟 수 
 	
 	//targeting 범위
 	var attackAreaWidth = 150;
@@ -268,6 +276,7 @@ html, body, .wrapper {
 	
 	//타겟을 만들어 떨어트림
 	function makeTarget(){
+		
 		var playGround = $(".play-ground");
 		var target = $("<div>", {"class" : "target"});
 		/* target.on("click", function(){
@@ -436,14 +445,33 @@ html, body, .wrapper {
 		 score.text(totalScore);
 	}
 	
-	
+	function checkTargetNumber(){
+		var targets = $(".target");
+		var targetNumber = 0;
+		targets.each(function(){
+			targetNumber = targetNumber+1;			
+		});
+		
+		if(targetNumber >= maxTargetNumber){ //만약 타겟수가 max 이상이라면 생성 쓰레드 정지
+			stopMakeTarget();
+		}
+		else{
+			if(makeTargetThread == null)
+				startMakeTarget();
+		}
+	}
 	function startMakeTarget() { //재귀를 이용한 Interval
 		makeTarget();
 		makeTargetThread = setTimeout(startMakeTarget, targetMakeRate);
-	}
-	
+	}	
+	function startTargetNumber(){ //타겟 수 체크
+		setInterval(function(){
+			checkTargetNumber();
+		},targetMakeRate);
+	}	
 	function stopMakeTarget() {
 		clearTimeout(makeTargetThread);
+		makeTargetThread = null; //쓰레드 변수 초기화
 	}
 	
 	$(document).ready(function(){
@@ -463,7 +491,7 @@ html, body, .wrapper {
 		
 		//타겟 생성 쓰레드
 		startMakeTarget();
-		
+		startTargetNumber();
 		//화면 클릭 이벤트
 		 $(".play-ground").on("click",function(e) {
 			var attacker = $(".attacker");
@@ -513,15 +541,17 @@ html, body, .wrapper {
 		<div class="wrap-fg"></div>
 		<div class="wrap-gameover">
 			<div class="gameover">
-				<div class="gameover-icon" style="background-image: url('${pageContext.request.contextPath}/resources/image/icon_play_gameover.gif');"></div>
+				<div class="gameover-icon"
+					style="background-image: url('${pageContext.request.contextPath}/resources/image/icon_play_gameover.gif');"></div>
 				<div class="gameover-message">GAME OVER</div>
 			</div>
 		</div>
-		
+
 		<div class="head">
 			<div class="bgm-source-board">
-				<embed class="back-music-source" src="${pageContext.request.contextPath}/resources/audio/sample_bgm.mp3"
-					autostart="true" hidden="true" loop="true" >
+				<embed class="back-music-source"
+					src="${pageContext.request.contextPath}/resources/audio/sample_bgm.mp3"
+					autostart="true" hidden="true" loop="true">
 			</div>
 			<div class="score-board">
 				<div class="score">0</div>
