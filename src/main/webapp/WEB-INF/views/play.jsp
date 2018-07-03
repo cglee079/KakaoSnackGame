@@ -89,7 +89,8 @@ html, body, .wrapper {
 	height: 100%;
 	background-repeat: no-repeat;
 	background-size: contain;
-	background-image: url("resources/image/sample_music_button.png");
+	background-image: url("resources/image/sample_stop_audio.jpg");
+	z-index: 4;
 }
 
 .score-board {
@@ -198,6 +199,8 @@ html, body, .wrapper {
 	//targeting 범위
 	var attackAreaWidth = 150;
 	var attackAreaHeight = 150;
+	//배경음악
+	var backgroundAudio;
 	
 	//클릭시 소리
 	var removeSound = new Audio();
@@ -503,6 +506,13 @@ html, body, .wrapper {
 		//타겟 생성 쓰레드
 		startMakeTarget();
 		startTargetNumber();
+		//오디오 시작
+		startAudio();
+		function startAudio(){
+			backgroundAudio = new Audio('${pageContext.request.contextPath}/resources/audio/sample_bgm.mp3');
+			backgroundAudio.play();
+		}
+		
 		//화면 클릭 이벤트
 		 $(".play-ground").on("click",function(e) {
 			var attacker = $(".attacker");
@@ -552,6 +562,20 @@ html, body, .wrapper {
     			}
     		}
 	    });
+	
+		//오디오 버튼 활성화 , 비활성화
+			$(".bgm-source-board").on("click",function(e) {
+				
+				if($(this).attr('data-click-state') == 1) {
+					$(this).attr('data-click-state', 0)
+					backgroundAudio.play();
+					$(".bgm-source-board").css({"background":"url(resources/image/sample_stop_audio.jpg", 'background-repeat' : 'no-repeat', 'background-size' : 'contain'});
+					} else {
+					$(this).attr('data-click-state', 1)
+					backgroundAudio.pause();
+					$(".bgm-source-board").css({"background":"url(resources/image/sample_start_audio.jpg", 'background-repeat' : 'no-repeat' ,'background-size' : 'contain'});
+					}
+			});
 		
 		//난이도UP 쓰레드 - 타겟이 빨리 떨어질수록, 타겟 만드는 속도는 빨라지도록
 		/* fallingSpeedUpThread = setInterval(function(){
@@ -560,7 +584,7 @@ html, body, .wrapper {
 		}, 1000); */
 		
 	})
-	
+
 </script>
 <body>
 	<div class="wrapper">
@@ -574,10 +598,10 @@ html, body, .wrapper {
 		</div>
 
 		<div class="head">
-			<div class="bgm-source-board">
-				<embed class="back-music-source"
+			<div class="bgm-source-board" >
+				<%-- <embed class="back-music-source"
 					src="${pageContext.request.contextPath}/resources/audio/sample_bgm.mp3"
-					autostart="true" hidden="true" loop="true">
+					autostart="true" hidden="true" loop="true"> --%>
 			</div>
 			<div class="score-board">
 				<div class="score">0</div>
