@@ -114,6 +114,20 @@ html, body, .wrapper {
 	display: none;
 }
 
+.life-board {
+	width: 200px;
+	height: 50px;
+	margin: auto;
+	display: inline-block;
+	border: 2px solid black;
+}
+
+.ui-widget-header {
+	background: #cedc98;
+	color: #333333;
+	height:50px;
+}
+
 .play-ground {
 	flex: 1;
 	position: relative;
@@ -179,9 +193,9 @@ html, body, .wrapper {
 	const ITEM_CREATE_PERCENT	= 0.05;  // 아이템 생성 확률
 	const RIGHT_ANGLE = 90;
 
-	//001 모두지우기
+	//001 모두지우기,지속시간
 	//002 잠깐 멈추기
-	const ITEMS = ["ITM_001", "ITM_002"]; 
+	const ITEMS = [{item_type :"ITM_001", item_duration :5000}, {item_type :"ITM_002", item_duration :5000}]; 
 	
 	var startX;
 	var startY;
@@ -195,6 +209,7 @@ html, body, .wrapper {
 	var fallingSpeedUpThread;
 	var moveDistance 	= 10;
 	var maxTargetNumber = 5; //최대 타겟 수 
+	var targetMoveSpeed = 100; //타겟 스피드
 	
 	//targeting 범위
 	var attackAreaWidth = 150;
@@ -209,34 +224,22 @@ html, body, .wrapper {
 	removeSound.controls = true;
 	removeSound.autoPlay = false;
 	
+	//체력
+	var life=100;
+	var lifeDecreaseThread;
+	var lifeDecreaseRate = 2000; //체력이 감소하는 속도
+
 	//타겟 삭제 - 공격당했을때
 	function doAttackTarget(target){
 		var target = $(target);
 		if(target.hasClass("item")){ //타겟이 아이템을 가진 경우
 	
-			var itemID = target.find(".item-id").val();
-			switch(itemID){
-			case ITEMS[0]: doItem001(); break;
-			case ITEMS[1]: doItem002(); break;
-			}
+			var itemObj = target.find(".item-id").val();
+			var itemID = itemObj.item_type;
+			var duringTime = itemObj.item_duration;
 			
-			function doItem001(){ // 모든 사탕 삭제, 아이템은 삭제X
-				removeAllCandy(true);
-			}
-			
-			function doItem002(){ // 떨어지는속도, 타겟 생성 잠깐 멈추기
-				fallingDistance = 0; // 속도 멈춤
-				stopMakeTarget(); // 생성 중지
-				
-				setTimeout(function(){
-					fallingDistance = 10;
-					startMakeTarget();
-				}, 2000);
-			}
-			
-			function doItem003(){ // ??
-					
-			}
+			using_item(itemID,duringTime);
+		
 			
 		} else{
 			gainScore(PER_SCORE);			
@@ -264,22 +267,16 @@ html, body, .wrapper {
 		clearTimeout(threadID); //쓰레드종료
 	}
 	
-	//모든 캔디 삭제 
-	function removeAllCandy(doEffect) {
-		var candies = $(".candy");
-		candies.each(function(){
-			removeTarget( $(this), doEffect);
-		});
-	}
-	
 	//모든 타겟 삭제
 	function removeAllTarget(doEffect) {
 		var targets = $(".target");
 		targets.each(function(){
 			removeTarget($(this), doEffect);
 		});
+		
 	}
 
+	//아이템 생성
 	function makeItem(){
 		target.addClass("item");
 		var item = Math.floor(Math.random() * ITEMS.length); //어떤 아이템을 부여할지 랜덤으로
@@ -435,7 +432,7 @@ html, body, .wrapper {
 			}
 			
 			//재귀를 이용한 Interval
-			var moveTargetThreadID = setTimeout(function(){ moveTarget(target)}, 100);
+			var moveTargetThreadID = setTimeout(function(){ moveTarget(target)}, targetMoveSpeed);
 			target.find(".moveTargetThreadID").val(moveTargetThreadID);
 		}
 		
@@ -445,6 +442,7 @@ html, body, .wrapper {
 	function gameover() {
 		removeAllTarget(false)// 모든 타겟 삭제
 		stopMakeTarget(); // 타겟 생성 중지
+		
 		
 		$(".wrap-fg").addClass("on");
 		$(".wrap-gameover").addClass("on");
@@ -457,8 +455,8 @@ html, body, .wrapper {
 		 score.text(totalScore);
 	}
 	
-
-	function checkTargetNumber(){ //타겟 수 체크 
+	//타겟 수 체크 
+	function checkTargetNumber(){ 
 		var targets = $(".target");
 		var targetNumber = 0;
 		targets.each(function(){
@@ -488,6 +486,61 @@ html, body, .wrapper {
 		makeTargetThread = null; //쓰레드 변수 초기화
 	}
 	
+	//체력 감소
+	function life_decrease() { //재귀를 이용한 Interval
+		life = life - 10;
+		$(".life-board").progressbar({value: life});
+		lifeDecreaseThread = setTimeout(life_decrease, lifeDecreaseRate);
+	}
+	
+	//체력 회복
+	function life_recovery(recover) {
+		$(".life-board").progressbar({value: life + recover});
+		
+	}
+	
+	//체력 확인 쓰레드
+	var checkLife = setInterval(function() {
+		if(life <= 0) {
+			gameover();
+			lifeDecreaseThread = null;
+		}
+	},500);
+	
+	//Item 사용
+	function using_item(item_type,time) {
+		switch(item_type) {
+			case 01: //타겟 속도 감소
+				moveTargetThread = moveTargetThread + 50;
+				setTimeout(function(){ turnBack_item(item_type); }, time);
+				break;
+				
+			case 02: //타겟속도 증가 및 파리채 면적 감소
+				setTimeout(function(){ turnBack_item(item_type); }, time);
+				break;
+			
+		}
+	}
+	
+	
+	//Item 효과 되돌리기
+	function turnBack_item(item_type) {
+		switch(item_type) {
+			case 01: //타겟 속도 감소
+				moveTargetThread = moveTargetThread - 50;
+				break;
+			case 02: //타겟속도 증가 및 파리채 면적 감소
+				break;
+				
+				
+		
+		}
+		
+	}
+	
+	
+	
+	
 	$(document).ready(function(){
 		var attacker = $(".attacker");
 		attacker.css("width", attackAreaWidth);
@@ -506,12 +559,25 @@ html, body, .wrapper {
 		//타겟 생성 쓰레드
 		startMakeTarget();
 		startTargetNumber();
+		life_decrease();
 		//오디오 시작
 		startAudio();
 		function startAudio(){
 			backgroundAudio = new Audio('${pageContext.request.contextPath}/resources/audio/sample_bgm.mp3');
 			backgroundAudio.play();
 		}
+		
+		//체력게이지
+			$( ".life-board" ).progressbar({
+				classes: {
+					  "ui-progressbar": "ui-corner-all",
+					  "ui-progressbar-complete": "ui-corner-right",
+					  "ui-progressbar-value": "ui-corner-left"
+				},
+	     	 value: life
+	 	   });
+		
+		
 		
 		//화면 클릭 이벤트
 		 $(".play-ground").on("click",function(e) {
@@ -559,6 +625,11 @@ html, body, .wrapper {
     				setTimeout(function(){combo.css("display", "none")}, 1000);
     				
     				gainScore(COMBO_SCORE);		
+    				
+    				//체력증가
+    				var recovery_degree = 5;
+    				life_recovery(recovery_degree);
+    				
     			}
     		}
 	    });
@@ -607,7 +678,8 @@ html, body, .wrapper {
 				<div class="score">0</div>
 				<div class="combo">COMBO!!</div>
 			</div>
-			<div></div>
+			<div class="life-board">
+			</div>
 		</div>
 		<div class="play-ground">
 			<div class="attacker"></div>
