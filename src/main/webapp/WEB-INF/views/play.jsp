@@ -129,7 +129,8 @@ html, body, .wrapper {
 	justify-content: center;
 	align-items: center;	
 	background: rgba(0,0,0,0);
-	transition: transform 0s cubic-bezier(0.215, 0.61, 0.355, 1);
+	transform-origin : 50% 50%;
+	/* transition: transform 0s cubic-bezier(0.215, 0.61, 0.355, 1); */
 }
 
 .target .target-icon{
@@ -140,19 +141,23 @@ html, body, .wrapper {
 }
 
 .targeting-area {
-	position: absolute;
-	width: 100px;
-	height: 100px;
-	top: 50%;
-	left: 50%;
-	background: red;
-	backface-visibility: hidden;
+	
 }
 
 .target.candy 	.target-icon{ background-image: url("resources/image/sample_candy.png");}
 .target.item 	.target-icon{ background-image: url("resources/image/sample_candy_item.png"); }
 .target.removed .target-icon{ background-image: url("resources/image/effect.gif"); }
 
+.attacker {
+	position: absolute;
+	background: red;
+	z-index :4;
+	display: none;
+}
+
+.attacker.on{
+	display : block;
+}
 </style>
 
 <script>
@@ -160,7 +165,7 @@ html, body, .wrapper {
 	const PER_SCORE				= 10; 	// 타겟 하나당 점수
 	const TARGET_WIDTH			= 50;	// 타겟 넓이
 	const TARGET_HEIGHT			= 50;	// 타겟 높이
-	const HIDDEN_PADDING		= 50;	// 타겟 높이
+	const HIDDEN_PADDING		= 0;	// 타겟 높이
 	const TOUCH_PADDING			= 10;
 	const ITEM_CREATE_PERCENT	= 0.05;  // 아이템 생성 확률
 
@@ -173,7 +178,7 @@ html, body, .wrapper {
 	var endX;
 	var endY;
 	
-	var targetMakeRate 		= 500; 	// 타겟이 생성되는 간격 , 1000 = 1초
+	var targetMakeRate 		= 500000; 	// 타겟이 생성되는 간격 , 1000 = 1초
 	var randAngleTime		= 5000; // 타겟이 이동방향을 바꾸는 쓰레드 간격.
 	var totalScore			= 0; 	// 점수
 	var makeTargetThread;
@@ -181,8 +186,8 @@ html, body, .wrapper {
 	var moveDistance 	= 5;
 	
 	//targeting 범위
-	var touchAreaWidth = 150;
-	var touchAreaHieght = 150;
+	var attackAreaWidth = 150;
+	var attackAreaHeight = 150;
 	
 	//클릭시 소리
 	var removeSound = new Audio();
@@ -191,8 +196,8 @@ html, body, .wrapper {
 	removeSound.controls = true;
 	removeSound.autoPlay = false;
 	
-	//타겟 삭제 - 터치했을때
-	function doTouchTarget(target){
+	//타겟 삭제 - 공격당했을때
+	function doAttackTarget(target){
 		var target = $(target);
 		if(target.hasClass("item")){ //타겟이 아이템을 가진 경우
 	
@@ -287,42 +292,55 @@ html, body, .wrapper {
 		var startLine = Math.floor(Math.random() * 4);
 		var left = 0;
 		var top	 = 0;
-		var deg	 = 0;
+		var angle = 0;
 		
 		switch(startLine){
 		case 0://왼쪽, 상하랜덤
-			left= startX - HIDDEN_PADDING;
-			top =  Math.random() * ((endY - TARGET_HEIGHT) - startY) + startY;
-			deg	= 90;
+			left	= startX - HIDDEN_PADDING;
+			top 	=  Math.random() * ((endY - TARGET_HEIGHT) - startY) + startY;
 			break;
 		case 1://오른쪽, 상하랜덤
-			left= endX - TARGET_WIDTH + HIDDEN_PADDING; 
-			top =  Math.random() * ((endY - TARGET_HEIGHT) - startY) + startY;
-			deg	= 270;
+			left	= endX - TARGET_WIDTH + HIDDEN_PADDING; 
+			top 	=  Math.random() * ((endY - TARGET_HEIGHT) - startY) + startY;
 			break;
 		case 2://위쪽, 좌우랜덤
-			left=  Math.random() * ((endX - TARGET_WIDTH) - startX) + startX;
-			top = startY - HIDDEN_PADDING;
-			deg	= 180;
+			left	=  Math.random() * ((endX - TARGET_WIDTH) - startX) + startX;
+			top 	= startY - HIDDEN_PADDING;
 			break;
 		case 3://아래쪽, 좌우랜덤
-			left=  Math.random() * ((endX - TARGET_WIDTH) - startX) + startX;
-			top = endY - TARGET_HEIGHT + HIDDEN_PADDING;
-			deg	= 0;
+			left	=  Math.random() * ((endX - TARGET_WIDTH) - startX) + startX;
+			top 	= endY - TARGET_HEIGHT + HIDDEN_PADDING;
 			break;
 		}
 		
-		target.offset({ "left": left });
-		target.offset({ "top": top });
-		target.css("transform", "rotate(" + deg + "deg)");
-	
+		target.offset({ "left": left});
+		target.offset({ "top": top});
+		target.css("transform", "rotate(" + angle + "deg)");
 		randAngle(target);
 		function randAngle(target){
 			var toLeftDistance 	= Math.floor(Math.random() * 2 * moveDistance) - moveDistance;
 			var toTopDistance  	= Math.floor(Math.random() * 2 * moveDistance) - moveDistance;
-			var tangentAngle	= toTopDistance/toLeftDistance 
-			var angle			= Math.atan(tangentAngle) * 180;
+			var tangent			= toTopDistance/toLeftDistance;
+			var angle			= Math.atan(tangent)/ 3.14 * 180;
 			
+			console.log(toTopDistance + " , " + toLeftDistance + " >>>>  " + tangent + " , " + angle);
+			//
+			if(toLeftDistance > 0 && toTopDistance > 0){
+				
+			}
+			
+			if(toLeftDistance > 0 && toTopDistance < 0){
+							
+			}
+						
+			if(toLeftDistance < 0 && toTopDistance < 0){
+				
+			}
+			
+			if(toLeftDistance < 0 && toTopDistance > 0){
+				
+			}
+						
 			target.css("transform", "rotate(" + angle + "deg)");
 			
 			//재귀를 이용한 Interval
@@ -331,7 +349,7 @@ html, body, .wrapper {
 			target.find(".toLeftDistance").val(toLeftDistance);
 			target.find(".toTopDistance").val(toTopDistance);
 			
-			var randAngleThreadID = setTimeout(function(){ randAngle(target)}, randAngleTime);
+			var randAngleThreadID = setTimeout(function(){ randAngle(target)}, 5000);
 			target.find(".randAngleThreadID").val(randAngleThreadID);
 		}
 		
@@ -394,6 +412,10 @@ html, body, .wrapper {
 	}
 	
 	$(document).ready(function(){
+		var attacker = $(".attacker");
+		attacker.css("width", attackAreaWidth);
+		attacker.css("height", attackAreaHeight);
+		
 		//초기화 (좌표)
 		initXY();
 		function initXY(){
@@ -406,51 +428,41 @@ html, body, .wrapper {
 		
 		//타겟 생성 쓰레드
 		startMakeTarget();
-
-		//마우스 클릭 범위 표시 
-		$('.play-ground').mousemove(function (e) {
-		
-			var targetingArea = $('.targeting-area');
-			
-			var left= targetingArea.offset().left;
-			var top = targetingArea.offset().top;
-			
-			//길이 높이 지정
-			targetingArea.width(touchAreaWidth);
-			targetingArea.height(touchAreaHieght);
-			
-			//위치 지정
-			targetingArea.offset({ "left": e.pageX - (touchAreaWidth/2)});
-			targetingArea.offset({ "top": e.pageY - (touchAreaHieght/2)});
-		});
-		
 		
 		//화면 클릭 이벤트
-		 $(document).on("click",".play-ground",function(e) {
-		   
-		        checkTargetArea(e);
-		        function checkTargetArea(e){
-		    		
-		        	var xpos = e.pageX;
-		        	var ypos = e.pageY;
-		        		        	
-		        	var targetingAreaXpos = xpos - (touchAreaWidth/2);
-		        	var targetingAreaYpos = ypos - (touchAreaHieght/2);
-		    			        
-		        	//범위 안에 있는지 검사
-		        	var targets = $(".target");
-		    		targets.each(function(){
-		    			
-		    			if($(this).offset().left + TARGET_WIDTH >= targetingAreaXpos && $(this).offset().left <= targetingAreaXpos + touchAreaWidth){
-			    				if($(this).offset().top + TARGET_HEIGHT >= targetingAreaYpos && $(this).offset().top <= targetingAreaYpos + touchAreaHieght){	
-		    						//타겟팅 범위 안에 있다면 해당 타켓 삭제
-			    					doTouchTarget(this);
-		   						}
-		  					}
-		    			
-		    		}); 		
-		    	}
-		    });
+		 $(".play-ground").on("click",function(e) {
+			var attacker = $(".attacker");
+			attacker.addClass("on");
+			
+        	var x = e.pageX;
+        	var y = e.pageY;
+        		        
+        	var attackStartX = x - (attackAreaWidth/2);
+        	var attackStartY = y - (attackAreaHeight/2);
+        	var attackEndX = x + (attackAreaWidth/2);
+        	var attackEndY = y + (attackAreaHeight/2);
+        	
+        	attacker.offset({"left" : attackStartX});
+        	attacker.offset({"top" : attackStartY});
+        	setTimeout(function(){attacker.removeClass("on")}, 100);
+    			        
+        	//범위 안에 있는지 검사
+        	var targets = $(".target");
+    		targets.each(function(){
+    			var targetStartX= $(this).offset().left;
+    			var targetEndX	= targetStartX + TARGET_WIDTH;
+    			var targetStartY= $(this).offset().top;
+    			var targetEndY 	= targetStartY + TARGET_HEIGHT;
+    			
+    			if(targetStartX > attackStartX 
+    					&& targetEndX < attackEndX
+    					&& targetStartY > attackStartY
+    					&& targetEndY < attackEndY){
+    				doAttackTarget(this);
+    			}
+    			
+    		}); 		
+	    });
 		
 		//난이도UP 쓰레드 - 타겟이 빨리 떨어질수록, 타겟 만드는 속도는 빨라지도록
 		/* fallingSpeedUpThread = setInterval(function(){
@@ -464,7 +476,6 @@ html, body, .wrapper {
 <body>
 	<div class="wrapper">
 		<div class="wrap-fg"></div>
-		<div class="targeting-area"></div>
 		<div class="wrap-gameover">
 			<div class="gameover">
 				<div class="gameover-icon" style="background-image: url('${pageContext.request.contextPath}/resources/image/icon_play_gameover.gif');"></div>
@@ -482,7 +493,9 @@ html, body, .wrapper {
 			</div>
 			<div></div>
 		</div>
-		<div class="play-ground"></div>
+		<div class="play-ground">
+			<div class="attacker"></div>
+		</div>
 		<div class="footer"></div>
 	</div>
 </body>
