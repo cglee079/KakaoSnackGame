@@ -105,6 +105,14 @@ html, body, .wrapper {
 	text-align: center;
 }
 
+.combo {
+	font-size: 1.5rem;
+	font-weight: bold;
+	text-align: center;
+	position: absolute;
+	display: none;
+}
+
 .play-ground {
 	flex: 1;
 	position: relative;
@@ -163,6 +171,7 @@ html, body, .wrapper {
 <script>
 	//FINAL
 	const PER_SCORE				= 1000; 	// 타겟 하나당 점수
+	const COMBO_SCORE			= 2000; 	// 콤보 시 타겟 하나당 점수
 	const TARGET_WIDTH			= 50;	// 타겟 넓이
 	const TARGET_HEIGHT			= 50;	// 타겟 높이
 	const HIDDEN_PADDING		= 0;	// 숨겨진 공간
@@ -227,7 +236,7 @@ html, body, .wrapper {
 			}
 			
 		} else{
-			gainScore();			
+			gainScore(PER_SCORE);			
 		}
 		
 		removeTarget(target, true);
@@ -439,13 +448,14 @@ html, body, .wrapper {
 	}
 	
 	//점수 증가
-	function gainScore(){
+	function gainScore(scoreType){
 		 var score = $(".score");
-		 totalScore = totalScore + PER_SCORE;
+		 totalScore = totalScore + scoreType;
 		 score.text(totalScore);
 	}
 	
-	function checkTargetNumber(){
+
+	function checkTargetNumber(){ //타겟 수 체크 
 		var targets = $(".target");
 		var targetNumber = 0;
 		targets.each(function(){
@@ -460,6 +470,7 @@ html, body, .wrapper {
 				startMakeTarget();
 		}
 	}
+	
 	function startMakeTarget() { //재귀를 이용한 Interval
 		makeTarget();
 		makeTargetThread = setTimeout(startMakeTarget, targetMakeRate);
@@ -509,6 +520,7 @@ html, body, .wrapper {
         	attacker.css("top", attackStartY);
         	setTimeout(function(){attacker.removeClass("on")}, 100);
     			        
+        	var attackedTargetNumber = 0;
         	//범위 안에 있는지 검사
         	var targets = $(".target");
     		targets.each(function(){
@@ -521,10 +533,24 @@ html, body, .wrapper {
     					&& targetEndX < attackEndX
     					&& targetStartY > attackStartY
     					&& targetEndY < attackEndY){
+    				attackedTargetNumber = attackedTargetNumber+1;
     				doAttackTarget(this);
     			}
     			
-    		}); 		
+    		}); 
+    		
+    		checkCombo();
+    		function checkCombo(){
+    			if(attackedTargetNumber >= 2){
+    				var combo = $(".combo");
+    				combo.css("left", attackStartX);
+    				combo.css("top", attackStartY);
+    				setTimeout(function(){combo.css("display", "block")}, 100);
+    				setTimeout(function(){combo.css("display", "none")}, 1000);
+    				
+    				gainScore(COMBO_SCORE);		
+    			}
+    		}
 	    });
 		
 		//난이도UP 쓰레드 - 타겟이 빨리 떨어질수록, 타겟 만드는 속도는 빨라지도록
@@ -555,6 +581,7 @@ html, body, .wrapper {
 			</div>
 			<div class="score-board">
 				<div class="score">0</div>
+				<div class="combo">COMBO!!</div>
 			</div>
 			<div></div>
 		</div>
