@@ -126,12 +126,12 @@ html, body, .wrapper {
 	align-items: center;	
 	background: rgba(0,0,0,0);
 	transform-origin : 50% 50%;
-	transition: transform 1s cubic-bezier(0.215, 0.61, 0.355, 1);
+	/* transition: transform 1s cubic-bezier(0.215, 0.61, 0.355, 1); */
 }
 
 .target .target-icon{
-	width : 80%;
-	height : 80%;
+	width : 100%;
+	height : 100%;
 	background-repeat: no-repeat;
 	background-size: contain;
 	background-image: url("resources/image/sample_target.png");
@@ -156,8 +156,8 @@ html, body, .wrapper {
 <script>
 	//FINAL
 	const PER_SCORE				= 10; 	// 타겟 하나당 점수
-	const TARGET_WIDTH			= 80;	// 타겟 넓이
-	const TARGET_HEIGHT			= 80;	// 타겟 높이
+	const TARGET_WIDTH			= 50;	// 타겟 넓이
+	const TARGET_HEIGHT			= 50;	// 타겟 높이
 	const HIDDEN_PADDING		= 50;	// 숨겨진 공간
 	const TOUCH_PADDING			= 10;
 	const ITEM_CREATE_PERCENT	= 0.05;  // 아이템 생성 확률
@@ -275,7 +275,6 @@ html, body, .wrapper {
 			doTouchTarget(this);
 		}); */
 		target.append($("<div>", {"class" : "target-icon"}));
-		target.append($("<input>", {"class" : "randAngleThreadID", type : "hidden"}));
 		target.append($("<input>", {"class" : "moveTargetThreadID", type : "hidden"}));
 		target.append($("<input>", {"class" : "angle", type : "hidden"}));
 		target.append($("<input>", {"class" : "toLeftDistance", type : "hidden"}));
@@ -294,29 +293,23 @@ html, body, .wrapper {
 		case 0://왼쪽, 상하랜덤
 			left	= startX - HIDDEN_PADDING;
 			top 	=  Math.random() * ((endY - TARGET_HEIGHT) - startY) + startY;
-			angle	= 90;
 			break;
 		case 1://오른쪽, 상하랜덤
 			left	= endX - TARGET_WIDTH + HIDDEN_PADDING; 
 			top 	=  Math.random() * ((endY - TARGET_HEIGHT) - startY) + startY;
-			angle	= 270;
 			break;
 		case 2://위쪽, 좌우랜덤
 			left	=  Math.random() * ((endX - TARGET_WIDTH) - startX) + startX;
 			top 	= startY - HIDDEN_PADDING;
-			angle	= 180;
 			break;
 		case 3://아래쪽, 좌우랜덤
 			left	=  Math.random() * ((endX - TARGET_WIDTH) - startX) + startX;
 			top 	= endY - TARGET_HEIGHT + HIDDEN_PADDING;
-			angle	= 0;
 			break;
 		}
 		
-		target.css("left", top);
+		target.css("left", left);
 		target.css("top", top);
-		target.css("transform", "rotate(" + angle + "deg)");
-		target.find(".angle").val(angle);
 	
 		randAngle(target);
 		function randAngle(target){
@@ -381,13 +374,9 @@ html, body, .wrapper {
 			target.css("transform", "rotate(" + angle + "deg)");
 			
 			//재귀를 이용한 Interval
-			target.find(".randAngleThreadID").val(randAngleThreadID);
 			target.find(".angle").val(angle);
 			target.find(".toLeftDistance").val(toLeftDistance);
 			target.find(".toTopDistance").val(toTopDistance);
-			
-			var randAngleThreadID = setTimeout(function(){ randAngle(target)}, 5000);
-			target.find(".randAngleThreadID").val(randAngleThreadID);
 		}
 		
 		moveTarget(target);
@@ -405,10 +394,8 @@ html, body, .wrapper {
 					|| left > (endX - TARGET_WIDTH + HIDDEN_PADDING)
 					|| top < (startY - HIDDEN_PADDING)
 					|| top > (endY - TARGET_HEIGHT + HIDDEN_PADDING)) {
-				var randAngleThreadID = target.find(".randAngleThreadID").val();
 				var moveTargetThreadID = target.find(".moveTargetThreadID").val();
 				
-				clearTimeout(randAngleThreadID);
 				randAngle(target);
 			}  else{
 				target.css("left", left);
