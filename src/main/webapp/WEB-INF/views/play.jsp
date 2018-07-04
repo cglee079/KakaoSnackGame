@@ -125,7 +125,7 @@ html, body, .wrapper {
 .ui-widget-header {
 	background: #cedc98;
 	color: #333333;
-	height:50px;
+	height: 50px;
 }
 
 .play-ground {
@@ -171,6 +171,25 @@ html, body, .wrapper {
 	background-image: url("resources/image/sample_target_removed.png");
 }
 
+.boss-target {
+position: absolute;
+	z-index: 2;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background: rgba(0, 0, 0, 0);
+	transform-origin: 50% 50%;
+}
+
+.boss-target .boss-target-icon {
+	width: 100%;
+	height: 100%;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("resources/image/sample_target_boss.jpg");
+}
+
+
 .attacker {
 	position: absolute;
 	background: red;
@@ -192,7 +211,11 @@ html, body, .wrapper {
 	const HIDDEN_PADDING		= 0;	// 숨겨진 공간
 	const ITEM_CREATE_PERCENT	= 0.05;  // 아이템 생성 확률
 	const RIGHT_ANGLE = 90;
-
+	const LIMIT_COMBO_NUMBER	= 3;	// 피버되기까지 콤보 수 
+	const BOSS_TARGET_LEFTDISTANCE= 30;
+	const BOSS_TARGET_WIDTH		= 300;	// 보스 타겟 넓이
+	const BOSS_TARGET_HEIGHT	= 300;	// 보스 타겟 높이
+	
 	//001 모두지우기,지속시간
 	//002 잠깐 멈추기
 	const ITEMS = [{item_type :"ITM_001", item_duration :5000}, {item_type :"ITM_002", item_duration :5000}]; 
@@ -206,10 +229,14 @@ html, body, .wrapper {
 	var randAngleTime		= 5000; // 타겟이 이동방향을 바꾸는 쓰레드 간격.
 	var totalScore			= 0; 	// 점수
 	var makeTargetThread;
+	var checkTargetThread;
 	var fallingSpeedUpThread;
 	var moveDistance 	= 10;
 	var maxTargetNumber = 5; //최대 타겟 수 
+	var comboNumber = 0; //콤보 횟수 저장
 	var targetMoveSpeed = 100; //타겟 스피드
+	var bossTargetLeftdistance= 10; //보스 타겟 왼쪽 이동 거리
+	var bossTargetTouchCount = 0; //보스 타겟 터치 카운트 
 	
 	//targeting 범위
 	var attackAreaWidth = 150;
@@ -477,7 +504,7 @@ html, body, .wrapper {
 		makeTargetThread = setTimeout(startMakeTarget, targetMakeRate);
 	}	
 	function startTargetNumber(){ //타겟 수 체크
-		setInterval(function(){
+		checkTargetThread = setInterval(function(){
 			checkTargetNumber();
 		},targetMakeRate);
 	}	
@@ -485,6 +512,25 @@ html, body, .wrapper {
 		clearTimeout(makeTargetThread);
 		makeTargetThread = null; //쓰레드 변수 초기화
 	}
+	
+	function stopTargetNumber(){
+		clearTimeout(checkTargetThread);
+		checkTargetThread = null;
+	}
+	
+	function stopMoveBossTarget(){
+		clearTimeout(moveBossTargetThread);
+		moveBossTargetThread = null;
+		
+		//보스 이미지 삭제 
+		var bossTarget = $(".boss-target");
+		bossTarget.remove();
+		
+		//타겟 생성 스레드 시작
+		startTargetNumber();
+		startMakeTarget();
+	}
+	
 	
 	//체력 감소
 	function life_decrease() { //재귀를 이용한 Interval
@@ -522,7 +568,6 @@ html, body, .wrapper {
 		}
 	}
 	
-	
 	//Item 효과 되돌리기
 	function turnBack_item(item_type) {
 		switch(item_type) {
@@ -530,14 +575,80 @@ html, body, .wrapper {
 				moveTargetThread = moveTargetThread - 50;
 				break;
 			case 02: //타겟속도 증가 및 파리채 면적 감소
-				break;
-				
-				
+				break;		
+		}	
+	}
+	
+function startFeverTime(){//피버타임 시작
 		
+		//기존 스레드 모두 정지
+		stopTargetNumber();
+		stopMakeTarget();
+		
+		removeAllTarget(false)// 모든 타겟 삭제
+		
+		var playGround = $(".play-ground");
+		var windowWidth = playGround.width();
+		var windowHeight = playGround.height();
+		var bosTarget = $("<div>", {"class" : "boss-target"});
+		bosTarget.on("click", function(){
+			//보스 타겟 터치 이벤트
+			
+			bossTargetTouchCount = bossTargetTouchCount+1;
+			
+			if(bossTargetTouchCount == 5){ //보스 타겟 다섯번 터피하면	
+				//보스 스레드 정지 
+				stopMoveBossTarget();
+				bossTargetTouchCount = 0;	
+			}
+		});
+		
+		//보스 타겟 설정
+		bosTarget.append($("<div>", {"class" : "boss-target-icon"}));
+		bosTarget.append($("<input>", {"class" : "toLeftDistance", type : "hidden"}));
+		bosTarget.append($("<input>", {"class" : "toTopDistance", type : "hidden"}));
+		bosTarget.appendTo(playGround);
+		bosTarget.css("width", BOSS_TARGET_WIDTH);
+		bosTarget.css("height", BOSS_TARGET_HEIGHT);
+		bosTarget.css("left", (windowWidth/2)-(BOSS_TARGET_WIDTH/2)); //보스 벌레 이미지 정중앙 배치
+		bosTarget.css("top", (windowHeight/2)-(BOSS_TARGET_HEIGHT/2));
+		bosTarget.find(".toLeftDistance").val(bossTargetLeftdistance);
+		/* bosTarget.find(".toTopDistance").val(2); */
+		
+		//보스 타겟 스레드 시작
+		startMoveBossTarget();
+		function startMoveBossTarget(){
+			moveBossTargetThread = setInterval(function(){
+				moveTarget();
+			},targetMakeRate);
+		}
+		
+		//보스 타겟 스레드
+		function moveTarget(){
+			var left= parseInt(bosTarget.css("left"));
+			/* var top = parseInt(bosTarget.css("top")); */
+			var toLeftDistance = parseInt(bosTarget.find(".toLeftDistance").val());
+			/* var toTopDistance = parseInt(bosTarget.find(".toTopDistance").val()); */
+			
+			left= left + toLeftDistance;
+			/* top = top + toTopDistance; */
+			
+			//범위를 넘어간경우
+			if(left < (startX - HIDDEN_PADDING)
+					|| left > (endX - BOSS_TARGET_WIDTH + HIDDEN_PADDING)
+					|| top < (startY - HIDDEN_PADDING)
+					|| top > (endY - BOSS_TARGET_HEIGHT + HIDDEN_PADDING)) {
+				bossTargetLeftdistance = bossTargetLeftdistance-(bossTargetLeftdistance*2);
+				bosTarget.find(".toLeftDistance").val(bossTargetLeftdistance);
+				/* bosTarget.find(".toTopDistance").val(-50); */
+				
+			}  else{
+				bosTarget.css("left", left);
+				/* bosTarget.css("top", top); */
+			}
 		}
 		
 	}
-	
 	
 	
 	
@@ -616,21 +727,30 @@ html, body, .wrapper {
     		}); 
     		
     		checkCombo();
+    		function plusCombo(){
+    			comboNumber = comboNumber+1;
+    		}
     		function checkCombo(){
     			if(attackedTargetNumber >= 2){
-    				var combo = $(".combo");
-    				combo.css("left", attackStartX);
-    				combo.css("top", attackStartY);
-    				setTimeout(function(){combo.css("display", "block")}, 100);
-    				setTimeout(function(){combo.css("display", "none")}, 1000);
-    				
-    				gainScore(COMBO_SCORE);		
-    				
-    				//체력증가
-    				var recovery_degree = 5;
-    				life_recovery(recovery_degree);
-    				
-    			}
+    				if(comboNumber == LIMIT_COMBO_NUMBER){ //피버타임 검사
+    					comboNumber = 0;
+    					startFeverTime();	
+    				}
+    				else{
+    					var combo = $(".combo");
+        				combo.css("left", attackStartX);
+        				combo.css("top", attackStartY);
+        				setTimeout(function(){combo.css("display", "block")}, 100);
+        				setTimeout(function(){combo.css("display", "none")}, 1000);
+        				
+        				gainScore(COMBO_SCORE);		
+        				plusCombo(); //콤보 증가
+        				//체력증가
+        				var recovery_degree = 5;
+        				life_recovery(recovery_degree);
+    				}
+    		
+   			}
     		}
 	    });
 	
@@ -669,7 +789,7 @@ html, body, .wrapper {
 		</div>
 
 		<div class="head">
-			<div class="bgm-source-board" >
+			<div class="bgm-source-board">
 				<%-- <embed class="back-music-source"
 					src="${pageContext.request.contextPath}/resources/audio/sample_bgm.mp3"
 					autostart="true" hidden="true" loop="true"> --%>
@@ -678,8 +798,7 @@ html, body, .wrapper {
 				<div class="score">0</div>
 				<div class="combo">COMBO!!</div>
 			</div>
-			<div class="life-board">
-			</div>
+			<div class="life-board"></div>
 		</div>
 		<div class="play-ground">
 			<div class="attacker"></div>
