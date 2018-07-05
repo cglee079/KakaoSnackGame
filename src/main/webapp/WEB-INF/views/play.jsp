@@ -628,8 +628,8 @@ html, body, .wrapper {
 		var bossTarget = $(".boss-target");
 		bossTarget.remove();
 		
-		$(".life-board").progressbar({value: fullLife}); 	//체력 가득
 		life = fullLife;
+		$(".life-board").progressbar({value: life}); 	//체력 가득
 	}
 	
 	//피버타겟 스레드 시작
