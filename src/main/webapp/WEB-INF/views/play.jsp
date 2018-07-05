@@ -118,7 +118,7 @@ html, body, .wrapper {
 	height: 100%;
 	background-repeat: no-repeat;
 	background-size: contain;
-	background-image: url("resources/image/sample_stop_audio.jpg");
+	background-image: url(resources/image/sample_start_audio.png);
 	z-index: 4;
 }
 
@@ -965,11 +965,11 @@ html, body, .wrapper {
 			if($(this).attr('data-click-state') == 1) {
 				$(this).attr('data-click-state', 0);
 				startAudio(audio);			
-				$(".bgm-source-board").css({"background":"url(resources/image/sample_stop_audio.jpg", 'background-repeat' : 'no-repeat', 'background-size' : 'contain'});} 
+				$(".bgm-source-board").css({"background":"url(resources/image/sample_start_audio.png", 'background-repeat' : 'no-repeat', 'background-size' : 'contain'});} 
 			else {
 				$(this).attr('data-click-state', 1);		
 				stopAudio(audio);			
-				$(".bgm-source-board").css({"background":"url(resources/image/sample_start_audio.jpg", 'background-repeat' : 'no-repeat' ,'background-size' : 'contain'});
+				$(".bgm-source-board").css({"background":"url(resources/image/sample_stop_audio.png", 'background-repeat' : 'no-repeat' ,'background-size' : 'contain'});
 }
 		});
 		
