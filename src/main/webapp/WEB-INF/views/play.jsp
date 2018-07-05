@@ -348,7 +348,7 @@ html, body, .wrapper {
 	
 	function removeTarget(target, doEffect){
 		if(doEffect){ //소리, 제거 효과
-			removeSound.play();
+			startAudio(removeSound);			
 			removeSound.currentTime = 0;
 	
 			target.addClass('removed'); //이미지 변경
@@ -405,7 +405,15 @@ html, body, .wrapper {
 	
 	//음악 시작
 	function startAudio(playtimeType){ 
-		playtimeType.play(); 
+		if($(".bgm-source-board").attr('data-click-state') == 1){ //지금 정지 중이라면 
+			playtimeType.play(); 
+			playtimeType.volume = 0.0;
+		}
+		else { //지금 재생중이라면
+			playtimeType.play(); 
+			playtimeType.volume = 0.5;
+		}
+		
 	}
 	//음악 정지
 	function stopAudio(playtimeType){ 
@@ -614,6 +622,8 @@ html, body, .wrapper {
 		var bosTarget = $("<div>", {"class" : "boss-target"});
 		bosTarget.on("click", function(){
 			bossTargetTouchCount = bossTargetTouchCount+1;
+			startAudio(removeSound);			
+			removeSound.currentTime = 0;
 			if(bossTargetTouchCount == BOSS_TARGET_NUMBRT){ //보스 타겟 다섯번 터치하면	
 				bossTargetTouchCount = 0;	
 				stopPlayBossTime();
@@ -959,7 +969,8 @@ html, body, .wrapper {
 			else {
 				$(this).attr('data-click-state', 1);		
 				stopAudio(audio);			
-				$(".bgm-source-board").css({"background":"url(resources/image/sample_start_audio.jpg", 'background-repeat' : 'no-repeat' ,'background-size' : 'contain'});}
+				$(".bgm-source-board").css({"background":"url(resources/image/sample_start_audio.jpg", 'background-repeat' : 'no-repeat' ,'background-size' : 'contain'});
+}
 		});
 		
 				
