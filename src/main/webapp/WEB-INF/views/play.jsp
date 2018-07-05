@@ -220,14 +220,14 @@ html, body, .wrapper {
 
 <script>
 	//FINAL
-	const PER_SCORE			 	  = 100;	// 타겟 하나당 점수
-	const COMBO_SCORE			  = 200;	// 콤보 시 타겟 하나당 점수
-	const FEVER_PER_SCORE		  = 300;	// 피버 타겟 하나당 점수
+	const TARGET_POINT	  = 100;	// 타겟 하나당 점수
+	const COMBO_POINT	  = 200;	// 콤보 시 타겟 하나당 점수
+	const FEVER_POINT	  = 300;	// 피버 타겟 하나당 점수
 	
 	const TARGET_WIDTH			  = 50;		// 타겟 넓이
 	const TARGET_HEIGHT			  = 50;		// 타겟 높이
-	const FEVER_TARGET_WIDTH      = 50;		// 피버  타겟 넓이
-	const FEVER_TARGET_HEIGHT     = 50;		// 피버 타겟 높이
+	const FEVER_WIDTH      = 50;		// 피버  타겟 넓이
+	const FEVER_HEIGHT     = 50;		// 피버 타겟 높이
 	const HIDDEN_PADDING		  = 50;		// 숨겨진 공간
 	const ITEM_CREATE_PERCENT	  = 0.05;	// 아이템 생성 확률
 	const RIGHT_ANGLE 			  = 90;
@@ -238,8 +238,6 @@ html, body, .wrapper {
 	const BOSS_TARGET_HEIGHT	  = 300;	// 보스 타겟 높이
 	const RECOVERY_DEGREE   	  = 10;     // 체력 회복 수치
 	
-	//001 모두지우기,지속시간
-	//002 잠깐 멈추기
 	const ITEMS = [
 		{type :"ITM_001", duration :5000}, 
 		{type :"ITM_002", duration :5000}
@@ -299,14 +297,17 @@ html, body, .wrapper {
 			var item = target.find(".item-id").val();
 			usingItem(item);
 			removeTarget(target, true);
+			
 		} else if(target.hasClass("fever-target")){ //피버타임 아이템인 경우
-			gainScore(FEVER_PER_SCORE);	
+			gainScore(FEVER_POINT);	
 			removeTarget(target, true);
+			
 		} else if(target.hasClass("boss-target")){ //보스타임 아이템인 경우
-			gainScore(PER_SCORE);	
+			gainScore(TARGET_POINT);	
 			lifeRecovery(10);
+			
 		} else{ //노말 타겟인 경우
-			gainScore(PER_SCORE);
+			gainScore(TARGET_POINT);
 			lifeRecovery(5);
 			removeTarget(target, true);
 		}
@@ -337,15 +338,38 @@ html, body, .wrapper {
 		targets.each(function(){
 			removeTarget($(this), doEffect);
 		});
-		
 	}
 
+	//체력 회복
+	function lifeRecovery(recover) {
+		$(".life-board").progressbar({value: life + recover});
+	}
+	
+	//Item 사용
+	function usingItem(item) {
+		switch(item) {
+		case ITEMS[0]: //타겟 속도 감소
+			targetMoveSpeed = targetMoveSpeed + 50;
+			setTimeout(function(){ 
+				targetMoveSpeed = targetMoveSpeed - 50;	
+			}, item.duration);
+			break;
+		case ITEMS[1]: //타겟속도 증가 및 파리채 면적 감소
+			setTimeout(function(){ 
+				
+			}, item.duration);
+			break;
+		}
+	}
+	
+	
 	//아이템 생성
 	function makeItem(){
 		target.addClass("item");
 		var item = Math.floor(Math.random() * ITEMS.length); //어떤 아이템을 부여할지 랜덤으로
 		target.append($("<input>", {"class" : "item-id", type : "hidden", value : ITEMS[item]}));
 	}
+	
 	
 	//타겟을 만들어 떨어트림
 	function makeTarget(){
@@ -497,8 +521,8 @@ html, body, .wrapper {
 			}
 			
 			//재귀를 이용한 Interval
-			var moveTargetThreadID = setTimeout(function(){ moveTarget(target)}, targetMoveSpeed);
-			target.find(".moveTargetThreadID").val(moveTargetThreadID); 
+			var moveTargetThread = setTimeout(function(){ moveTarget(target)}, targetMoveSpeed);
+			target.find(".moveTargetThreadID").val(moveTargetThread); 
 		}
 		
 	}
@@ -506,17 +530,16 @@ html, body, .wrapper {
 	//게임 오버
 	function gameover() {
 		removeAllTarget(".target", false)// 모든 타겟 삭제
-		stopMakeTarget(); // 타겟 생성 중지
-		stopLifeDecrease(); //생명 감소 스레드 중지
+		stopPlayNormalTime();
 		
 		$(".wrap-fg").addClass("on");
 		$(".wrap-gameover").addClass("on");
 	}
 	
 	//점수 증가
-	function gainScore(scoreType){
+	function gainScore(point){
 		 var score = $(".score");
-		 totalScore = totalScore + scoreType;
+		 totalScore = totalScore + point;
 		 score.text(totalScore);
 	}
 	
@@ -621,8 +644,8 @@ html, body, .wrapper {
 			
 			feverTarget.append($("<div>", {"class" : "fever-target-icon"}));
 			feverTarget.append($("<input>", {"class" : "moveTargetThreadID", type : "hidden"}));
-			feverTarget.css("width", FEVER_TARGET_WIDTH);
-			feverTarget.css("height", FEVER_TARGET_HEIGHT);
+			feverTarget.css("width", FEVER_WIDTH);
+			feverTarget.css("height", FEVER_HEIGHT);
 			feverTarget.addClass("fever");
 			feverTarget.appendTo(playGround);
 		
@@ -630,8 +653,8 @@ html, body, .wrapper {
 			var top	 = 0;
 			
 			//보완필요
-			left	=  Math.random() * ((endX - FEVER_TARGET_WIDTH) - startX) + startX;
-			top 	=   Math.random() * ((endY - FEVER_TARGET_HEIGHT) - startY) + startY;
+			left	=  Math.random() * ((endX - FEVER_WIDTH) - startX) + startX;
+			top 	=   Math.random() * ((endY - FEVER_HEIGHT) - startY) + startY;
 			
 			//피버 타겟 위치 지정
 			feverTarget.css("left", left);
@@ -680,28 +703,6 @@ html, body, .wrapper {
 	function stopLifeDecrease(){
 		clearTimeout(lifeDecreaseThread);
 		lifeDecreaseThread = undefined;
-	}
-	
-	//체력 회복
-	function lifeRecovery(recover) {
-		$(".life-board").progressbar({value: life + recover});
-	}
-	
-	//Item 사용
-	function usingItem(item) {
-		switch(item) {
-		case ITEMS[0]: //타겟 속도 감소
-			moveTargetThread = moveTargetThread + 50;
-			setTimeout(function(){ 
-				moveTargetThread = moveTargetThread - 50;	
-			}, item.duration);
-			break;
-		case ITEMS[1]: //타겟속도 증가 및 파리채 면적 감소
-			setTimeout(function(){ 
-				
-			}, item.duration);
-			break;
-		}
 	}
 	
 	$(document).ready(function(){
@@ -789,7 +790,7 @@ html, body, .wrapper {
             				setTimeout(function(){combo.css("display", "block")}, 100);
             				setTimeout(function(){combo.css("display", "none")}, 1000);
             				
-            				gainScore(COMBO_SCORE); //콤보 점수 추가 획득		
+            				gainScore(COMBO_POINT); //콤보 점수 추가 획득		
             				plusCombo(); //콤보 증가
             				
         				}
@@ -803,8 +804,8 @@ html, body, .wrapper {
         		feverTargets.each(function(){
         			var targetStartX= parseInt($(this).css("left"));
         			var targetStartY= parseInt($(this).css("top"));
-        			var targetEndX	= targetStartX + FEVER_TARGET_WIDTH;
-        			var targetEndY 	= targetStartY + FEVER_TARGET_HEIGHT;
+        			var targetEndX	= targetStartX + FEVER_WIDTH;
+        			var targetEndY 	= targetStartY + FEVER_HEIGHT;
         			
         			if(targetStartX > attackStartX 
         					&& targetEndX < attackEndX
