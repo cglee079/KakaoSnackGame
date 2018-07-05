@@ -76,6 +76,36 @@ html, body, .wrapper {
 	font-weight: bold;
 }
 
+.wrap-fevertime {
+	display: none;
+	z-index: 3;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0);
+	justify-content: center;
+	align-items: center;
+}
+
+.fevertime {
+	width: 100%;
+	height: 100%;
+	/* background: #FFF;
+	border-radius: 10px;
+	box-shadow: 0px 10px 20px #222; */
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: center;
+	align-items: center;
+}
+
+.fevertime .fevertime-message {
+	font-size: 2rem;
+	font-weight: bold;
+}
+
 .head {
 	width: 100%;
 	height: 50px;
@@ -638,6 +668,25 @@ html, body, .wrapper {
 		
 		makeFeverTargetThread = setInterval(makeFeverTarget, feverTargetMakeRate);
 		
+		//피버타임 메세지 나타남
+		 var startFeverTimeMessage = setInterval(function(){
+			
+			var feverTimeMessage = $(".wrap-fevertime");
+			feverTimeMessage.toggle();
+		 }, '300');
+		
+		var startFeverTimeBackgroundChange = setInterval(function(){
+			var playGround = $('.play-ground');
+			
+			var r =  Math.round( Math.random()*256);
+			var g =  Math.round( Math.random()*256);
+			var b =  Math.round( Math.random()*256);
+			
+			var rgb = r + "," + g + "," + b;
+			playGround.css("background-color","rgb(" + rgb +")");
+			
+		}, '300');
+		 
 		function makeFeverTarget(){
 			var playGround = $(".play-ground");
 			var feverTarget = $("<div>", {"class" : "fever-target"});
@@ -660,6 +709,19 @@ html, body, .wrapper {
 			feverTarget.css("left", left);
 			feverTarget.css("top", top);
 		}
+		
+		setTimeout(function(){ // 피버 타임 백그라운드 색 변경 스레드 제거
+			var playGround = $('.play-ground');
+			clearTimeout(startFeverTimeBackgroundChange);
+			startFeverTimeBackgroundChange = undefined; 
+			playGround.css("background-color","rgba(0, 0, 0, 0)");
+			}, 
+			'5000');
+		
+		setTimeout(function(){ // 피버 타임 메세지 스레드 제거
+			clearTimeout(startFeverTimeMessage);
+			startFeverTimeMessage = undefined; }, 
+			'5000');
 		
 		setTimeout(stopPlayFeverTime, '5000'); // 모든 피버 타겟 삭제
 		setTimeout(startPlayNormalTime, '5000');
@@ -867,6 +929,13 @@ html, body, .wrapper {
 				<div class="gameover-icon"
 					style="background-image: url('${pageContext.request.contextPath}/resources/image/icon_play_gameover.gif');"></div>
 				<div class="gameover-message">GAME OVER</div>
+			</div>
+		</div>
+		<div class="wrap-fevertime">
+			<div class="fevertime">
+				<%-- 	<div class="fevertime-icon"
+					style="background-image: url('${pageContext.request.contextPath}/resources/image/icon_play_gameover.gif');"></div> --%>
+				<div class="fevertime-message">FEVER TIME</div>
 			</div>
 		</div>
 
