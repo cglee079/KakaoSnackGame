@@ -267,6 +267,7 @@ html, body, .wrapper {
 	const BOSS_TARGET_WIDTH		  = 300;	// 보스 타겟 넓이
 	const BOSS_TARGET_HEIGHT	  = 300;	// 보스 타겟 높이
 	const RECOVERY_DEGREE   	  = 10;     // 체력 회복 수치
+	const FEVER_TIME_SEC		= 10000;		//피버 타임 시간
 	
 	const ITEMS = [
 		{type :"ITM_001", duration :5000}, 
@@ -304,15 +305,17 @@ html, body, .wrapper {
 	var attackAreaWidth 	= 150;
 	var attackAreaHeight    = 150;
 	
-	//배경음악
-	var backgroundAudio;
+	//노말 음악
+	var backgroundAudio; //노말 배경 음악
 	
-	//클릭시 소리
-	var removeSound = new Audio();
-	removeSound.src = getContextPath() + "/resources/audio/sample_remove_sound.wav";
-	removeSound.preLoad = true;
-	removeSound.controls = true;
-	removeSound.autoPlay = false;
+	//보스 타임 음악
+	var bossTimeBackgroundAudio; //보스 배경 음악
+	
+	//피버 타임 음악
+	var feverTimeBackgroundAudio; //피버 배경 음악
+	
+	//효과음
+	var removeSound; //클릭시 소리
 	
 	//체력
 	var life = fullLife;
@@ -400,7 +403,15 @@ html, body, .wrapper {
 		target.append($("<input>", {"class" : "item-id", type : "hidden", value : ITEMS[item]}));
 	}
 	
-	
+	//음악 시작
+	function startAudio(playtimeType){ 
+		playtimeType.play(); 
+	}
+	//음악 정지
+	function stopAudio(playtimeType){ 
+		playtimeType.pause(); 
+	}
+
 	//타겟을 만들어 떨어트림
 	function makeTarget(){
 		var targets = $(".target");
@@ -594,6 +605,8 @@ html, body, .wrapper {
 		timeType = PLAYTIME_BOSS; //보스 타임으로 변경
 		
 		startLifeDecrease();
+		stopAudio(backgroundAudio);
+		startAudio(bossTimeBackgroundAudio);
 		
 		var playGround = $(".play-ground");
 		var windowWidth = playGround.width();
@@ -665,6 +678,9 @@ html, body, .wrapper {
 	//피버타겟 스레드 시작
 	function startPlayFeverTime(){
 		timeType = PLAYTIME_FEVER; //피버 타겟 모드
+		//오디오 설정
+		stopAudio(bossTimeBackgroundAudio); //보스 타임 백그라운드 음악 제거
+		startAudio(feverTimeBackgroundAudio); //피버 타임 백그라운드 음악 시작
 		
 		makeFeverTargetThread = setInterval(makeFeverTarget, feverTargetMakeRate);
 		
@@ -716,15 +732,18 @@ html, body, .wrapper {
 			startFeverTimeBackgroundChange = undefined; 
 			playGround.css("background-color","rgba(0, 0, 0, 0)");
 			}, 
-			'5000');
+			FEVER_TIME_SEC);
 		
 		setTimeout(function(){ // 피버 타임 메세지 스레드 제거
 			clearTimeout(startFeverTimeMessage);
-			startFeverTimeMessage = undefined; }, 
-			'5000');
+			startFeverTimeMessage = undefined; 
+			var feverTimeMessage = $(".wrap-fevertime");
+			feverTimeMessage.css("display","none");
+			}, 
+			FEVER_TIME_SEC);
 		
-		setTimeout(stopPlayFeverTime, '5000'); // 모든 피버 타겟 삭제
-		setTimeout(startPlayNormalTime, '5000');
+		setTimeout(stopPlayFeverTime, FEVER_TIME_SEC); // 모든 피버 타겟 삭제
+		setTimeout(startPlayNormalTime, FEVER_TIME_SEC);
 	}
 	
 	//피버타겟 스레드 중지
@@ -732,6 +751,10 @@ html, body, .wrapper {
 		clearInterval(makeFeverTargetThread);
 		makeFeverTargetThread = undefined;
 		removeAllTarget(".fever-target", false);
+		
+		//음악 설정
+		stopAudio(feverTimeBackgroundAudio); //피버 타임 백그라운드 음악 제거
+		startAudio(backgroundAudio); //노말 타임 백그라운드 음악 시작
 	}
 	
 	/**  ============================================================================== **/
@@ -781,9 +804,25 @@ html, body, .wrapper {
 			endX	= playGround.width() + HIDDEN_PADDING;
 			endY	= playGround.height() + HIDDEN_PADDING;
 		}
+		
+		initAudio();
+		function initAudio(){
 			
-		backgroundAudio = new Audio('${pageContext.request.contextPath}/resources/audio/sample_bgm.mp3');
-		backgroundAudio.play();
+			//노말 타임 백그라운드 음악
+			backgroundAudio = new Audio('${pageContext.request.contextPath}/resources/audio/sample_bgm.mp3');
+			//보스 타임 백그라운드 음악
+			bossTimeBackgroundAudio = new Audio('${pageContext.request.contextPath}/resources/audio/sample_boss_bgm.mp3');
+			//피버 타임 백그라운드 음악
+			feverTimeBackgroundAudio = new Audio('${pageContext.request.contextPath}/resources/audio/sample_fever_bgm.mp3');
+			//제거 소리
+			removeSound = new Audio();
+			removeSound.src = getContextPath() + "/resources/audio/sample_remove_sound.wav";
+			removeSound.preLoad = true;
+			removeSound.controls = true;
+			removeSound.autoPlay = false;
+		}
+		
+		startAudio(backgroundAudio);
 		
 		//체력게이지
 		$( ".life-board" ).progressbar({
@@ -899,15 +938,28 @@ html, body, .wrapper {
 		//오디오 버튼 활성화 , 비활성화
 		$(".bgm-source-board").on("click",function(e) {
 			
+			var audio;
+			
+			switch(timeType){
+			case PLAYTIME_NORMAL :
+				audio = backgroundAudio;
+				break;	
+			case PLAYTIME_FEVER : 
+				audio = feverTimeBackgroundAudio;
+				break;
+			case PLAYTIME_BOSS :
+				audio = bossTimeBackgroundAudio;
+				break;
+			}
+			
 			if($(this).attr('data-click-state') == 1) {
-				$(this).attr('data-click-state', 0)
-				backgroundAudio.play();
-				$(".bgm-source-board").css({"background":"url(resources/image/sample_stop_audio.jpg", 'background-repeat' : 'no-repeat', 'background-size' : 'contain'});
-				} else {
-				$(this).attr('data-click-state', 1)
-				backgroundAudio.pause();
-				$(".bgm-source-board").css({"background":"url(resources/image/sample_start_audio.jpg", 'background-repeat' : 'no-repeat' ,'background-size' : 'contain'});
-				}
+				$(this).attr('data-click-state', 0);
+				startAudio(audio);			
+				$(".bgm-source-board").css({"background":"url(resources/image/sample_stop_audio.jpg", 'background-repeat' : 'no-repeat', 'background-size' : 'contain'});} 
+			else {
+				$(this).attr('data-click-state', 1);		
+				stopAudio(audio);			
+				$(".bgm-source-board").css({"background":"url(resources/image/sample_start_audio.jpg", 'background-repeat' : 'no-repeat' ,'background-size' : 'contain'});}
 		});
 		
 				
