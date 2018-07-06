@@ -2,6 +2,7 @@
 <html>
 <head>
 <%@ include file="/WEB-INF/views/included/included_head.jsp"%>
+<%@ include file="/resources/css/common.css"%>
 <style>
 html, body, .wrapper {
 	overflow-x: hidden;
@@ -69,7 +70,7 @@ html, body, .wrapper {
 	<div class="wrapper">
 		<div class="head">
 			<div class="bgm-source-board">
-				<embed class="back-music-source" src="${pageContext.request.contextPath}/resources/audio/sample_bgm.mp3"
+				<embed class="back-music-source" src="${pageContext.request.contextPath}/resources/audio/sample_bgm.mp3" type="audio/mpeg"
 					autostart="true" hidden="true" loop="true" >
 			</div>
 		</div>

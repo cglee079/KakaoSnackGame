@@ -106,6 +106,56 @@ html, body, .wrapper {
 	font-weight: bold;
 }
 
+.wrap-item {
+	display: none;
+	z-index: 3;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0);
+	justify-content: center;
+	align-items: center;
+}
+
+.wrap-item .powerup-item {
+	display: flex;
+	z-index: 3;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0);
+	justify-content: center;
+	align-items: center;
+}
+
+.powerup-item .powerup-message {
+	font-size: 2rem;
+	font-weight: bold;
+}
+
+.wrap-item .spray-item {
+	display: flex;
+	z-index: 3;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0);
+	justify-content: center;
+	align-items: center;
+}
+
+.spray-item .spray-message {
+	font-size: 2rem;
+	font-weight: bold;
+}
+
+
 .head {
 	width: 100%;
 	height: 50px;
@@ -200,6 +250,10 @@ html, body, .wrapper {
 	background-image: url("resources/image/sample_target_removed.png");
 }
 
+.target.limit .target-icon {
+	background-image: url("resources/image/sample_target_limit.png");
+}
+
 .fever-target {
 	position: absolute;
 	z-index: 2;
@@ -246,6 +300,52 @@ html, body, .wrapper {
 .attacker.on {
 	display: block;
 }
+
+.power-item {
+	width:100px;
+	height:100%;
+	display: inline-block;
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-image: url("resources/image/sample_power_item.JPG");
+	border : solid 1px black;
+	
+}
+
+.clean-item {
+	width:100px;
+	height:100%;
+	display: inline-block;
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-image: url("resources/image/sample_clean_item.JPG");
+	border : solid 1px black;
+}
+
+.coin-item {
+	width:100px;
+	height:100%;
+	display: inline-block;
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-image: url("resources/image/sample_coin_item.JPG");
+	border : solid 1px black;
+}
+
+.coin {
+	width:100px;
+	height:100%;
+	display: inline-block;
+	border : solid 1px black;
+	z-index : 2;
+	font-size : 3em;
+	text-align: center;
+	vertical-align: top;
+	line-height: 100px; 
+	
+}
+
+
 </style>
 
 <script>
@@ -268,11 +368,6 @@ html, body, .wrapper {
 	const BOSS_TARGET_HEIGHT	  = 300;	// 보스 타겟 높이
 	const RECOVERY_DEGREE   	  = 10;     // 체력 회복 수치
 	const FEVER_TIME_SEC		= 10000;		//피버 타임 시간
-	
-	const ITEMS = [
-		{type :"ITM_001", duration :5000}, 
-		{type :"ITM_002", duration :5000}
-	]; 
 	
 	const PLAYTIME_NORMAL	= "PLAYTIME_001";
 	const PLAYTIME_FEVER 	= "PLAYTIME_002";
@@ -299,7 +394,11 @@ html, body, .wrapper {
 	var bossTargetLeftdistance= 10; //보스 타겟 왼쪽 이동 거리
 	var bossTargetTouchCount= 0; 	//보스 타겟 터치 카운트 
 	var timeType 			= PLAYTIME_NORMAL; 	
-	var fullLife 			= 100; 	//총 생명력
+	var fullLife 			= 1000; 	//총 생명력
+	var totalCoin           = 0;    //코인 숫자
+	var attackPower  	    = 1;    //공격 파워
+	var targetLife          = 1;    //타겟 생명
+	var targetLifeIncTime   = 10000;
 	
 	//targeting 범위
 	var attackAreaWidth 	= 150;
@@ -326,31 +425,40 @@ html, body, .wrapper {
 	//타겟 삭제 - 공격당했을때
 	function doAttackTarget(target){
 		var target = $(target);
-		if(target.hasClass("item")){ //타겟이 아이템을 가진 경우
-			var item = target.find(".item-id").val();
-			usingItem(item);
-			removeTarget(target, true);
-			
-		} else if(target.hasClass("fever-target")){ //피버타임 아이템인 경우
+		if(target.hasClass("fever-target")){ //피버타임 아이템인 경우
 			gainScore(FEVER_POINT);	
 			removeTarget(target, true);
 			
 		} else if(target.hasClass("boss-target")){ //보스타임 아이템인 경우
 			gainScore(TARGET_POINT);	
 			lifeRecovery(10);
+			makeCoin(5);
 			
 		} else{ //노말 타겟인 경우
-			gainScore(TARGET_POINT);
-			lifeRecovery(5);
-			removeTarget(target, true);
+			
+			var targetlife = parseInt(target.find(".life").val());
+			if(targetlife - attackPower > attackPower ) {
+				target.find(".life").val(targetlife-attackPower);
+			} else if(targetlife - attackPower === attackPower) {
+				target.find(".life").val(targetlife-attackPower);
+				target.addClass('limit');
+			} else  {
+				gainScore(TARGET_POINT);
+				lifeRecovery(5);
+				makeCoin(1);
+				removeTarget(target,true);
+			}
+			
+			//
 		}
 	}
 	
 	function removeTarget(target, doEffect){
+		
 		if(doEffect){ //소리, 제거 효과
 			startAudio(removeSound);			
 			removeSound.currentTime = 0;
-	
+			target.removeClass('limit');
 			target.addClass('removed'); //이미지 변경
 			target.find(".toLeftDistance").val(0);
 			target.find(".toTopDistance").val(5);
@@ -377,24 +485,6 @@ html, body, .wrapper {
 	function lifeRecovery(recover) {
 		$(".life-board").progressbar({value: life + recover});
 	}
-	
-	//Item 사용
-	function usingItem(item) {
-		switch(item) {
-		case ITEMS[0]: //타겟 속도 감소
-			targetMoveSpeed = targetMoveSpeed + 50;
-			setTimeout(function(){ 
-				targetMoveSpeed = targetMoveSpeed - 50;	
-			}, item.duration);
-			break;
-		case ITEMS[1]: //타겟속도 증가 및 파리채 면적 감소
-			setTimeout(function(){ 
-				
-			}, item.duration);
-			break;
-		}
-	}
-	
 	
 	//아이템 생성
 	function makeItem(){
@@ -434,6 +524,8 @@ html, body, .wrapper {
 		target.append($("<input>", {"class" : "angle", type : "hidden"}));
 		target.append($("<input>", {"class" : "toLeftDistance", type : "hidden"}));
 		target.append($("<input>", {"class" : "toTopDistance", type : "hidden"}));
+		target.append($("<input>", {"class" : "life",type : "hidden" , value: targetLife}));
+		
 		target.appendTo(playGround);
 		target.css("width", TARGET_WIDTH);
 		target.css("height", TARGET_HEIGHT);
@@ -592,6 +684,13 @@ html, body, .wrapper {
 		 score.text(totalScore);
 	}
 	
+	//돈 증가
+	function makeCoin(coin) {
+		totalCoin = totalCoin + coin;
+		$(".coin").text(totalCoin);
+	}
+	
+	
 	
 	/**** ========== 플레이 타임에 시작/정지 로직  =================== **/
 	
@@ -644,12 +743,12 @@ html, body, .wrapper {
 		bosTarget.find(".toLeftDistance").val(bossTargetLeftdistance);
 		
 		//보스 타겟 스레드 시작
-		moveBossTargetThread = setInterval(function(){
+ 		moveBossTargetThread = setInterval(function(){
 			moveTarget();
-		}, bossTargetMoveTime);
+		}, bossTargetMoveTime); 
 		
 		//보스 이동 스레드
-		function moveTarget(){
+ 		function moveTarget(){
 			var left= parseInt(bosTarget.css("left"));
 			var toLeftDistance = parseInt(bosTarget.find(".toLeftDistance").val());
 			
@@ -666,7 +765,7 @@ html, body, .wrapper {
 			}  else{
 				bosTarget.css("left", left);
 			}
-		}
+		} 
 		
 	}
 	
@@ -800,10 +899,21 @@ html, body, .wrapper {
 		lifeDecreaseThread = undefined;
 	}
 	
+	//타겟 체력 증가 스레드
+	setInterval(function(){
+		targetLife++;
+		console.log(targetLife);
+		
+	}, targetLifeIncTime);
+	
+	
 	$(document).ready(function(){
 		var attacker = $(".attacker");
 		attacker.css("width", attackAreaWidth);
 		attacker.css("height", attackAreaHeight);
+		
+		$(".coin").text(totalCoin);
+		
 		
 		//초기화 (좌표)
 		initXY();
@@ -843,6 +953,8 @@ html, body, .wrapper {
 			},
      	 	value: life
  	   	});
+
+		
 			
 		//화면 클릭 이벤트
 		 $(".play-ground").on("click",function(e) {
@@ -972,7 +1084,21 @@ html, body, .wrapper {
 				$(".bgm-source-board").css({"background":"url(resources/image/sample_stop_audio.png", 'background-repeat' : 'no-repeat' ,'background-size' : 'contain'});
 }
 		});
+				
 		
+		//스프레이 아이템	
+		$(".clean-item").on("click",function(){
+			setInterval(function(){
+				$(".spray-item").toggle();
+			 }, '300');
+			removeAllTarget(".target", true)// 모든 타겟 삭제
+			
+		});
+		
+		//파리채 아이템
+		$(".power-item").on("click",function(){
+			attackPower++;// 공격 강화
+		});
 				
 		startPlayNormalTime();
 		//난이도UP 쓰레드 - 타겟이 빨리 떨어질수록, 타겟 만드는 속도는 빨라지도록
@@ -982,6 +1108,12 @@ html, body, .wrapper {
 		}, 1000); */
 		
 	})
+	
+
+				
+	
+	
+	
 
 </script>
 <body>
@@ -1001,6 +1133,19 @@ html, body, .wrapper {
 				<div class="fevertime-message">FEVER TIME</div>
 			</div>
 		</div>
+		<div class="wrap-item">
+			<div class="powerup-item">
+				<%-- 	<div class="fevertime-icon"
+					style="background-image: url('${pageContext.request.contextPath}/resources/image/icon_play_gameover.gif');"></div> --%>
+				<div class="powerup-message">POWER UP</div>
+			</div>
+			<div class="spray-item">
+				<%-- 	<div class="fevertime-icon"
+					style="background-image: url('${pageContext.request.contextPath}/resources/image/icon_play_gameover.gif');"></div> --%>
+				<div class="spray-message">Spray Attack</div>
+			</div>
+		</div>
+		
 
 		<div class="head">
 			<div class="bgm-source-board">
@@ -1017,7 +1162,12 @@ html, body, .wrapper {
 		<div class="play-ground">
 			<div class="attacker"></div>
 		</div>
-		<div class="footer"></div>
+		<div class="footer">
+			<div class="power-item"></div>
+			<div class="clean-item"></div>
+			<div class="coin-item"></div>
+			<div class="coin"></div>
+		</div>
 	</div>
 </body>
 </html>
