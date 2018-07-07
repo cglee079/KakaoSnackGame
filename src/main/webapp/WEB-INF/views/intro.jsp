@@ -2,7 +2,6 @@
 <html>
 <head>
 <%@ include file="/WEB-INF/views/included/included_head.jsp"%>
-<%@ include file="/resources/css/common.css"%>
 <style>
 html, body, .wrapper {
 	overflow-x: hidden;

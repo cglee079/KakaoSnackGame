@@ -3,349 +3,6 @@
 <head>
 <%@ include file="/WEB-INF/views/included/included_head.jsp"%>
 <style>
-html, body, .wrapper {
-	overflow-x: hidden;
-}
-
-.wrapper {
-	position: relative;
-	display: flex;
-	flex-flow: column nowrap;
-	height: 100%;
-	max-width: 500px;
-	background-repeat: no-repeat;
-	background-size: cover;
-	/* background-image: url("resources/image/bg_play.jpg"); */
-}
-
-.wrapper .wrap-fg {
-	display: none;
-	z-index: 1;
-	position: absolute;
-	left: 0;
-	right: 0;
-	top: 0;
-	bottom: 0;
-	background: rgba(0, 0, 0, 0.6);
-}
-
-.wrapper .wrap-fg.on {
-	display: block;
-}
-
-.wrapper .wrap-gameover {
-	display: none;
-	z-index: 3;
-	position: absolute;
-	left: 0;
-	right: 0;
-	top: 0;
-	bottom: 0;
-	background: rgba(0, 0, 0, 0);
-	justify-content: center;
-	align-items: center;
-}
-
-.wrapper .wrap-gameover.on {
-	display: flex;
-}
-
-.gameover {
-	width: 300px;
-	height: 400px;
-	background: #FFF;
-	border-radius: 10px;
-	box-shadow: 0px 10px 20px #222;
-	display: flex;
-	flex-flow: column nowrap;
-	justify-content: center;
-	align-items: center;
-}
-
-.gameover .gameover-icon {
-	width: 150px;
-	height: 150px;
-	background-repeat: no-repeat;
-	background-size: contain;
-	background-position: center;
-	margin-bottom: 10px;
-}
-
-.gameover .gameover-message {
-	font-size: 2rem;
-	font-weight: bold;
-}
-
-.wrap-fevertime {
-	display: none;
-	z-index: 3;
-	position: absolute;
-	left: 0;
-	right: 0;
-	top: 0;
-	bottom: 0;
-	background: rgba(0, 0, 0, 0);
-	justify-content: center;
-	align-items: center;
-}
-
-.fevertime {
-	width: 100%;
-	height: 100%;
-	/* background: #FFF;
-	border-radius: 10px;
-	box-shadow: 0px 10px 20px #222; */
-	display: flex;
-	flex-flow: column nowrap;
-	justify-content: center;
-	align-items: center;
-}
-
-.fevertime .fevertime-message {
-	font-size: 2rem;
-	font-weight: bold;
-}
-
-.wrap-item {
-	display: none;
-	z-index: 3;
-	position: absolute;
-	left: 0;
-	right: 0;
-	top: 0;
-	bottom: 0;
-	background: rgba(0, 0, 0, 0);
-	justify-content: center;
-	align-items: center;
-}
-
-.wrap-item .powerup-item {
-	display: flex;
-	z-index: 3;
-	position: absolute;
-	left: 0;
-	right: 0;
-	top: 0;
-	bottom: 0;
-	background: rgba(0, 0, 0, 0);
-	justify-content: center;
-	align-items: center;
-}
-
-.powerup-item .powerup-message {
-	font-size: 2rem;
-	font-weight: bold;
-}
-
-.wrap-item .spray-item {
-	display: flex;
-	z-index: 3;
-	position: absolute;
-	left: 0;
-	right: 0;
-	top: 0;
-	bottom: 0;
-	background: rgba(0, 0, 0, 0);
-	justify-content: center;
-	align-items: center;
-}
-
-.spray-item .spray-message {
-	font-size: 2rem;
-	font-weight: bold;
-}
-
-
-.head {
-	width: 100%;
-	height: 50px;
-	display: flex;
-	justify-content: space-between;
-}
-
-.bgm-source-board {
-	width: 50px;
-	height: 100%;
-	background-repeat: no-repeat;
-	background-size: contain;
-	background-image: url(resources/image/sample_start_audio.png);
-	z-index: 4;
-}
-
-.score-board {
-	width: 100px;
-	height: 50px;
-	margin: auto;
-	display: inline-block;
-}
-
-.score {
-	font-size: 2rem;
-	font-weight: bold;
-	text-align: center;
-}
-
-.combo {
-	font-size: 1.5rem;
-	font-weight: bold;
-	text-align: center;
-	position: absolute;
-	display: none;
-}
-
-.life-board {
-	width: 200px;
-	height: 50px;
-	margin: auto;
-	display: inline-block;
-	border: 2px solid black;
-}
-
-.ui-widget-header {
-	background: #cedc98;
-	color: #333333;
-	height: 50px;
-}
-
-.play-ground {
-	flex: 1;
-	position: relative;
-	overflow: hidden;
-}
-
-.footer {
-	width: 100%;
-	height: 100px;
-	background: red;
-}
-
-.target {
-	position: absolute;
-	z-index: 2;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	background: rgba(0, 0, 0, 0);
-	transform-origin: 50% 50%;
-	/* transition: transform 1s cubic-bezier(0.215, 0.61, 0.355, 1); */
-}
-
-.target .target-icon {
-	width: 100%;
-	height: 100%;
-	background-repeat: no-repeat;
-	background-size: contain;
-	background-image: url("resources/image/sample_target.png");
-}
-
-.target.candy 	.target-icon {
-	background-image: url("resources/image/sample_candy.png");
-}
-
-.target.item 	.target-icon {
-	background-image: url("resources/image/sample_candy_item.png");
-}
-
-.target.removed .target-icon {
-	background-image: url("resources/image/sample_target_removed.png");
-}
-
-.target.limit .target-icon {
-	background-image: url("resources/image/sample_target_limit.png");
-}
-
-.fever-target {
-	position: absolute;
-	z-index: 2;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	background: rgba(0, 0, 0, 0);
-	transform-origin: 50% 50%;
-}
-
-.fever-target-icon {
-	width: 100%;
-	height: 100%;
-	background-repeat: no-repeat;
-	background-size: contain;
-	background-image: url("resources/image/sample_heart.gif");
-}
-
-.boss-target {
-	position: absolute;
-	z-index: 2;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	background: rgba(0, 0, 0, 0);
-	transform-origin: 50% 50%;
-}
-
-.boss-target .boss-target-icon {
-	width: 100%;
-	height: 100%;
-	background-repeat: no-repeat;
-	background-size: contain;
-	background-image: url("resources/image/sample_target_boss.jpg");
-}
-
-.attacker {
-	position: absolute;
-	background: red;
-	z-index: 4;
-	display: none;
-}
-
-.attacker.on {
-	display: block;
-}
-
-.power-item {
-	width:100px;
-	height:100%;
-	display: inline-block;
-	background-repeat: no-repeat;
-	background-size: cover;
-	background-image: url("resources/image/sample_power_item.JPG");
-	border : solid 1px black;
-	
-}
-
-.clean-item {
-	width:100px;
-	height:100%;
-	display: inline-block;
-	background-repeat: no-repeat;
-	background-size: cover;
-	background-image: url("resources/image/sample_clean_item.JPG");
-	border : solid 1px black;
-}
-
-.coin-item {
-	width:100px;
-	height:100%;
-	display: inline-block;
-	background-repeat: no-repeat;
-	background-size: cover;
-	background-image: url("resources/image/sample_coin_item.JPG");
-	border : solid 1px black;
-}
-
-.coin {
-	width:100px;
-	height:100%;
-	display: inline-block;
-	border : solid 1px black;
-	z-index : 2;
-	font-size : 3em;
-	text-align: center;
-	vertical-align: top;
-	line-height: 100px; 
-	
-}
-
-
 </style>
 
 <script>
@@ -388,7 +45,7 @@ html, body, .wrapper {
 	var fallingSpeedUpThread;
 	var makeFeverTargetThread;
 	var moveDistance 		= 10;
-	var maxTargetNumber 	= 5;	//최대 타겟 수 
+	var maxTargetNumber 	= 20;	//최대 타겟 수 
 	var comboNumber 		= 0; 	//콤보 횟수 저장
 	var targetMoveSpeed 	= 100; 	//타겟 스피드
 	var bossTargetLeftdistance= 10; //보스 타겟 왼쪽 이동 거리
@@ -720,15 +377,16 @@ html, body, .wrapper {
 		var windowHeight = playGround.height();
 		var bosTarget = $("<div>", {"class" : "boss-target"});
 		bosTarget.on("click", function(){
-			bossTargetTouchCount = bossTargetTouchCount+1;
 			startAudio(removeSound);			
 			removeSound.currentTime = 0;
-			if(bossTargetTouchCount == BOSS_TARGET_NUMBRT){ //보스 타겟 다섯번 터치하면	
-				bossTargetTouchCount = 0;	
-				stopPlayBossTime();
-				startPlayFeverTime();
-			}
+				
 		});
+		
+		//피버타임 종료
+		setTimeout(function() {
+			stopPlayBossTime();
+		}, FEVER_TIME_SEC)
+		
 		
 		//보스 타겟 설정
 		bosTarget.append($("<div>", {"class" : "boss-target-icon"}));
@@ -737,13 +395,72 @@ html, body, .wrapper {
 		bosTarget.appendTo(playGround);
 		bosTarget.css("width", BOSS_TARGET_WIDTH);
 		bosTarget.addClass("boss");
-		bosTarget.css("height", BOSS_TARGET_HEIGHT);
-		bosTarget.css("left", (windowWidth/2)-(BOSS_TARGET_WIDTH/2)); //보스 벌레 이미지 정중앙 배치
+		bosTarget.css("height", BOSS_TARGET_HEIGHT);  //보스 벌레 이미지 정중앙 배치
+		bosTarget.css("left", (windowWidth/2)-(BOSS_TARGET_WIDTH/2));
 		bosTarget.css("top", (windowHeight/2)-(BOSS_TARGET_HEIGHT/2));
 		bosTarget.find(".toLeftDistance").val(bossTargetLeftdistance);
+
+		//////////////////////////////////////////////////////////////////
+
+		//피버타임 메세지 나타남
+		var startFeverTimeMessage = setInterval(function() {
+			var feverTimeMessage = $(".wrap-fevertime");
+			feverTimeMessage.toggle();
+		}, '300');
+
+		setTimeout(function() { // 피버 타임 백그라운드 색 변경 스레드 제거
+			var playGround = $('.play-ground');
+			clearTimeout(startFeverTimeBackgroundChange);
+			startFeverTimeBackgroundChange = undefined;
+			playGround.css("background-color", "rgba(0, 0, 0, 0)");
+		},FEVER_TIME_SEC);
+
+		setTimeout(function() { // 피버 타임 메세지 스레드 제거
+			clearTimeout(startFeverTimeMessage);
+			startFeverTimeMessage = undefined;
+			var feverTimeMessage = $(".wrap-fevertime");
+			feverTimeMessage.css("display", "none");
+		},FEVER_TIME_SEC);
+
+		setTimeout(startPlayNormalTime, FEVER_TIME_SEC);
 		
 		//보스 타겟 스레드 시작
- 		moveBossTargetThread = setInterval(function(){
+/* 		moveBossTargetThread = setInterval(function(){
+			moveTarget();
+		}, FEVER_TIME_SEC); */ 
+		
+		//보스 타겟 이동 스레드 정지
+		function stopPlayBossTime(){
+			stopLifeDecrease(); //체력감소 중지
+			stopAudio(bossTimeBackgroundAudio); //보스 타임 백그라운드 음악 제거
+			//clearTimeout(moveBossTargetThread);
+			moveBossTargetThread = undefined;
+			
+			//보스 이미지 삭제 
+			var bossTarget = $(".boss-target");
+			bossTarget.remove();
+			
+			life = fullLife;
+			$(".life-board").progressbar({value: life}); 	//체력 가득
+		}
+		
+		var startFeverTimeBackgroundChange = setInterval(function(){
+			var playGround = $('.play-ground');
+			
+			var r =  Math.round( Math.random()*256);
+			var g =  Math.round( Math.random()*256);
+			var b =  Math.round( Math.random()*256);
+			
+			var rgb = r + "," + g + "," + b;
+			playGround.css("background-color","rgb(" + rgb +")");
+			
+		}, '300');
+
+
+		//////////////////////////////////////////////////////////////////
+
+		//보스 타겟 스레드 시작
+		/* moveBossTargetThread = setInterval(function(){
 			moveTarget();
 		}, bossTargetMoveTime); 
 		
@@ -765,12 +482,12 @@ html, body, .wrapper {
 			}  else{
 				bosTarget.css("left", left);
 			}
-		} 
+		}  */
 		
 	}
 	
 	//보스 타겟 이동 스레드 정지
-	function stopPlayBossTime(){
+	/* function stopPlayBossTime(){
 		stopLifeDecrease(); //체력감소 중지
 		
 		clearTimeout(moveBossTargetThread);
@@ -783,9 +500,9 @@ html, body, .wrapper {
 		life = fullLife;
 		$(".life-board").progressbar({value: life}); 	//체력 가득
 	}
-	
-	//피버타겟 스레드 시작
-	function startPlayFeverTime(){
+	 */
+	//피버 타겟 스레드 시작
+	/* function startPlayFeverTime(){
 		timeType = PLAYTIME_FEVER; //피버 타겟 모드
 		//오디오 설정
 		stopAudio(bossTimeBackgroundAudio); //보스 타임 백그라운드 음악 제거
@@ -865,7 +582,7 @@ html, body, .wrapper {
 		stopAudio(feverTimeBackgroundAudio); //피버 타임 백그라운드 음악 제거
 		startAudio(backgroundAudio); //노말 타임 백그라운드 음악 시작
 	}
-	
+	 */
 	/**  ============================================================================== **/
 	
 	
@@ -989,6 +706,7 @@ html, body, .wrapper {
         					&& targetEndY < attackEndY){
         				attackedTargetNumber = attackedTargetNumber+1;
         				doAttackTarget(this);
+        			
         			}
         			
         		}); 
@@ -1087,16 +805,22 @@ html, body, .wrapper {
 				
 		
 		//스프레이 아이템	
-		$(".clean-item").on("click",function(){
-			setInterval(function(){
-				$(".spray-item").toggle();
-			 }, '300');
+		$(".spray-item").on("click",function(){
+			
+			$(".spray").css('display', 'flex');
+			setTimeout(function() {
+				$(".spray").css('display', 'none');
+			}, 1000)
 			removeAllTarget(".target", true)// 모든 타겟 삭제
 			
 		});
 		
 		//파리채 아이템
 		$(".power-item").on("click",function(){
+			$(".powerup").css('display', 'flex');
+			setTimeout(function() {
+				$(".powerup").css('display', 'none');
+			}, 1000)
 			attackPower++;// 공격 강화
 		});
 				
@@ -1133,13 +857,13 @@ html, body, .wrapper {
 				<div class="fevertime-message">FEVER TIME</div>
 			</div>
 		</div>
-		<div class="wrap-item">
-			<div class="powerup-item">
+		<div class="wrap-effect">
+			<div class="powerup">
 				<%-- 	<div class="fevertime-icon"
 					style="background-image: url('${pageContext.request.contextPath}/resources/image/icon_play_gameover.gif');"></div> --%>
 				<div class="powerup-message">POWER UP</div>
 			</div>
-			<div class="spray-item">
+			<div class="spray">
 				<%-- 	<div class="fevertime-icon"
 					style="background-image: url('${pageContext.request.contextPath}/resources/image/icon_play_gameover.gif');"></div> --%>
 				<div class="spray-message">Spray Attack</div>
@@ -1164,7 +888,7 @@ html, body, .wrapper {
 		</div>
 		<div class="footer">
 			<div class="power-item"></div>
-			<div class="clean-item"></div>
+			<div class="spray-item"></div>
 			<div class="coin-item"></div>
 			<div class="coin"></div>
 		</div>
