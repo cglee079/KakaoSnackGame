@@ -76,6 +76,20 @@ html, body, .wrapper {
 	font-weight: bold;
 }
 
+.restart-button {
+	display: flex;
+	width: 30%;
+	justify-content: center;
+	align-items: center;
+}
+
+.home-button {
+	display: flex;
+	width: 30%;
+	justify-content: center;
+	align-items: center;
+}
+
 .wrap-fevertime {
 	display: none;
 	z-index: 4;

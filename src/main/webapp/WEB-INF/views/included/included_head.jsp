@@ -11,6 +11,9 @@
 <!-- common-css -->
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common.css" />
 
+<!-- common-js -->
+<script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
+
 <script>
 /* context Path */
 var contextPath = "${pageContext.request.contextPath}";
