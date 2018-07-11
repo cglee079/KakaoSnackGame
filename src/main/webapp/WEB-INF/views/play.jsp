@@ -19,7 +19,7 @@
 	const ITEM_CREATE_PERCENT	  = 0.05;	// 아이템 생성 확률
 	const RIGHT_ANGLE 			  = 90;
 	const LIMIT_COMBO_NUMBER	  = 0;		// 보스타임이 되기까지 콤보 수/ n번 때리면 보스타임 시작
-	const BOSS_TARGET_NUMBRT	  = 10;     // 보스 터치 제한 횟수
+	const BOSS_TARGET_NUMBRT	  = 5;     // 보스 터치 제한 횟수
 	const BOSS_TARGET_LEFTDISTANCE= 30;
 	const BOSS_TARGET_WIDTH		  = 300;	// 보스 타겟 넓이
 	const BOSS_TARGET_HEIGHT	  = 300;	// 보스 타겟 높이
@@ -51,7 +51,7 @@
 	var bossTargetLeftdistance= 10; //보스 타겟 왼쪽 이동 거리
 	var bossTargetTouchCount= 0; 	//보스 타겟 터치 카운트 
 	var timeType 			= PLAYTIME_NORMAL; 	
-	var fullLife 			= 1000; 	//총 생명력
+	var fullLife 			= 100; 	//총 생명력
 	var totalCoin           = 0;    //코인 숫자
 	var attackPower  	    = 1;    //공격 파워
 	var targetLife          = 1;    //타겟 생명
@@ -368,7 +368,7 @@
 	function startPlayBossTime(){//보스타임 시작
 		timeType = PLAYTIME_BOSS; //보스 타임으로 변경
 		
-		startLifeDecrease();
+		/* startLifeDecrease(); */ //보스타임 시 체력감소 없이
 		stopAudio(backgroundAudio);
 		startAudio(bossTimeBackgroundAudio);
 		
@@ -823,7 +823,17 @@
 			}, 1000)
 			attackPower++;// 공격 강화
 		});
-				
+			
+		//다시하기 버튼 클릭 이벤트
+		$(".restart-button").on("click",function(e) {
+			 location.reload();
+		});
+		
+		//홈 버튼 클릭 이벤트
+		$(".home-button").on("click",function(e) {
+			 location.replace("${pageContext.request.contextPath}/");	
+		});
+		
 		startPlayNormalTime();
 		//난이도UP 쓰레드 - 타겟이 빨리 떨어질수록, 타겟 만드는 속도는 빨라지도록
 		/* fallingSpeedUpThread = setInterval(function(){
@@ -832,11 +842,6 @@
 		}, 1000); */
 		
 	})
-	
-
-				
-	
-	
 	
 
 </script>
@@ -848,6 +853,8 @@
 				<div class="gameover-icon"
 					style="background-image: url('${pageContext.request.contextPath}/resources/image/icon_play_gameover.gif');"></div>
 				<div class="gameover-message">GAME OVER</div>
+				<input type="button" class="restart-button" value="다시하기"/>
+				<input type="button" class="home-button" value="홈"/>
 			</div>
 		</div>
 		<div class="wrap-fevertime">
