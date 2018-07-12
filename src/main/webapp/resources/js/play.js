@@ -888,7 +888,7 @@ $(document).ready(function(){
 		var coinNumber = parseInt(coin.text(), 10);
 		
 		if(coinNumber >= sprayItemCost){//가지고 있는 코인이 아이템 비용보다 높다면
-			
+
 			startAudio(itemSound);		
 			
 			$(".spray").css('display', 'flex');
@@ -904,12 +904,13 @@ $(document).ready(function(){
 	// 파리채 아이템 클릭 이벤트
 	$(".power-item").on("click",function(){
 		
-		startAudio(itemSound);		
-		
 		var coin = $(".coin");
 		var coinNumber = parseInt(coin.text(), 10);
 		
 		if(coinNumber >= powerItemCost){ //가지고 있는 코인이 아이템 비용보다 높다면
+			
+			startAudio(itemSound);		
+			
 			$(".powerup").css('display', 'flex');
 			setTimeout(function() {
 				$(".powerup").css('display', 'none');
