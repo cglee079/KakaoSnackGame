@@ -2,9 +2,9 @@
 <html>
 <head>
 <%@ include file="/WEB-INF/views/included/included_head.jsp"%>
-<style>
-</style>
-
+<script src="${pageContext.request.contextPath}/resources/js/play.js"></script>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/play.css" />
+</head>
 <body>
 	<div class="wrapper">
 		<div class="wrap-fg"></div>
@@ -53,11 +53,11 @@
 		<div class="play-ground">
 			<div class="attacker"></div>
 		</div>
-		<div class="footer">
-			<div class="power-item"></div>
-			<div class="spray-item"></div>
-			<div class="coin-item"></div>
-			<div class="coin"></div>
+		<div class="itembar">
+			<div class="itembar-item power-item"></div>
+			<div class="itembar-item spray-item"></div>
+			<div class="itembar-item coin-item"></div>
+			<div class="itembar-item coin"></div>
 		</div>
 	</div>
 </body>
