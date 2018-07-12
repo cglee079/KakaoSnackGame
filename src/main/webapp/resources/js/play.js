@@ -51,6 +51,8 @@ var totalCoin           = 0;    // 코인 숫자
 var attackPower  	    = 1;    // 공격 파워
 var targetLife          = 1;    // 타겟 생명
 var targetLifeIncTime   = 10000;
+var sprayItemCost		= 50;	// 스프레이 아이템 비용
+var powerItemCost		= 10;	// 파워 아이템 비용
 
 // targeting 범위
 var attackAreaWidth 	= 150;
@@ -339,7 +341,24 @@ function gainScore(point){
 // 돈 증가
 function makeCoin(coin) {
 	totalCoin = totalCoin + coin;
-	$(".coin").text(totalCoin);
+	setCoin(totalCoin);
+}
+
+// 돈 감소
+function decreaseCoin(coin) {
+	totalCoin = totalCoin - coin;
+	setCoin(totalCoin);
+}
+
+// 돈 초기화
+function initCoin(){
+	totalCoin = 0;
+	setCoin(totalCoin);
+}
+
+// 돈 설정
+function setCoin(coin){
+	$(".coin").text(coin);
 }
 
 
@@ -350,7 +369,7 @@ function startPlayNormalTime(){
 	
 	startMakeTarget(); // 타겟 생성 쓰레드
 	startLifeDecrease(); // 생명력 감소 스레드 시작
-	warningBackgroundChange == undefined; //생명력 경고 쓰레드 초기화
+	warningBackgroundChange == undefined; // 생명력 경고 쓰레드 초기화
 }
 
 function stopPlayNormalTime(){
@@ -431,6 +450,7 @@ function startPlayBossTime(){// 보스타임 시작
 	function stopPlayBossTime(){
 		stopLifeDecrease(); // 체력감소 중지
 		stopAudio(bossTimeBackgroundAudio); // 보스 타임 백그라운드 음악 제거
+		startAudio(backgroundAudio); // 보스 타임 백그라운드 음악 제거
 		// clearTimeout(moveBossTargetThread);
 		moveBossTargetThread = undefined;
 		
@@ -468,13 +488,13 @@ function startPlayBossTime(){// 보스타임 시작
 	 * 
 	 * left = left + toLeftDistance;
 	 * 
-	 * //범위를 넘어간경우 //보완 필요 if(left < (startX - HIDDEN_PADDING) || left >
-	 * (endX - BOSS_TARGET_WIDTH + HIDDEN_PADDING) || top < (startY -
-	 * HIDDEN_PADDING) || top > (endY - BOSS_TARGET_HEIGHT +
-	 * HIDDEN_PADDING)) { bossTargetLeftdistance =
+	 * //범위를 넘어간경우 //보완 필요 if(left < (startX - HIDDEN_PADDING) || left > (endX -
+	 * BOSS_TARGET_WIDTH + HIDDEN_PADDING) || top < (startY - HIDDEN_PADDING) ||
+	 * top > (endY - BOSS_TARGET_HEIGHT + HIDDEN_PADDING)) {
+	 * bossTargetLeftdistance =
 	 * bossTargetLeftdistance-(bossTargetLeftdistance*2);
-	 * bosTarget.find(".toLeftDistance").val(bossTargetLeftdistance); }
-	 * else{ bosTarget.css("left", left); } }
+	 * bosTarget.find(".toLeftDistance").val(bossTargetLeftdistance); } else{
+	 * bosTarget.css("left", left); } }
 	 */
 	
 }
@@ -491,20 +511,19 @@ function startPlayBossTime(){// 보스타임 시작
  */
 // 피버 타겟 스레드 시작
 /*
- * function startPlayFeverTime(){ timeType = PLAYTIME_FEVER; //피버 타겟 모드
- * //오디오 설정 stopAudio(bossTimeBackgroundAudio); //보스 타임 백그라운드 음악 제거
+ * function startPlayFeverTime(){ timeType = PLAYTIME_FEVER; //피버 타겟 모드 //오디오 설정
+ * stopAudio(bossTimeBackgroundAudio); //보스 타임 백그라운드 음악 제거
  * startAudio(feverTimeBackgroundAudio); //피버 타임 백그라운드 음악 시작
  * 
- * makeFeverTargetThread = setInterval(makeFeverTarget,
- * feverTargetMakeRate);
+ * makeFeverTargetThread = setInterval(makeFeverTarget, feverTargetMakeRate);
  * 
  * //피버타임 메세지 나타남 var startFeverTimeMessage = setInterval(function(){
  * 
  * var feverTimeMessage = $(".wrap-fevertime"); feverTimeMessage.toggle(); },
  * '300');
  * 
- * var startFeverTimeBackgroundChange = setInterval(function(){ var
- * playGround = $('.play-ground');
+ * var startFeverTimeBackgroundChange = setInterval(function(){ var playGround =
+ * $('.play-ground');
  * 
  * var r = Math.round( Math.random()*256); var g = Math.round(
  * Math.random()*256); var b = Math.round( Math.random()*256);
@@ -517,26 +536,25 @@ function startPlayBossTime(){// 보스타임 시작
  * 
  * feverTarget.append($("<div>", {"class" : "fever-target-icon"}));
  * feverTarget.append($("<input>", {"class" : "moveTargetThreadID", type :
- * "hidden"})); feverTarget.css("width", FEVER_WIDTH);
- * feverTarget.css("height", FEVER_HEIGHT); feverTarget.addClass("fever");
+ * "hidden"})); feverTarget.css("width", FEVER_WIDTH); feverTarget.css("height",
+ * FEVER_HEIGHT); feverTarget.addClass("fever");
  * feverTarget.appendTo(playGround);
  * 
  * var left = 0; var top = 0;
  * 
- * //보완필요 left = Math.random() * ((endX - FEVER_WIDTH) - startX) + startX;
- * top = Math.random() * ((endY - FEVER_HEIGHT) - startY) + startY;
+ * //보완필요 left = Math.random() * ((endX - FEVER_WIDTH) - startX) + startX; top =
+ * Math.random() * ((endY - FEVER_HEIGHT) - startY) + startY;
  * 
  * //피버 타겟 위치 지정 feverTarget.css("left", left); feverTarget.css("top", top); }
  * 
  * setTimeout(function(){ // 피버 타임 백그라운드 색 변경 스레드 제거 var playGround =
  * $('.play-ground'); clearTimeout(startFeverTimeBackgroundChange);
  * startFeverTimeBackgroundChange = undefined;
- * playGround.css("background-color","rgba(0, 0, 0, 0)"); },
- * FEVER_TIME_SEC);
+ * playGround.css("background-color","rgba(0, 0, 0, 0)"); }, FEVER_TIME_SEC);
  * 
  * setTimeout(function(){ // 피버 타임 메세지 스레드 제거
- * clearTimeout(startFeverTimeMessage); startFeverTimeMessage = undefined;
- * var feverTimeMessage = $(".wrap-fevertime");
+ * clearTimeout(startFeverTimeMessage); startFeverTimeMessage = undefined; var
+ * feverTimeMessage = $(".wrap-fevertime");
  * feverTimeMessage.css("display","none"); }, FEVER_TIME_SEC);
  * 
  * setTimeout(stopPlayFeverTime, FEVER_TIME_SEC); // 모든 피버 타겟 삭제
@@ -572,7 +590,10 @@ function startLifeDecrease() { // 재귀를 이용한 Interval
 		lifeDecreaseThread = undefined;
 	} else {
 		
-		if(life <= fullLife/3 && warningBackgroundChange == undefined){ //체력이 일정 수준 이하로 감소했을때	
+		if(life <= fullLife/3 && warningBackgroundChange == undefined){ // 체력이
+																		// 일정 수준
+																		// 이하로
+																		// 감소했을때
 			startWarningBackgroundChange();
 		}
 		
@@ -585,14 +606,15 @@ function startLifeDecrease() { // 재귀를 이용한 Interval
 	}
 }
 
-//경고 백그라운드 스레드 시작
+// 경고 백그라운드 스레드 시작
 function startWarningBackgroundChange(){
 
 	if(warningBackgroundChange == undefined){
 		warningBackgroundChange = setInterval(function(){
 			var playGround = $('.play-ground');			
 			
-			if(playGround.css("background-color") == "rgba(0, 0, 0, 0)"){ //배경색 변경
+			if(playGround.css("background-color") == "rgba(0, 0, 0, 0)"){ // 배경색
+																			// 변경
 				playGround.css("background-color","red");		
 			}
 			else {
@@ -603,7 +625,7 @@ function startWarningBackgroundChange(){
 	}	
 }
 
-//경고 백그라운드 스레드 중지
+// 경고 백그라운드 스레드 중지
 function stopWarningBackgroundChange(){
 	clearTimeout(warningBackgroundChange);
 	warningBackgroundChange = undefined; // 쓰레드 변수 초기화
@@ -670,6 +692,19 @@ $(document).ready(function(){
  	 	value: life
    	});
 
+	// 아이템 비용 설정
+	initItemCost();
+	function initItemCost(){
+		
+		// 파워 아이템 비용 설정
+		var powerItemCostDiv = $(".power-item-cost");
+		powerItemCostDiv.text(powerItemCost);
+		
+		// 스프레이 아이템 비용 설정
+		var sprayItemCostDiv = $(".spray-item-cost");
+		sprayItemCostDiv.text(sprayItemCost);
+		
+	}
 		
 	// 화면 클릭 이벤트
 	 $(".play-ground").on("click",function(e) {
@@ -802,24 +837,39 @@ $(document).ready(function(){
 	});
 			
 	
-	// 스프레이 아이템
+	// 스프레이 아이템 클릭 이벤트
 	$(".spray-item").on("click",function(){
 		
-		$(".spray").css('display', 'flex');
-		setTimeout(function() {
-			$(".spray").css('display', 'none');
-		}, 1000)
-		removeAllTarget(".target", true)// 모든 타겟 삭제
+		var coin = $(".coin");
+		var coinNumber = parseInt(coin.text(), 10);
 		
+		if(coinNumber >= sprayItemCost){//가지고 있는 코인이 아이템 비용보다 높다면
+			$(".spray").css('display', 'flex');
+			setTimeout(function() {
+				$(".spray").css('display', 'none');
+			}, 1000)
+			removeAllTarget(".target", true)// 모든 타겟 삭제
+		
+			decreaseCoin(sprayItemCost); //코인 감소
+		}
 	});
 	
-	// 파리채 아이템
+	// 파리채 아이템 클릭 이벤트
 	$(".power-item").on("click",function(){
-		$(".powerup").css('display', 'flex');
-		setTimeout(function() {
-			$(".powerup").css('display', 'none');
-		}, 1000)
-		attackPower++;// 공격 강화
+		
+		var coin = $(".coin");
+		var coinNumber = parseInt(coin.text(), 10);
+		
+		if(coinNumber >= powerItemCost){ //가지고 있는 코인이 아이템 비용보다 높다면
+			$(".powerup").css('display', 'flex');
+			setTimeout(function() {
+				$(".powerup").css('display', 'none');
+			}, 1000)
+			attackPower++;// 공격 강화
+		}
+		
+		decreaseCoin(powerItemCost); //코인 감소
+		
 	});
 		
 	// 다시하기 버튼 클릭 이벤트

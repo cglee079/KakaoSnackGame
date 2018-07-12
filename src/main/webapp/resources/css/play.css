@@ -290,6 +290,35 @@
 	display: block;
 }
 
+.itembar-cost{
+	display : flex;
+	flex-flow: column no-wrap;
+	width: 100%;
+}
+
+.itembar-item-cost{
+	background: white;
+	flex : 1;
+	height: 20px;
+	border : solid 1px black;
+}
+
+.power-item-cost{
+	font-size : 1em;
+	text-align: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.spray-item-cost{
+	font-size : 1em;
+	text-align: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
 .itembar{
 	display : flex;
 	flex-flow: column no-wrap;
@@ -302,6 +331,7 @@
 	height: 100px;
 	border : solid 1px black;
 }
+
 
 .power-item {
 	background-repeat: no-repeat;
