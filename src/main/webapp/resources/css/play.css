@@ -358,3 +358,13 @@
 	justify-content: center;
 	align-items: center;
 }
+
+.overlay-item {
+  display: none;
+  z-index: 5;
+  position: fixed;
+  width: 25%; height: 100px;
+ 
+  background-color: rgba(0,0,0, 0.4);
+  overflow-x: hidden;
+}

@@ -342,23 +342,53 @@ function gainScore(point){
 function makeCoin(coin) {
 	totalCoin = totalCoin + coin;
 	setCoin(totalCoin);
+	checkItemCost();
 }
 
 // 돈 감소
 function decreaseCoin(coin) {
 	totalCoin = totalCoin - coin;
 	setCoin(totalCoin);
+	checkItemCost();
 }
 
 // 돈 초기화
 function initCoin(){
 	totalCoin = 0;
 	setCoin(totalCoin);
+	checkItemCost();
 }
 
 // 돈 설정
 function setCoin(coin){
 	$(".coin").text(coin);
+	checkItemCost();
+}
+
+// 아이템 활성화 체크
+function checkItemCost(){
+	showSprayItem();
+	showPowerItem();
+}
+
+//spray 아이템 show
+function showSprayItem(){
+	if(totalCoin >= sprayItemCost){
+		$(".spray-overlay").hide();
+	}
+	else {
+		$(".spray-overlay").show();
+	}
+}
+
+//power 아이템 show
+function showPowerItem(){
+	if(totalCoin >= powerItemCost){
+		$(".power-overlay").hide();
+	}
+	else {
+		$(".power-overlay").show();
+	}
 }
 
 
@@ -705,6 +735,11 @@ $(document).ready(function(){
 		sprayItemCostDiv.text(sprayItemCost);
 		
 	}
+	
+	initItemOverlay();
+	function initItemOverlay(){
+		$(".overlay-item").show();
+	}
 		
 	// 화면 클릭 이벤트
 	 $(".play-ground").on("click",function(e) {
@@ -865,11 +900,11 @@ $(document).ready(function(){
 			setTimeout(function() {
 				$(".powerup").css('display', 'none');
 			}, 1000)
+			
 			attackPower++;// 공격 강화
-		}
-		
-		decreaseCoin(powerItemCost); //코인 감소
-		
+			
+			decreaseCoin(powerItemCost); //코인 감소
+		}	
 	});
 		
 	// 다시하기 버튼 클릭 이벤트
@@ -888,7 +923,6 @@ $(document).ready(function(){
 	 * fallingSpeedUpThread = setInterval(function(){ fallingSpeed *= 0.97;
 	 * targetMakeRate *= 0.97; }, 1000);
 	 */
-	
 })
 		
 	

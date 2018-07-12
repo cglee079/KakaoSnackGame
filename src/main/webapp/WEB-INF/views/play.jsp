@@ -54,8 +54,8 @@
 			<div class="attacker"></div>
 		</div>
 		<div class="itembar">
-			<div class="itembar-item power-item"></div>
-			<div class="itembar-item spray-item"></div>
+			<div class="itembar-item power-item"><div class="overlay-item power-overlay"></div></div>
+			<div class="itembar-item spray-item"><div class="overlay-item spray-overlay"></div></div>
 			<div class="itembar-item coin-item"></div>
 			<div class="itembar-item coin"></div>
 		</div>
