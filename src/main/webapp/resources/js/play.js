@@ -69,6 +69,7 @@ var feverTimeBackgroundAudio; // 피버 배경 음악
 
 // 효과음
 var removeSound; // 클릭시 소리
+var itemSound;	// 아이템 소리
 
 // 체력
 var life = fullLife;
@@ -708,6 +709,14 @@ $(document).ready(function(){
 		removeSound.preLoad = true;
 		removeSound.controls = true;
 		removeSound.autoPlay = false;
+		// 아이템 사용 소리
+		itemSound = new Audio();
+		itemSound.src = getContextPath() + "/resources/audio/sample_item.wav";
+		itemSound.preLoad = true;
+		itemSound.controls = true;
+		itemSound.autoPlay = false;
+		
+		
 	}
 	
 	startAudio(backgroundAudio);
@@ -879,6 +888,9 @@ $(document).ready(function(){
 		var coinNumber = parseInt(coin.text(), 10);
 		
 		if(coinNumber >= sprayItemCost){//가지고 있는 코인이 아이템 비용보다 높다면
+			
+			startAudio(itemSound);		
+			
 			$(".spray").css('display', 'flex');
 			setTimeout(function() {
 				$(".spray").css('display', 'none');
@@ -891,6 +903,8 @@ $(document).ready(function(){
 	
 	// 파리채 아이템 클릭 이벤트
 	$(".power-item").on("click",function(){
+		
+		startAudio(itemSound);		
 		
 		var coin = $(".coin");
 		var coinNumber = parseInt(coin.text(), 10);
