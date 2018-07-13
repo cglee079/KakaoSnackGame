@@ -77,7 +77,6 @@ function doAttackTarget(target){
 		makeCoin(5);
 		
 	} else{ // 노말 타겟인 경우
-		
 		var targetlife = parseInt(target.find(".life").val());
 		if(targetlife - attackPower > attackPower ) {
 			target.find(".life").val(targetlife-attackPower);
