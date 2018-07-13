@@ -144,12 +144,12 @@ function usingItem(itemId){
 	startAudio(itemSound);		
 	
 	switch(itemId){
-	case 0 : doUpgradeAttacker();break;
+	case 0 : doUpgradePower();break;
 	case 1 : doUsingSpray(); break;
 	case 2 : doRecoveryHeart(); break;
 	}
 	
-	function doUpgradeAttacker(){
+	function doUpgradePower(){
 		if(coinNumber >= ITEM_COST_POWER){ //가지고 있는 코인이 아이템 비용보다 높다면
 			$(".effect.powerup").css('display', 'flex');
 			setTimeout(function() {
@@ -157,7 +157,7 @@ function usingItem(itemId){
 			}, 1000)
 			
 			attackPower++;// 공격 강화
-			decreaseCoin(ITEM_COST_SPRAY); //코인 감소
+			decreaseCoin(ITEM_COST_POWER); //코인 감소
 		}	
 	}
 	
