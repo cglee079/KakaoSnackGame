@@ -1,0 +1,20 @@
+@font-face {
+  font-family: 'KCC_Kimhoon';
+  font-style: normal;
+  src: url(../../font/KCC/KCC-Kimhoon.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'KCC_eunyoung';
+  font-style: normal;
+  src: url(../../font/KCC/KCC-eunyoung.ttf) format('truetype');
+}
+
+
+.font-kimhoon {
+	font-family: KCC_Kimhoon, serif;
+}
+
+.font-eunyoun {
+	font-family: KCC_eunyoung, serif;
+}

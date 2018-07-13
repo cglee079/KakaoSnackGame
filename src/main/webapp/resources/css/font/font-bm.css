@@ -1,0 +1,19 @@
+@font-face {
+  font-family: 'BM_Jua';
+  font-style: normal;
+  src: url(../../font/BM/BMDOHYEON_ttf.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'BM_Dohyeon';
+  font-style: normal;
+  src: url(../../font/BM/BMDOHYEON_ttf.ttf) format('truetype');
+}
+
+.font-bmjua {
+	font-family: BM_Jua, serif;
+}
+
+.font-bmdohyeon {
+	font-family: BM_Dohyeon, serif;
+}

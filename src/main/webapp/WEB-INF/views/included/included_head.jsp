@@ -6,7 +6,7 @@
 
 <!-- lib-js -->
 <script src="${pageContext.request.contextPath}/resources/js/lib/jquery-3.2.1.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/lib/jquery-ui.min.js"></script>
+<%-- <script src="${pageContext.request.contextPath}/resources/js/lib/jquery-ui.min.js"></script> --%>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common.css" />
 
 <script>

@@ -1,0 +1,10 @@
+@font-face {
+  font-family: 'Misaeng';
+  font-style: normal;
+  font-size : 1rem;
+  src: url(../../font/SDMiSaeng/SDMiSaeng.ttf) format('truetype');
+}
+
+.font-misaeng {
+	font-family: Misaeng, serif;
+}
