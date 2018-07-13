@@ -17,14 +17,6 @@
 				<input type="button" class="restart-button" value="다시하기" onclick="location.reload();"/>
 			</div>
 		</div>
-		<div class="wrap-fevertime">
-			<div class="fevertime">
-				<%-- 	<div class="fevertime-icon"
-					style="background-image: url('${pageContext.request.contextPath}/resources/image/icon_play_gameover.gif');"></div> --%>
-				<div class="fevertime-message">FEVER TIME</div>
-			</div>
-		</div>
-		
 		<div class="wrap-effect">
 			<div class="effect powerup">
 				<%-- 	<div class="fevertime-icon"
@@ -41,6 +33,7 @@
 					style="background-image: url('${pageContext.request.contextPath}/resources/image/icon_play_gameover.gif');"></div> --%>
 				<div class="effect-message">Heart UP</div>
 			</div>
+			
 		</div>
 		
 
@@ -52,12 +45,14 @@
 			</div>
 			<div class="score-board">
 				<div class="score">0</div>
-				<div class="combo">COMBO!!</div>
 			</div>
-			<div class="life-board"></div>
+			<div class="wrap-life-board">
+				<div class="life-board"></div>
+			</div>
 		</div>
 		<div class="play-ground">
 			<div class="attacker"></div>
+			<div class="combo-message">COMBO <span class="combo-count">1</span> !!</div>
 		</div>
 		<div class="itembar">
 			<div class="itembar-item power-item" onclick="usingItem(0)">

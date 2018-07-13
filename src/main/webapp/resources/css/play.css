@@ -94,21 +94,6 @@
 	align-items: center;
 }
 
-.fevertime {
-	display: flex;
-	width: 100%;
-	height: 100%;
-	flex-flow: column nowrap;
-	justify-content: center;
-	align-items: center;
-}
-
-.fevertime .fevertime-message {
-	margin-bottom: 90%;
-	font-size: 2rem;
-	font-weight: bold;
-}
-
 .wrap-effect { }
 .wrap-effect .effect{
 	width: 100%;
@@ -121,11 +106,16 @@
 	justify-content: center;
 	align-items: center;
 }
+.wrap-effect .effect.on{
+	display: flex;
+}
 
-.wrap-effect .effect .effect-message{
+.effect .effect-message{
 	font-size: 2rem;
 	font-weight: bold;
 }
+
+/** ======== 상단바 부분 ======= **/
 
 .head {
 	width: 100%;
@@ -140,49 +130,50 @@
 	background-repeat: no-repeat;
 	background-size: contain;
 	background-image: url("../image/sample_start_audio.png");
-	z-index: 4;
 }
 
 .score-board {
 	width: 100px;
 	height: 50px;
 	margin: auto;
-	display: inline-block;
 }
 
-.score {
+.wrap-life-board{
+	width: 200px;
+	height: 50px;
+	border: 2px solid black;
+}
+
+.life-board {
+	width: 100%;
+	height: 100%;
+	background: red;
+}
+
+.score-board .score {
 	font-size: 2rem;
 	font-weight: bold;
 	text-align: center;
 }
 
-.combo {
-	font-size: 1.5rem;
-	font-weight: bold;
-	text-align: center;
-	position: absolute;
-	display: none;
-}
-
-.life-board {
-	width: 200px;
-	height: 50px;
-	margin: auto;
-	display: inline-block;
-	border: 2px solid black;
-}
-
-.ui-widget-header {
-	background: #cedc98;
-	color: #333333;
-	height: 50px;
-}
+/** ========= Play Ground ======== **/
 
 .play-ground {
 	flex: 1;
 	position: relative;
 	overflow: hidden;
 	z-index: 1;
+}
+
+.combo-message {
+	font-size: 1.5rem;
+	font-weight: bold;
+	text-align: center;
+	position: absolute;
+	display: none;
+}
+.combo-message.on{
+	display: block;
 }
 
 .target {
@@ -210,24 +201,6 @@
 .target.limit .target-icon { background-image: url("../image/sample_target_limit.png"); }
 
 .fever-target {
-	position: absolute;
-	z-index: 2;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	background: rgba(0, 0, 0, 0);
-	transform-origin: 50% 50%;
-}
-
-.fever-target-icon {
-	width: 100%;
-	height: 100%;
-	background-repeat: no-repeat;
-	background-size: contain;
-	background-image: url("../image/sample_heart.gif");
-}
-
-.boss-target {
 	margin-bottom: 20%;
 	position: absolute;
 	z-index: 5;
@@ -238,7 +211,7 @@
 	transform-origin: 50% 50%;
 }
 
-.boss-target .boss-target-icon {
+.fever-target .fever-target-icon {
 	width: 100%;
 	height: 100%;
 	background-repeat: no-repeat;
