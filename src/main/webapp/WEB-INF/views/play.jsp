@@ -46,8 +46,10 @@
 			<div class="score-board">
 				<div class="score">0</div>
 			</div>
-			<div class="wrap-life-board">
-				<div class="life-board"></div>
+			<div class="wrap-life-progress">
+				<div class="progress">
+					<div class="progress-bar"></div>
+				</div>
 			</div>
 		</div>
 		<div class="play-ground">

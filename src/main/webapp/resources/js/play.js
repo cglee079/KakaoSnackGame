@@ -9,9 +9,8 @@ const ITEM_CREATE_PERCENT	= 0.05;	// 아이템 생성 확률
 const RIGHT_ANGLE 			= 90;
 const LIMIT_COMBO_NUMBER	= 3;		// 보스타임이 되기까지 콤보 수/ n번 때리면 보스타임 시작
 const FEVER_TARGET_NUMBRT	= 5;     // 보스 터치 제한 횟수
-const FEVER_TARGET_LEFTDISTANCE= 10;
-const FEVER_TARGET_WIDTH		= 300;	// 보스 타겟 넓이
-const FEVER_TARGET_HEIGHT		= 300;	// 보스 타겟 높이
+const FEVER_TARGET_WIDTH	= 300;	// 보스 타겟 넓이
+const FEVER_TARGET_HEIGHT	= 300;	// 보스 타겟 높이
 const RECOVERY_DEGREE   	= 10;     // 체력 회복 수치
 const FEVER_TIME_SEC		= 5000;		// 피버 타임 시간
 
@@ -125,8 +124,8 @@ function removeAllTarget(targetType, doEffect) {
 function lifeRecovery(recover) {
 	life += recover;
 	if(life > FULL_LIFE) {life = FULL_LIFE;}
-	$(".life-board").stop();
-	$(".life-board").css("width", life + "%");
+	$(".wrap-life-progress .progress-bar").stop();
+	$(".wrap-life-progress .progress-bar").css("width", life + "%");
 }
 
 function usingItem(itemId){
@@ -308,13 +307,11 @@ function makeTarget(){
 			angle = 3 * RIGHT_ANGLE + (RIGHT_ANGLE - angle % RIGHT_ANGLE);
 		}
 		
-		/*
-		 * if(Math.abs(toTopDistance) > moveDistance){ console.log("1 " +
-		 * toTopDistance + ", " + toLeftDistance + "===>"); var ratio =
-		 * Math.abs(toTopDistance/moveDistance); toTopDistance = 10;
-		 * toLeftDistance /= ratio; console.log("2 " + ratio + "===>" +
-		 * toTopDistance + ", " + toLeftDistance); console.log(" "); }
-		 */	
+		if(Math.abs(toTopDistance) > moveDistance){
+			var ratio = Math.abs(toTopDistance/moveDistance); 
+			toTopDistance = 10 * Math.sign(toTopDistance);
+			toLeftDistance /= ratio; 
+		}
 		
 		target.css("transform", "rotate(" + angle + "deg)");
 		
@@ -516,7 +513,7 @@ function stopMakeTarget() {
 	makeTargetThread = undefined; // 쓰레드 변수 초기화
 }
 
-// 체력 감소 스레드
+// 체력 감소 스레드 시작
 function startLifeDecrease() { // 재귀를 이용한 Interval
 	life = life - 0.5;
 	if(life < 0){
@@ -529,9 +526,15 @@ function startLifeDecrease() { // 재귀를 이용한 Interval
 			stopWarningBackgroundChange();
 		}
 		
-		$(".life-board").stop().animate({"width" : life + "%"});
+		$(".wrap-life-progress .progress-bar").stop().animate({"width" : life + "%"});
 		lifeDecreaseThread = setTimeout(startLifeDecrease, lifeDecreaseRate);
 	}
+}
+
+//체력 감소 스레드 중지
+function stopLifeDecrease(){
+	clearTimeout(lifeDecreaseThread);
+	lifeDecreaseThread = undefined;
 }
 
 // 경고 백그라운드 스레드 시작
@@ -539,14 +542,11 @@ function startWarningBackgroundChange(){
 	if(warningBackgroundChange == undefined){
 		warningBackgroundChange = setInterval(function(){
 			var playGround = $('.play-ground');			
-			
-				if(playGround.css("background-color") == "rgba(0, 0, 0, 0)"){ // 배경색 변경
+			if(playGround.css("background-color") == "rgba(0, 0, 0, 0)"){ // 배경색 변경
 				playGround.css("background-color","red");		
-			}
-			else {
+			} else {
 				playGround.css("background-color","rgba(0, 0, 0, 0)");	
 			}
-				
 		}, '200');
 	}	
 }
@@ -557,12 +557,6 @@ function stopWarningBackgroundChange(){
 	warningBackgroundChange = undefined; // 쓰레드 변수 초기화
 }
 
-
-// 체력 감소 스레드 중지
-function stopLifeDecrease(){
-	clearTimeout(lifeDecreaseThread);
-	lifeDecreaseThread = undefined;
-}
 
 $(document).ready(function(){
 	var attacker = $(".attacker");
