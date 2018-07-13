@@ -239,6 +239,9 @@
 	display: block;
 }
 
+
+
+/** ==== 아이템 영역 ===== **/
 .itembar {
 	display: flex;
 	flex-flow: column no-wrap;
