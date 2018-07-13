@@ -13,8 +13,8 @@
 				<div class="gameover-icon"
 					style="background-image: url('${pageContext.request.contextPath}/resources/image/icon_play_gameover.gif');"></div>
 				<div class="gameover-message">GAME OVER</div>
-				<input type="button" class="home-button" value="홈"/>
-				<input type="button" class="restart-button" value="다시하기"/>
+				<input type="button" class="home-button" value="홈" onclick="location.replace(getContextPath() + '/');"/>
+				<input type="button" class="restart-button" value="다시하기" onclick="location.reload();"/>
 			</div>
 		</div>
 		<div class="wrap-fevertime">
@@ -24,16 +24,22 @@
 				<div class="fevertime-message">FEVER TIME</div>
 			</div>
 		</div>
+		
 		<div class="wrap-effect">
-			<div class="powerup">
+			<div class="effect powerup">
 				<%-- 	<div class="fevertime-icon"
 					style="background-image: url('${pageContext.request.contextPath}/resources/image/icon_play_gameover.gif');"></div> --%>
-				<div class="powerup-message">POWER UP</div>
+				<div class="effect-message" >POWER UP</div>
 			</div>
-			<div class="spray">
+			<div class="effect spray">
 				<%-- 	<div class="fevertime-icon"
 					style="background-image: url('${pageContext.request.contextPath}/resources/image/icon_play_gameover.gif');"></div> --%>
-				<div class="spray-message">Spray Attack</div>
+				<div class="effect-message">Spray Attack</div>
+			</div>
+			<div class="effect heart">
+				<%-- 	<div class="fevertime-icon"
+					style="background-image: url('${pageContext.request.contextPath}/resources/image/icon_play_gameover.gif');"></div> --%>
+				<div class="effect-message">Heart UP</div>
 			</div>
 		</div>
 		
@@ -54,16 +60,28 @@
 			<div class="attacker"></div>
 		</div>
 		<div class="itembar">
-			<div class="itembar-item power-item"><div class="overlay-item power-overlay"></div></div>
-			<div class="itembar-item spray-item"><div class="overlay-item spray-overlay"></div></div>
-			<div class="itembar-item coin-item"></div>
+			<div class="itembar-item power-item" onclick="usingItem(0)">
+				<div class="item-icon power-item-icon"></div>
+				<div class="item-cost power-item-cost">0</div>			
+				<div class="overlay-item"></div>
+			</div>
+			
+			<div class="itembar-item spray-item" onclick="usingItem(1)">
+				<div class="item-icon spray-item-icon"></div>
+				<div class="item-cost spray-item-cost">0</div>
+				<div class="overlay-item"></div>
+			</div>
+			
+			<div class="itembar-item heart-item" onclick="usingItem(2)">
+				<div class="item-icon heart-item-icon"></div>
+				<div class="item-cost heart-item-cost">0</div>
+				<div class="overlay-item"></div>
+			</div>
+			
 			<div class="itembar-item coin"></div>
 		</div>
+		
 		<div class="itembar-cost">
-			<div class="itembar-item-cost power-item-cost">0</div>
-			<div class="itembar-item-cost spray-item-cost">0</div>
-			<div class="itembar-item-cost coin-item-cost"></div>
-			<div class="itembar-item-cost coin-cost"></div>
 		</div>
 	</div>
 </body>

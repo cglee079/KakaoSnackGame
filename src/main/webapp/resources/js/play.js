@@ -1,6 +1,3 @@
-/**
- * common.js
- */
 const TARGET_POINT	  = 100;	// 타겟 하나당 점수
 const COMBO_POINT	  = 200;	// 콤보 시 타겟 하나당 점수
 const FEVER_POINT	  = 300;	// 피버 타겟 하나당 점수
@@ -20,9 +17,16 @@ const BOSS_TARGET_HEIGHT	  = 300;	// 보스 타겟 높이
 const RECOVERY_DEGREE   	  = 10;     // 체력 회복 수치
 const FEVER_TIME_SEC		= 5000;		// 피버 타임 시간
 
+const ITEM_COST_POWER = 10;	// 파워 아이템 비용
+const ITEM_COST_SPRAY = 50;	// 스프레이 아이템 비용
+const ITEM_COST_HEART = 20;
+
 const PLAYTIME_NORMAL	= "PLAYTIME_001";
 const PLAYTIME_FEVER 	= "PLAYTIME_002";
 const PLAYTIME_BOSS 	= "PLAYTIME_003";
+
+const FULL_LIFE			= 100;
+
 
 var startX;
 var startY;
@@ -33,6 +37,7 @@ var targetMakeRate 		= 600; 	// 타겟이 생성되는 간격 , 1000 = 1초
 var randAngleTime		= 5000; // 타겟이 이동방향을 바꾸는 쓰레드 간격.
 var bossTargetMoveTime  = 100;  // 보스 타겟이 이동하는 쓰레드 간격.
 var totalScore			= 0; 	// 점수
+var totalCoin           = 100;    // 코인 숫자
 var feverTargetMakeRate = 100;  // 피버 타겟이 생성되는 간격, 1000 = 1초
 var makeTargetThread;
 var checkTargetThread;
@@ -46,13 +51,9 @@ var targetMoveSpeed 	= 100; 	// 타겟 스피드
 var bossTargetLeftdistance= 10; // 보스 타겟 왼쪽 이동 거리
 var bossTargetTouchCount= 0; 	// 보스 타겟 터치 카운트
 var timeType 			= PLAYTIME_NORMAL; 	
-var fullLife 			= 100; 	// 총 생명력
-var totalCoin           = 0;    // 코인 숫자
 var attackPower  	    = 1;    // 공격 파워
 var targetLife          = 1;    // 타겟 생명
 var targetLifeIncTime   = 10000;
-var sprayItemCost		= 50;	// 스프레이 아이템 비용
-var powerItemCost		= 10;	// 파워 아이템 비용
 
 // targeting 범위
 var attackAreaWidth 	= 150;
@@ -72,9 +73,9 @@ var removeSound; // 클릭시 소리
 var itemSound;	// 아이템 소리
 
 // 체력
-var life = fullLife;
+var life = FULL_LIFE;
 var lifeDecreaseThread;
-var lifeDecreaseRate = 2000; // 체력이 감소하는 속도
+var lifeDecreaseRate = 1000; // 체력이 감소하는 속도
 
 
 // 타겟 삭제 - 공격당했을때
@@ -137,15 +138,58 @@ function removeAllTarget(targetType, doEffect) {
 
 // 체력 회복
 function lifeRecovery(recover) {
-	$(".life-board").progressbar({value: life + recover});
+	life += recover;
+	if(life > FULL_LIFE) {life = FULL_LIFE;}
+	$(".life-board").progressbar({value: life});
 }
 
-// 아이템 생성
-function makeItem(){
-	target.addClass("item");
-	var item = Math.floor(Math.random() * ITEMS.length); // 어떤 아이템을 부여할지
-															// 랜덤으로
-	target.append($("<input>", {"class" : "item-id", type : "hidden", value : ITEMS[item]}));
+function usingItem(itemId){
+	var coin = $(".coin");
+	var coinNumber = parseInt(coin.text(), 10);
+	
+	startAudio(itemSound);		
+	
+	switch(itemId){
+	case 0 : doUpgradeAttacker();break;
+	case 1 : doUsingSpray(); break;
+	case 2 : doRecoveryHeart(); break;
+	}
+	
+	function doUpgradeAttacker(){
+		if(coinNumber >= ITEM_COST_POWER){ //가지고 있는 코인이 아이템 비용보다 높다면
+			$(".effect.powerup").css('display', 'flex');
+			setTimeout(function() {
+				$(".effect.powerup").css('display', 'none');
+			}, 1000)
+			
+			attackPower++;// 공격 강화
+			decreaseCoin(ITEM_COST_SPRAY); //코인 감소
+		}	
+	}
+	
+	function doUsingSpray(){
+		if(coinNumber >= ITEM_COST_SPRAY){//가지고 있는 코인이 아이템 비용보다 높다면
+			$(".effect.spray").css('display', 'flex');
+			setTimeout(function() {
+				$(".effect.spray").css('display', 'none');
+			}, 1000)
+			removeAllTarget(".target", true)// 모든 타겟 삭제
+			decreaseCoin(ITEM_COST_SPRAY); //코인 감소
+		}
+	}
+	
+	function doRecoveryHeart(){
+		if(coinNumber >= ITEM_COST_HEART){ //가지고 있는 코인이 아이템 비용보다 높다면
+			$(".effect.heart").css('display', 'flex');
+			setTimeout(function() {
+				$(".effect.heart").css('display', 'none');
+			}, 1000)
+			
+			lifeRecovery(30);
+			decreaseCoin(ITEM_COST_HEART); //코인 감소
+		}	
+	}
+	
 }
 
 // 음악 시작
@@ -342,54 +386,38 @@ function gainScore(point){
 // 돈 증가
 function makeCoin(coin) {
 	totalCoin = totalCoin + coin;
-	setCoin(totalCoin);
+	drawCoin(totalCoin);
 	checkItemCost();
 }
 
 // 돈 감소
 function decreaseCoin(coin) {
 	totalCoin = totalCoin - coin;
-	setCoin(totalCoin);
+	drawCoin(totalCoin);
 	checkItemCost();
 }
 
 // 돈 초기화
 function initCoin(){
 	totalCoin = 0;
-	setCoin(totalCoin);
+	drawCoin(totalCoin);
 	checkItemCost();
 }
 
-// 돈 설정
-function setCoin(coin){
+function drawCoin(coin){
 	$(".coin").text(coin);
-	checkItemCost();
 }
 
 // 아이템 활성화 체크
 function checkItemCost(){
-	showSprayItem();
-	showPowerItem();
-}
+	if(totalCoin >= ITEM_COST_SPRAY){ $(".spray-item .overlay-item").removeClass("on"); }
+	else { $(".spray-item .overlay-item").addClass("on"); }
 
-//spray 아이템 show
-function showSprayItem(){
-	if(totalCoin >= sprayItemCost){
-		$(".spray-overlay").hide();
-	}
-	else {
-		$(".spray-overlay").show();
-	}
-}
-
-//power 아이템 show
-function showPowerItem(){
-	if(totalCoin >= powerItemCost){
-		$(".power-overlay").hide();
-	}
-	else {
-		$(".power-overlay").show();
-	}
+	if(totalCoin >= ITEM_COST_POWER){ $(".power-item .overlay-item").removeClass("on"); }
+	else { $(".power-item .overlay-item").addClass("on"); }
+	
+	if(totalCoin >= ITEM_COST_HEART){ $(".heart-item .overlay-item").removeClass("on"); }
+	else { $(".heart-item .overlay-item").addClass("on"); }
 }
 
 
@@ -489,7 +517,7 @@ function startPlayBossTime(){// 보스타임 시작
 		var bossTarget = $(".boss-target");
 		bossTarget.remove();
 		
-		life = fullLife;
+		life = FULL_LIFE;
 		$(".life-board").progressbar({value: life}); 	// 체력 가득
 	}
 	
@@ -538,7 +566,7 @@ function startPlayBossTime(){// 보스타임 시작
  * 
  * //보스 이미지 삭제 var bossTarget = $(".boss-target"); bossTarget.remove();
  * 
- * life = fullLife; $(".life-board").progressbar({value: life}); //체력 가득 }
+ * life = FULL_LIFE; $(".life-board").progressbar({value: life}); //체력 가득 }
  */
 // 피버 타겟 스레드 시작
 /*
@@ -620,15 +648,9 @@ function startLifeDecrease() { // 재귀를 이용한 Interval
 		gameover();
 		lifeDecreaseThread = undefined;
 	} else {
-		
-		if(life <= fullLife/3 && warningBackgroundChange == undefined){ // 체력이
-																		// 일정 수준
-																		// 이하로
-																		// 감소했을때
+		if(life <= FULL_LIFE/3 && warningBackgroundChange == undefined){ // 체력이 일정수준 이하로 감소했을때 
 			startWarningBackgroundChange();
-		}
-		
-		else if(life > fullLife/3 && warningBackgroundChange != undefined){
+		} else if(life > FULL_LIFE/3 && warningBackgroundChange != undefined){
 			stopWarningBackgroundChange();
 		}
 		
@@ -639,13 +661,11 @@ function startLifeDecrease() { // 재귀를 이용한 Interval
 
 // 경고 백그라운드 스레드 시작
 function startWarningBackgroundChange(){
-
 	if(warningBackgroundChange == undefined){
 		warningBackgroundChange = setInterval(function(){
 			var playGround = $('.play-ground');			
 			
-			if(playGround.css("background-color") == "rgba(0, 0, 0, 0)"){ // 배경색
-																			// 변경
+				if(playGround.css("background-color") == "rgba(0, 0, 0, 0)"){ // 배경색 변경
 				playGround.css("background-color","red");		
 			}
 			else {
@@ -662,19 +682,12 @@ function stopWarningBackgroundChange(){
 	warningBackgroundChange = undefined; // 쓰레드 변수 초기화
 }
 
+
 // 체력 감소 스레드 중지
 function stopLifeDecrease(){
 	clearTimeout(lifeDecreaseThread);
 	lifeDecreaseThread = undefined;
 }
-
-// 타겟 체력 증가 스레드
-setInterval(function(){
-	targetLife++;
-	console.log(targetLife);
-	
-}, targetLifeIncTime);
-
 
 $(document).ready(function(){
 	var attacker = $(".attacker");
@@ -715,8 +728,6 @@ $(document).ready(function(){
 		itemSound.preLoad = true;
 		itemSound.controls = true;
 		itemSound.autoPlay = false;
-		
-		
 	}
 	
 	startAudio(backgroundAudio);
@@ -731,25 +742,14 @@ $(document).ready(function(){
  	 	value: life
    	});
 
-	// 아이템 비용 설정
+	// 아이템 비용 표시
 	initItemCost();
 	function initItemCost(){
-		
-		// 파워 아이템 비용 설정
-		var powerItemCostDiv = $(".power-item-cost");
-		powerItemCostDiv.text(powerItemCost);
-		
-		// 스프레이 아이템 비용 설정
-		var sprayItemCostDiv = $(".spray-item-cost");
-		sprayItemCostDiv.text(sprayItemCost);
-		
+		$(".power-item-cost").text(ITEM_COST_POWER);
+		$(".spray-item-cost").text(ITEM_COST_SPRAY);
+		$(".heart-item-cost").text(ITEM_COST_HEART);
 	}
 	
-	initItemOverlay();
-	function initItemOverlay(){
-		$(".overlay-item").show();
-	}
-		
 	// 화면 클릭 이벤트
 	 $(".play-ground").on("click",function(e) {
 		var attacker = $(".attacker");
@@ -880,58 +880,11 @@ $(document).ready(function(){
 		}
 	});
 			
-	
-	// 스프레이 아이템 클릭 이벤트
-	$(".spray-item").on("click",function(){
-		
-		var coin = $(".coin");
-		var coinNumber = parseInt(coin.text(), 10);
-		
-		if(coinNumber >= sprayItemCost){//가지고 있는 코인이 아이템 비용보다 높다면
+	//타겟 체력 증가 스레드
+	setInterval(function(){
+		targetLife++;
+	}, targetLifeIncTime);
 
-			startAudio(itemSound);		
-			
-			$(".spray").css('display', 'flex');
-			setTimeout(function() {
-				$(".spray").css('display', 'none');
-			}, 1000)
-			removeAllTarget(".target", true)// 모든 타겟 삭제
-		
-			decreaseCoin(sprayItemCost); //코인 감소
-		}
-	});
-	
-	// 파리채 아이템 클릭 이벤트
-	$(".power-item").on("click",function(){
-		
-		var coin = $(".coin");
-		var coinNumber = parseInt(coin.text(), 10);
-		
-		if(coinNumber >= powerItemCost){ //가지고 있는 코인이 아이템 비용보다 높다면
-			
-			startAudio(itemSound);		
-			
-			$(".powerup").css('display', 'flex');
-			setTimeout(function() {
-				$(".powerup").css('display', 'none');
-			}, 1000)
-			
-			attackPower++;// 공격 강화
-			
-			decreaseCoin(powerItemCost); //코인 감소
-		}	
-	});
-		
-	// 다시하기 버튼 클릭 이벤트
-	$(".restart-button").on("click",function(e) {
-		 location.reload();
-	});
-	
-	// 홈 버튼 클릭 이벤트
-	$(".home-button").on("click",function(e) {
-		 location.replace(getContextPath() + "/");	
-	});
-	
 	startPlayNormalTime();
 	// 난이도UP 쓰레드 - 타겟이 빨리 떨어질수록, 타겟 만드는 속도는 빨라지도록
 	/*
