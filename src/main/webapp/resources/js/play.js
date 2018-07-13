@@ -37,7 +37,7 @@ var targetMakeRate 		= 600; 	// 타겟이 생성되는 간격 , 1000 = 1초
 var randAngleTime		= 5000; // 타겟이 이동방향을 바꾸는 쓰레드 간격.
 var bossTargetMoveTime  = 100;  // 보스 타겟이 이동하는 쓰레드 간격.
 var totalScore			= 0; 	// 점수
-var totalCoin           = 100;    // 코인 숫자
+var totalCoin           = 0;    // 코인 숫자
 var feverTargetMakeRate = 100;  // 피버 타겟이 생성되는 간격, 1000 = 1초
 var makeTargetThread;
 var checkTargetThread;
@@ -59,13 +59,9 @@ var targetLifeIncTime   = 10000;
 var attackAreaWidth 	= 150;
 var attackAreaHeight    = 150;
 
-// 노말 음악
+//배경음악
 var backgroundAudio; // 노말 배경 음악
-
-// 보스 타임 음악
 var bossTimeBackgroundAudio; // 보스 배경 음악
-
-// 피버 타임 음악
 var feverTimeBackgroundAudio; // 피버 배경 음악
 
 // 효과음
@@ -104,8 +100,6 @@ function doAttackTarget(target){
 			makeCoin(1);
 			removeTarget(target,true);
 		}
-		
-		//
 	}
 }
 
