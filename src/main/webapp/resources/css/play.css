@@ -117,7 +117,7 @@
 	font-weight: bold;
 }
 
-/** ======== 상단바 부분 ======= **/
+/** ======== �긽�떒諛� 遺�遺� ======= **/
 
 .head {
 	width: 100%;
@@ -208,6 +208,7 @@
 
 .target.removed .target-icon { 	background-image: url("../image/sample_target_removed.png"); }
 .target.limit .target-icon { background-image: url("../image/sample_target_limit.png"); }
+.target.warning .target-icon { background-image: url("../image/sample_target_warning.png"); }
 
 .fever-target {
 	margin-bottom: 20%;
@@ -241,7 +242,7 @@
 
 
 
-/** ==== 아이템 영역 ===== **/
+/** ==== �븘�씠�뀥 �쁺�뿭 ===== **/
 .itembar {
 	display: flex;
 	flex-flow: column no-wrap;

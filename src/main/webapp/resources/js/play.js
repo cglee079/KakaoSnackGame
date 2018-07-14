@@ -31,6 +31,7 @@ var endY;
 
 var targetMakeRate 		= 600; 	// 타겟이 생성되는 간격 , 1000 = 1초
 var randAngleTime		= 5000; // 타겟이 이동방향을 바꾸는 쓰레드 간격.
+var wariningTargetRate  = 0.3;  // Warning 타겟이 생성되는 확률
 var totalScore			= 0; 	// 점수
 var totalCoin           = 0;    // 코인 숫자
 var feverTargetMakeRate = 100;  // 피버 타겟이 생성되는 간격, 1000 = 1초
@@ -76,7 +77,11 @@ function doAttackTarget(target){
 		lifeRecovery(10);
 		makeCoin(5);
 		
-	} else{ // 노말 타겟인 경우
+	} else if(target.find(".targetType").val() === "warning"){
+		lifeRecovery(-10);
+		usingItem(3);
+		removeTarget(target,true);
+	}else{ // 노말 타겟인 경우
 		var targetlife = parseInt(target.find(".life").val());
 		if(targetlife - attackPower > attackPower ) {
 			target.find(".life").val(targetlife-attackPower);
@@ -130,6 +135,7 @@ function lifeRecovery(recover) {
 function usingItem(itemId){
 	var coin = $(".coin");
 	var coinNumber = parseInt(coin.text(), 10);
+	var duration = 3000; //아이템 지속 시간
 	
 	startAudio(itemSound);		
 	
@@ -137,6 +143,7 @@ function usingItem(itemId){
 	case 0 : doUpgradePower();break;
 	case 1 : doUsingSpray(); break;
 	case 2 : doRecoveryHeart(); break;
+	case 3 : doChangemoveSpeed(duration); break;
 	}
 	
 	function doUpgradePower(){
@@ -173,6 +180,14 @@ function usingItem(itemId){
 			decreaseCoin(ITEM_COST_HEART); //코인 감소
 		}	
 	}
+	function doChangemoveSpeed(duration) {
+		targetMoveSpeed = targetMoveSpeed - 40;
+		setTimeout(function() {
+			targetMoveSpeed = targetMoveSpeed + 40;
+		}, duration)
+		
+	}
+	
 	
 }
 
@@ -202,13 +217,25 @@ function makeTarget(){
 	}
 	
 	var playGround = $(".play-ground");
-	var target = $("<div>", {"class" : "target"});
-	target.append($("<div>", {"class" : "target-icon"}));
+	
+	
+	var targetType = Math.random();
+	if(targetType < wariningTargetRate) { // warningTarget이 만들어질 확률
+		var target = $("<div>", {"class" : "target warning"});
+		target.append($("<div>", {"class" : "target-icon"}));
+		target.append($("<input>", {"class" : "targetType", type :"hidden", value: "warning"}));
+		target.append($("<input>", {"class" : "life",type : "hidden" , value: 1}));	
+	} else {
+		var target = $("<div>", {"class" : "target"});
+		target.append($("<div>", {"class" : "target-icon"}));
+		target.append($("<input>", {"class" : "targetType", type :"hidden", value: "normal"}));
+		target.append($("<input>", {"class" : "life",type : "hidden" , value: targetLife}));
+	}
+	
 	target.append($("<input>", {"class" : "moveTargetThreadID", type : "hidden"}));
 	target.append($("<input>", {"class" : "angle", type : "hidden"}));
 	target.append($("<input>", {"class" : "toLeftDistance", type : "hidden"}));
 	target.append($("<input>", {"class" : "toTopDistance", type : "hidden"}));
-	target.append($("<input>", {"class" : "life",type : "hidden" , value: targetLife}));
 	
 	target.appendTo(playGround);
 	target.css("width", TARGET_WIDTH);
@@ -626,24 +653,31 @@ $(document).ready(function(){
     	
     	if(timeType == PLAYTIME_NORMAL){ // 노말 타임
     		var targets = $(".target");
+    		var checkComboflag = 0;
     		targets.each(function(){
     			var targetStartX= parseInt($(this).css("left"));
     			var targetStartY= parseInt($(this).css("top"));
     			var targetEndX	= targetStartX + TARGET_WIDTH;
     			var targetEndY 	= targetStartY + TARGET_HEIGHT;
     			
+    			
     			if(targetStartX > attackStartX 
     					&& targetEndX < attackEndX
     					&& targetStartY > attackStartY
     					&& targetEndY < attackEndY){
     				attackedTargetNumber = attackedTargetNumber+1;
+    				
+    				if($(this).find(".targetType").val() ==="warning")
+    					 checkComboflag =1;
+    				 
     				doAttackTarget(this);
-    			
+ 
     			}
     			
     		}); 
-    		
+    		if(checkComboflag === 0) {
     		checkCombo();
+    		}
     		function checkCombo(){ // 콤보 수 확인
     			if(attackedTargetNumber >= 2){
     				comboNumber = comboNumber + 1;
