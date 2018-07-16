@@ -113,11 +113,39 @@
 
 .wrap-effect .effect.on {
 	display: flex;
+	opacity: 100;
 }
 
 .effect .effect-message {
+	
 	font-size: 2rem;
 	font-weight: bold;
+}
+
+.effect .spray-effect {
+
+	width: 100%;
+	height: 700px;
+	-webkit-animation: fadeInFromNone 5s ease-out;
+	background-repeat: no-repeat;
+	background-image: url("../image/sample_spray_effect.png");
+}
+
+@-webkit-keyframes fadeInFromNone {
+    0% {
+        display: none;
+        opacity: 0;
+    }
+
+    1% {
+        display: block;
+        opacity: 0;
+    }
+
+    100% {
+        display: block;
+        opacity: 1;
+    }
 }
 
 /** ======== 占쎄맒占쎈뼊獄쏉옙 �겫占썽겫占� ======= **/
@@ -180,6 +208,7 @@
 	position: relative;
 	overflow: hidden;
 	z-index: 1;
+	background-color: #3c7c1c;
 }
 
 .combo-message {
@@ -256,12 +285,13 @@
 
 .attacker.on {
 	display: flex;
+	
 }
 
 .lime_item_area {
 	display: none;
 	position: absolute;
-	background: green;
+	background: pink;
 	
 }
 

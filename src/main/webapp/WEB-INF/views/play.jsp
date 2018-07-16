@@ -24,9 +24,11 @@
 				<div class="effect-message" >LIME</div>
 			</div>
 			<div class="effect spray">
+				<div class="spray-effect">
 				<%-- 	<div class="fevertime-icon"
 					style="background-image: url('${pageContext.request.contextPath}/resources/image/icon_play_gameover.gif');"></div> --%>
 				<div class="effect-message">Spray Attack</div>
+				</div>
 			</div>
 			<div class="effect heart">
 				<%-- 	<div class="fevertime-icon"

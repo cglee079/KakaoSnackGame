@@ -6,10 +6,10 @@ const RECOVERY_DEGREE   	= 10;     // 체력 회복 수치
 const FULL_LIFE				= 100;
 
 const ITEM_COST_LIME = 10;	// 파워 아이템 비용
-const ITEM_COST_SPRAY = 50;	// 스프레이 아이템 비용
+const ITEM_COST_SPRAY = 1;	// 스프레이 아이템 비용
 const ITEM_COST_HEART = 20;
 
-const COMBO_COIN 			= 2;
+const COMBO_COIN 			= 2;1
 
 const TARGET_NORMAL			= "normal";
 const TARGET_WARNING 		= "warning";
@@ -20,8 +20,8 @@ const TARGET_NORMAL_COIN	= 1;
 const TARGET_NORMAL_RECOVERY= 5;
 const TARGET_WARNING_DAMEAGE= -50;
 const TARGET_GOLD_COIN		= 10;
-const ITEM_LIME_WIDTH	= 100;
-const ITEM_LIME_HEIGHT	= 300;
+const ITEM_LIME_WIDTH	= 200;
+const ITEM_LIME_HEIGHT	= 200;
 
 
 const MAX_GOLD_TARGET		= 2;
@@ -62,7 +62,7 @@ var startX;
 var startY;
 var endX;
 var endY;
-
+var clickType           = 1; // 1 = 기본공격 , 2 = 끈끈이공격
 var level				= 0;
 var config				= undefined;
 var time				= 0;
@@ -159,56 +159,88 @@ function usingItem(itemId){
 	startAudio(itemSound);		
 	
 	switch(itemId){
-	case 0 : doSetLime(duration);break;
+	case 0 : doSetLime();break;
 	case 1 : doUsingSpray(); break;
 	case 2 : doRecoveryHeart(); break;
 	case 3 : doChangemoveSpeed(duration); break;
+	case 4 : doSetLimeStart(duration); break;
 	}
 	
-	function doSetLime(duration){
+	function doSetLime(){
 		
 		if(coinNumber >= ITEM_COST_LIME){// 가지고 있는 코인이 아이템 비용보다 높다면
-		
-			console.log("끈끈이 설치!");
-			var catchedtargets = new Array; // 끈끈이 잡힌 타겟 저장 리스트
-			
-			// 끈끈이 나타남
-			$(".lime_item_area").addClass("on");
-			//$(".effect.lime").addClass("on");
-			setTimeout(function() {
-				$(".lime_item_area").removeClass("on");
-				//$(".effect.lime").removeClass("on");
-			}, duration);
-			
-			// 끈끈이 범위 속하는지 검사
-			var limeThread = setInterval(function(){setLime(), config.targetMoveSpeed});
-			
-			// 끈끈이 스레드 정지
-			setTimeout(function(){
-				// 끈끈이 스레드 초기화
-				clearInterval(limeThread); 
-				limeThread = undefined; 
+			clickType = 2;
 	
-				// 아이템 효과 사라진 후 move 스레드 재시작	
-				catchedtargets.forEach(function (target){
-					var moveTargetThread = setTimeout(function(){ moveTarget(target)}, 0);
-					target.find(".moveTargetThreadID").val(moveTargetThread); 	
-					target.find(".effectedItem").val("0"); 
-				});
-			
-			}, duration);
-			
 			decreaseCoin(ITEM_COST_LIME); // 코인 감소
 		}
+	}
+	
+	function doUsingSpray(){
+		if(coinNumber >= ITEM_COST_SPRAY){// 가지고 있는 코인이 아이템 비용보다 높다면
+			stopLifeDecrease();
+			$(".effect.spray").addClass("on");
+			setTimeout(function() {
+				startLifeDecrease();
+				$(".effect.spray").removeClass("on");
+				removeAllTarget(".target", true)// 모든 타겟 삭제
+			}, 3000)
+			
+			decreaseCoin(ITEM_COST_SPRAY); // 코인 감소
+		}
+	}
+	
+	function doRecoveryHeart(){
+		if(coinNumber >= ITEM_COST_HEART){ // 가지고 있는 코인이 아이템 비용보다 높다면
+			$(".effect.heart").addClass("on");
+			setTimeout(function() {
+				$(".effect.heart").removeClass("on");
+			}, 1000)
+			
+			lifeRecovery(30);
+			decreaseCoin(ITEM_COST_HEART); // 코인 감소
+		}	
+	}
+	
+	function doChangemoveSpeed(duration) {
+		targetMoveSpeed = targetMoveSpeed - 40;
+		setTimeout(function() {
+			targetMoveSpeed = targetMoveSpeed + 40;
+		}, duration)
+		
+	}
+	
+	function doSetLimeStart(duration) {
+		var catchedtargets = new Array; // 끈끈이 잡힌 타겟 저장 리스트
+
+		setTimeout(function() {
+			$(".lime_item_area").removeClass("on");
+		//$(".effect.lime").removeClass("on");
+		}, duration);
+		var limeThread = setInterval(function() {
+			setLime(), config.targetMoveSpeed
+		});
+
+		// 끈끈이 스레드 정지
+		setTimeout(function() {
+			// 끈끈이 스레드 초기화
+			clearInterval(limeThread);
+			limeThread = undefined;
+
+			// 아이템 효과 사라진 후 move 스레드 재시작	
+			catchedtargets.forEach(function(target) {
+				var moveTargetThread = setTimeout(function() {
+					moveTarget(target)
+				}, 0);
+				target.find(".moveTargetThreadID").val(moveTargetThread);
+				target.find(".effectedItem").val("0");
+			});
+
+		}, duration);
 		
 		function setLime(){
 			
 			// 끈끈이 지역
 			var limeItemArea = $(".lime_item_area");
-			
-			limeItemArea.css("width", ITEM_LIME_WIDTH);
-			limeItemArea.css("height", ITEM_LIME_HEIGHT);
-			limeItemArea.css("left", $(window).width()/2 - ITEM_LIME_WIDTH/2);
 			var x = limeItemArea.offset().left - $(".play-ground").offset().left;
 	    	var y = limeItemArea.offset().top - $(".play-ground").offset().top;
 	    	
@@ -275,37 +307,7 @@ function usingItem(itemId){
 				}			
 			}); 			
 		}
-	}
-	
-	function doUsingSpray(){
-		if(coinNumber >= ITEM_COST_SPRAY){// 가지고 있는 코인이 아이템 비용보다 높다면
-			$(".effect.spray").addClass("on");
-			setTimeout(function() {
-				$(".effect.spray").removeClass("on");
-			}, 1000)
-			removeAllTarget(".target", true)// 모든 타겟 삭제
-			decreaseCoin(ITEM_COST_SPRAY); // 코인 감소
-		}
-	}
-	
-	function doRecoveryHeart(){
-		if(coinNumber >= ITEM_COST_HEART){ // 가지고 있는 코인이 아이템 비용보다 높다면
-			$(".effect.heart").addClass("on");
-			setTimeout(function() {
-				$(".effect.heart").removeClass("on");
-			}, 1000)
-			
-			lifeRecovery(30);
-			decreaseCoin(ITEM_COST_HEART); // 코인 감소
-		}	
-	}
-	
-	function doChangemoveSpeed(duration) {
-		targetMoveSpeed = targetMoveSpeed - 40;
-		setTimeout(function() {
-			targetMoveSpeed = targetMoveSpeed + 40;
-		}, duration)
-		
+
 	}
 }
 
@@ -710,90 +712,122 @@ $(document).ready(function(){
 	}
 
 	// 화면 클릭 이벤트
-	 $(".play-ground").on("click",function(e) {
-		var attacker = $(".attacker");
-		attacker.addClass("on");
-		
-    	var x = e.pageX - $(".play-ground").offset().left;
-    	var y = e.pageY - $(".play-ground").offset().top;
-    	
-    	var attackStartX = x - (attackAreaWidth/2);
-    	var attackStartY = y - (attackAreaHeight/2);
-    	var attackEndX = x + (attackAreaWidth/2);
-    	var attackEndY = y + (attackAreaHeight/2);
-    	
-    	attacker.css("left", attackStartX);
-    	attacker.css("top", attackStartY);
-    	setTimeout(function(){attacker.removeClass("on")}, 100);
-			        
-    	var attackedTargetNumber = 0;
-    	
-		var targets = $(".target");
-		var checkComboflag = true;
-		targets.each(function(){
-			var targetStartX= parseInt($(this).css("left"));
-			var targetStartY= parseInt($(this).css("top"));
-			var targetEndX	= targetStartX + TARGET_WIDTH;
-			var targetEndY 	= targetStartY + TARGET_HEIGHT;
-    		var attacked	= false;
-			
-    		// case1 왼쪽에 벌레가 걸쳤다.
-			if(targetEndX > attackStartX 
+	$(".play-ground").on("click", function(e) {
+		if (clickType === 1) {
+			var attacker = $(".attacker");
+			attacker.addClass("on");
+
+			var x = e.pageX - $(".play-ground").offset().left;
+			var y = e.pageY - $(".play-ground").offset().top;
+
+			var attackStartX = x - (attackAreaWidth / 2);
+			var attackStartY = y - (attackAreaHeight / 2);
+			var attackEndX = x + (attackAreaWidth / 2);
+			var attackEndY = y + (attackAreaHeight / 2);
+
+			attacker.css("left", attackStartX);
+			attacker.css("top", attackStartY);
+			setTimeout(function() {
+				attacker.removeClass("on")
+			}, 100);
+
+			var attackedTargetNumber = 0;
+
+			var targets = $(".target");
+			var checkComboflag = true;
+			targets.each(function() {
+				var targetStartX = parseInt($(this).css("left"));
+				var targetStartY = parseInt($(this).css("top"));
+				var targetEndX = targetStartX + TARGET_WIDTH;
+				var targetEndY = targetStartY + TARGET_HEIGHT;
+				var attacked = false;
+
+				// case1 왼쪽에 벌레가 걸쳤다.
+				if (targetEndX > attackStartX
 					&& targetEndX < attackEndX
 					&& targetStartY > attackStartY
-					&& targetEndY < attackEndY){
-				attacked = true;
-			}
-			
-			// case2 오른쪽에 벌레가 걸쳤다.
-			if(targetStartX < attackEndX 
+					&& targetEndY < attackEndY) {
+					attacked = true;
+				}
+
+				// case2 오른쪽에 벌레가 걸쳤다.
+				if (targetStartX < attackEndX
 					&& targetStartX > attackStartX
 					&& targetStartY > attackStartY
-					&& targetEndY < attackEndY){
-				attacked = true;
-			}
-			
-			// case3 위쪽에 벌레가 걸쳤다.
-			if(targetStartX > attackStartX 
+					&& targetEndY < attackEndY) {
+					attacked = true;
+				}
+
+				// case3 위쪽에 벌레가 걸쳤다.
+				if (targetStartX > attackStartX
 					&& targetEndX < attackEndX
 					&& targetEndY > attackStartY
-					&& targetEndY < attackEndY){
-				attacked = true;
-			}
-			
-			// case4 아래쪽에 벌레가 걸쳤다.
-			if(targetStartX > attackStartX 
+					&& targetEndY < attackEndY) {
+					attacked = true;
+				}
+
+				// case4 아래쪽에 벌레가 걸쳤다.
+				if (targetStartX > attackStartX
 					&& targetEndX < attackEndX
 					&& targetStartY < attackEndY
-					&& targetStartY > attackStartY){
-				attacked = true;
-			}
-			
-			
-			if(attacked){
-				if(!$(this).hasClass(TARGET_WARNING)){
-					attackedTargetNumber = attackedTargetNumber+1;
+					&& targetStartY > attackStartY) {
+					attacked = true;
 				}
-				doAttackTarget(this);
+
+
+				if (attacked) {
+					if (!$(this).hasClass(TARGET_WARNING)) {
+						attackedTargetNumber = attackedTargetNumber + 1;
+					}
+					doAttackTarget(this);
+				}
+
+			});
+
+			checkCombo();
+			function checkCombo() { // 콤보 수 확인
+				if (attackedTargetNumber >= 2) {
+					var comboMessage = $(".combo-message");
+					comboMessage.css("left", attackStartX);
+					comboMessage.css("top", attackStartY);
+					comboMessage.find(".combo-count").text(attackedTargetNumber);
+
+					setTimeout(function() {
+						comboMessage.addClass("on");
+					}, 100);
+					setTimeout(function() {
+						comboMessage.removeClass("on");
+					}, 1000);
+
+					makeCoin(COMBO_COIN * attackedTargetNumber);
+				}
 			}
+
+		} else {
 			
-		}); 
-    		
-		checkCombo();
-		function checkCombo(){ // 콤보 수 확인
-			if(attackedTargetNumber >= 2){
-				var comboMessage = $(".combo-message");
-				comboMessage.css("left", attackStartX);
-				comboMessage.css("top", attackStartY);
-				comboMessage.find(".combo-count").text(attackedTargetNumber);
+			var limeAttack = $(".lime_item_area");
+			limeAttack.css("width", ITEM_LIME_WIDTH);
+			limeAttack.css("height", ITEM_LIME_HEIGHT);
+			limeAttack.addClass("on");
+
+			var x = e.pageX - $(".play-ground").offset().left;
+			var y = e.pageY - $(".play-ground").offset().top;
+
+			var attackStartX = x - (ITEM_LIME_WIDTH / 2);
+			var attackStartY = y - (ITEM_LIME_HEIGHT / 2);
+			var attackEndX = x + (ITEM_LIME_WIDTH / 2);
+			var attackEndY = y + (ITEM_LIME_HEIGHT / 2);
+
+			limeAttack.css("left", attackStartX);
+			limeAttack.css("top", attackStartY);
 			
-				setTimeout(function(){comboMessage.addClass("on");}, 100);
-				setTimeout(function(){comboMessage.removeClass("on");}, 1000);
-				
-				makeCoin(COMBO_COIN * attackedTargetNumber);
-			}
+			usingItem(4);
+			clickType = 1;
+			
+
 		}
-    });
+
+	});
 
 	// 오디오 버튼 활성화 , 비활성화, 이거는 첫화면에 있어야하는듯? (-이찬구)
 // $(".bgm-source-board").on("click",function(e) {
