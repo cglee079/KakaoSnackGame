@@ -18,10 +18,10 @@
 			</div>
 		</div>
 		<div class="wrap-effect">
-			<div class="effect powerup">
+			<div class="effect lime">
 				<%-- 	<div class="fevertime-icon"
 					style="background-image: url('${pageContext.request.contextPath}/resources/image/icon_play_gameover.gif');"></div> --%>
-				<div class="effect-message" >POWER UP</div>
+				<div class="effect-message" >LIME</div>
 			</div>
 			<div class="effect spray">
 				<%-- 	<div class="fevertime-icon"
@@ -50,6 +50,7 @@
 		<div class="play-ground">
 			<div class="attacker"></div>
 			<div class="combo-message">COMBO <span class="combo-count">1</span> !!</div>
+			<div class="lime_item_area"></div>
 		</div>
 		<div class="itembar">
 			<div class="itembar-item lime-item" onclick="usingItem(0)">
