@@ -297,6 +297,10 @@
 	background-image: url("../image/sample_power_item.JPG");
 }
 
+.itembar-item .lime-item-icon {
+	background-image: url("../image/sample_lime_item.png");
+}
+
 .itembar-item .spray-item-icon {
 	background-image: url("../image/sample_clean_item.JPG");
 }
