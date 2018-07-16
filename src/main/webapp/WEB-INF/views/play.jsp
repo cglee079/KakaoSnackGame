@@ -38,13 +38,8 @@
 		
 
 		<div class="head">
-			<div class="bgm-source-board">
-				<%-- <embed class="back-music-source"
-					src="${pageContext.request.contextPath}/resources/audio/sample_bgm.mp3"
-					autostart="true" hidden="true" loop="true"> --%>
-			</div>
-			<div class="score-board">
-				<div class="score">0</div>
+			<div class="time-board">
+				<div class="time">0</div>
 			</div>
 			<div class="wrap-life-progress">
 				<div class="progress">
@@ -57,9 +52,9 @@
 			<div class="combo-message">COMBO <span class="combo-count">1</span> !!</div>
 		</div>
 		<div class="itembar">
-			<div class="itembar-item power-item" onclick="usingItem(0)">
-				<div class="item-icon power-item-icon"></div>
-				<div class="item-cost power-item-cost">0</div>			
+			<div class="itembar-item lime-item" onclick="usingItem(0)">
+				<div class="item-icon lime-item-icon"></div>
+				<div class="item-cost lime-item-cost">0</div>			
 				<div class="overlay-item on"></div>
 			</div>
 			

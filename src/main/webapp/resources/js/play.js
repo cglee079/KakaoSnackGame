@@ -1,27 +1,59 @@
-const TARGET_POINT	  = 100;	// 타겟 하나당 점수
-const COMBO_POINT	  = 200;	// 콤보 시 타겟 하나당 점수
-const FEVER_POINT	  = 300;	// 피버 타겟 하나당 점수
-
 const TARGET_WIDTH			= 50;		// 타겟 넓이
 const TARGET_HEIGHT			= 50;		// 타겟 높이
 const HIDDEN_PADDING		= 50;		// 숨겨진 공간
-const ITEM_CREATE_PERCENT	= 0.05;	// 아이템 생성 확률
 const RIGHT_ANGLE 			= 90;
-const LIMIT_COMBO_NUMBER	= 3;		// 보스타임이 되기까지 콤보 수/ n번 때리면 보스타임 시작
-const FEVER_TARGET_NUMBRT	= 5;     // 보스 터치 제한 횟수
-const FEVER_TARGET_WIDTH	= 300;	// 보스 타겟 넓이
-const FEVER_TARGET_HEIGHT	= 300;	// 보스 타겟 높이
 const RECOVERY_DEGREE   	= 10;     // 체력 회복 수치
-const FEVER_TIME_SEC		= 5000;		// 피버 타임 시간
+const FULL_LIFE				= 100;
 
-const ITEM_COST_POWER = 10;	// 파워 아이템 비용
+const ITEM_COST_LIME = 10;	// 파워 아이템 비용
 const ITEM_COST_SPRAY = 50;	// 스프레이 아이템 비용
 const ITEM_COST_HEART = 20;
 
-const PLAYTIME_NORMAL	= "PLAYTIME_001";
-const PLAYTIME_FEVER 	= "PLAYTIME_002";
+const COMBO_COIN 			= 2;
 
-const FULL_LIFE			= 100;
+const TARGET_NORMAL			= "normal";
+const TARGET_WARNING 		= "warning";
+const TARGET_GOLD	 		= "gold";
+
+
+const TARGET_NORMAL_COIN	= 1;
+const TARGET_NORMAL_RECOVERY= 5;
+const TARGET_WARNING_DAMEAGE= -50;
+const TARGET_GOLD_COIN		= 10;
+
+
+const MAX_GOLD_TARGET		= 2;
+
+const LEVEL_CONFIG =[
+	{ // level1
+		maxWarningTarget: 2,
+		maxNormalTarget : 30,
+		maxTime			: 50,
+		targetMoveSpeed	: 60,
+		lifeDecreaseRate: 100
+	},
+	{ // level2
+		maxWarningTarget: 4,
+		maxNormalTarget : 25,
+		maxTime			: 100,
+		targetMoveSpeed	: 50,
+		lifeDecreaseRate: 80
+	},
+	{ // level3
+		maxWarningTarget: 7,
+		maxNormalTarget : 15,
+		maxTime			: 150,
+		targetMoveSpeed	: 40,
+		lifeDecreaseRate: 60
+	},
+	{ // level4
+		maxWarningTarget: 10,
+		maxNormalTarget : 15,
+		maxTime			: 200,
+		targetMoveSpeed	: 30,
+		lifeDecreaseRate: 50
+	}
+]
 
 
 var startX;
@@ -29,26 +61,21 @@ var startY;
 var endX;
 var endY;
 
-var targetMakeRate 		= 600; 	// 타겟이 생성되는 간격 , 1000 = 1초
-var randAngleTime		= 5000; // 타겟이 이동방향을 바꾸는 쓰레드 간격.
+var level				= 0;
+var config				= undefined;
+var time				= 0;
+var targetMakeRate 		= 500; 	// 타겟이 생성되는 간격 , 1000 = 1초
 var wariningTargetRate  = 0.3;  // Warning 타겟이 생성되는 확률
-var totalScore			= 0; 	// 점수
+var goldTargetRate  	= 0.01;  // 골드 타겟이 생성되는 확률
 var totalCoin           = 0;    // 코인 숫자
-var feverTargetMakeRate = 100;  // 피버 타겟이 생성되는 간격, 1000 = 1초
 var makeTargetThread;
 var checkTargetThread;
 var fallingSpeedUpThread;
 var makeFeverTargetThread;
+var timeThread;
 var warningBackgroundChange;
 var moveDistance 		= 10;
-var maxTargetNumber 	= 20;	// 최대 타겟 수
-var comboNumber 		= 0; 	// 콤보 횟수 저장
-var targetMoveSpeed 	= 100; 	// 타겟 스피드
 var feverTargetTouchCount= 0; 	// 보스 타겟 터치 카운트
-var timeType 			= PLAYTIME_NORMAL; 	
-var attackPower  	    = 1;    // 공격 파워
-var targetLife          = 1;    // 타겟 생명
-var targetLifeIncTime   = 10000;
 
 // targeting 범위
 var attackAreaWidth 	= 150;
@@ -56,7 +83,6 @@ var attackAreaHeight    = 150;
 
 //배경음악
 var backgroundAudio; // 노말 배경 음악
-var feverTimeBackgroundAudio; // 피버 배경 음악
 
 // 효과음
 var removeSound; // 클릭시 소리
@@ -65,35 +91,26 @@ var itemSound;	// 아이템 소리
 // 체력
 var life = FULL_LIFE;
 var lifeDecreaseThread;
-var lifeDecreaseRate = 100; // 체력이 감소하는 속도
 
 
 // 타겟 삭제 - 공격당했을때
 function doAttackTarget(target){
 	var target = $(target);
 	
-	if(target.hasClass("fever-target")){ // 피버타겟 아이템인경우
-		gainScore(TARGET_POINT);	
-		lifeRecovery(10);
-		makeCoin(5);
-		
-	} else if(target.find(".targetType").val() === "warning"){
-		lifeRecovery(-10);
-		usingItem(3);
-		removeTarget(target,true);
-	}else{ // 노말 타겟인 경우
-		var targetlife = parseInt(target.find(".life").val());
-		if(targetlife - attackPower > attackPower ) {
-			target.find(".life").val(targetlife-attackPower);
-		} else if(targetlife - attackPower === attackPower) {
-			target.find(".life").val(targetlife-attackPower);
-			target.addClass('limit');
-		} else  {
-			gainScore(TARGET_POINT);
-			lifeRecovery(5);
-			makeCoin(1);
+	if(!target.hasClass("died")){
+		if(target.hasClass(TARGET_WARNING)){
+			lifeRecovery(TARGET_WARNING_DAMEAGE);
+			removeTarget(target,true);
+		} else if (target.hasClass(TARGET_GOLD)){
+			makeCoin(TARGET_GOLD_COIN);
+			removeTarget(target,true);
+		} else{ // 노말 타겟인 경우
+			lifeRecovery(TARGET_NORMAL_RECOVERY);
+			makeCoin(TARGET_NORMAL_COIN);
 			removeTarget(target,true);
 		}
+		
+		target.addClass("died");
 	}
 }
 
@@ -140,22 +157,15 @@ function usingItem(itemId){
 	startAudio(itemSound);		
 	
 	switch(itemId){
-	case 0 : doUpgradePower();break;
+	case 0 : doSetLime();break;
 	case 1 : doUsingSpray(); break;
 	case 2 : doRecoveryHeart(); break;
 	case 3 : doChangemoveSpeed(duration); break;
 	}
 	
-	function doUpgradePower(){
-		if(coinNumber >= ITEM_COST_POWER){ //가지고 있는 코인이 아이템 비용보다 높다면
-			$(".effect.powerup").addClass("on")
-			setTimeout(function() {
-				$(".effect.powerup").removeClass("on");
-			}, 1000)
-			
-			attackPower++;// 공격 강화
-			decreaseCoin(ITEM_COST_POWER); //코인 감소
-		}	
+	function doSetLime(){
+		console.log("끈끈이 설치!");
+		decreaseCoin(ITEM_COST_LIME); //코인 감소
 	}
 	
 	function doUsingSpray(){
@@ -180,6 +190,7 @@ function usingItem(itemId){
 			decreaseCoin(ITEM_COST_HEART); //코인 감소
 		}	
 	}
+	
 	function doChangemoveSpeed(duration) {
 		targetMoveSpeed = targetMoveSpeed - 40;
 		setTimeout(function() {
@@ -187,14 +198,12 @@ function usingItem(itemId){
 		}, duration)
 		
 	}
-	
-	
 }
 
+
 // 음악 시작
-function startAudio(playtimeType){ 
-	if($(".bgm-source-board").attr('data-click-state') == 1){ // 지금 정지
-																// 중이라면
+function startAudio(playtimeType){  
+	if($(".bgm-source-board").attr('data-click-state') == 1){ // 지금 정지 중이라면
 		playtimeType.play(); 
 		playtimeType.volume = 0.0;
 	}
@@ -204,6 +213,7 @@ function startAudio(playtimeType){
 	}
 	
 }
+
 // 음악 정지
 function stopAudio(playtimeType){ 
 	playtimeType.pause(); 
@@ -211,27 +221,36 @@ function stopAudio(playtimeType){
 
 // 타겟을 만들어 떨어트림
 function makeTarget(){
-	var targets = $(".target");
-	if(targets.length > maxTargetNumber){ // 최대 타겟수보다 많을경우 만들지 않음.
-		return;
-	}
-	
 	var playGround = $(".play-ground");
+	var target = $("<div>", {"class" : "target"});
+	var targetType = randTargetType();
 	
-	
-	var targetType = Math.random();
-	if(targetType < wariningTargetRate) { // warningTarget이 만들어질 확률
-		var target = $("<div>", {"class" : "target warning"});
-		target.append($("<div>", {"class" : "target-icon"}));
-		target.append($("<input>", {"class" : "targetType", type :"hidden", value: "warning"}));
-		target.append($("<input>", {"class" : "life",type : "hidden" , value: 1}));	
-	} else {
-		var target = $("<div>", {"class" : "target"});
-		target.append($("<div>", {"class" : "target-icon"}));
-		target.append($("<input>", {"class" : "targetType", type :"hidden", value: "normal"}));
-		target.append($("<input>", {"class" : "life",type : "hidden" , value: targetLife}));
+	function randTargetType(){
+		var rand = Math.random();
+		if(rand < wariningTargetRate) { // warningTarget이 만들어질 확률
+			if($(".target" + "." + TARGET_WARNING).length >= config.maxWarningTarget){
+				return randTargetType();
+			}
+			return TARGET_WARNING;
+		} else if(rand < wariningTargetRate + goldTargetRate && rand > wariningTargetRate){
+			if($(".target" + "." + TARGET_GOLD).length >= MAX_GOLD_TARGET){
+				return randTargetType();
+			}
+			return TARGET_GOLD;
+		} else {
+			if($(".target" + "." + TARGET_NORMAL).length >= config.maxNormalTarget){
+				return undefined;
+			}
+			return TARGET_NORMAL;
+		}
 	}
 	
+	if(!targetType){
+		return ;
+	}
+	
+	target.addClass(targetType);
+	target.append($("<div>", {"class" : "target-icon"}));
 	target.append($("<input>", {"class" : "moveTargetThreadID", type : "hidden"}));
 	target.append($("<input>", {"class" : "angle", type : "hidden"}));
 	target.append($("<input>", {"class" : "toLeftDistance", type : "hidden"}));
@@ -370,7 +389,7 @@ function makeTarget(){
 		}
 		
 		// 재귀를 이용한 Interval
-		var moveTargetThread = setTimeout(function(){ moveTarget(target)}, targetMoveSpeed);
+		var moveTargetThread = setTimeout(function(){ moveTarget(target)}, config.targetMoveSpeed);
 		target.find(".moveTargetThreadID").val(moveTargetThread); 
 	}
 	
@@ -385,12 +404,6 @@ function gameover() {
 	$(".wrap-gameover").addClass("on");
 }
 
-// 점수 증가
-function gainScore(point){
-	 var score = $(".score");
-	 totalScore = totalScore + point;
-	 score.text(totalScore);
-}
 
 // 돈 증가
 function makeCoin(coin) {
@@ -422,8 +435,8 @@ function checkItemCost(){
 	if(totalCoin >= ITEM_COST_SPRAY){ $(".spray-item .overlay-item").removeClass("on"); }
 	else { $(".spray-item .overlay-item").addClass("on"); }
 
-	if(totalCoin >= ITEM_COST_POWER){ $(".power-item .overlay-item").removeClass("on"); }
-	else { $(".power-item .overlay-item").addClass("on"); }
+	if(totalCoin >= ITEM_COST_LIME){ $(".lime-item .overlay-item").removeClass("on"); }
+	else { $(".lime-item .overlay-item").addClass("on"); }
 	
 	if(totalCoin >= ITEM_COST_HEART){ $(".heart-item .overlay-item").removeClass("on"); }
 	else { $(".heart-item .overlay-item").addClass("on"); }
@@ -433,101 +446,46 @@ function checkItemCost(){
 /** ** ========== 플레이 타임에 시작/정지 로직 =================== * */
 
 function startPlayNormalTime(){
-	timeType = PLAYTIME_NORMAL;
-	
 	startAudio(backgroundAudio); // 보스 타임 백그라운드 음악 제거
 	
+	config = LEVEL_CONFIG[level];
+	startTime();
 	startMakeTarget(); // 타겟 생성 쓰레드
 	startLifeDecrease(); // 생명력 감소 스레드 시작
-	warningBackgroundChange == undefined; // 생명력 경고 쓰레드 초기화
+	warningBackgroundChange = undefined; // 생명력 경고 쓰레드 초기화
 }
 
 function stopPlayNormalTime(){
-	removeAllTarget(".target",false)// 모든 타겟 삭제
+	removeAllTarget(".target", false)// 모든 타겟 삭제
 	stopAudio(backgroundAudio);
 	
+	stopTime();
 	stopMakeTarget();
 	stopLifeDecrease();
 	stopWarningBackgroundChange();
 }
 
-function startPlayFeverTime(){// 보스타임 시작
-	timeType = PLAYTIME_FEVER; // 보스 타임으로 변경
-	
-	startAudio(feverTimeBackgroundAudio);
-	
-	var playGround = $(".play-ground");
-	var windowWidth = playGround.width();
-	var windowHeight = playGround.height();
-	var feverTarget = $("<div>", {"class" : "fever-target"});
-	feverTarget.on("click", function(){
-		startAudio(removeSound);			
-		removeSound.currentTime = 0;
-	});
-	
-	// 보스 타겟 설정
-	feverTarget.append($("<div>", {"class" : "fever-target-icon"}));
-	feverTarget.appendTo(playGround);
-	feverTarget.css("width", FEVER_TARGET_WIDTH);
-	feverTarget.css("height", FEVER_TARGET_HEIGHT);  // 보스 벌레 이미지 정중앙 배치
-	feverTarget.css("left", (windowWidth/2) - (FEVER_TARGET_WIDTH / 2));
-	feverTarget.css("top", (windowHeight/2	) - (FEVER_TARGET_HEIGHT / 2));
-	// ////////////////////////////////////////////////////////////////
-
-	
-
-	/*
-	// 피버타임 메세지 나타남
-	var startFeverTimeMessage = setInterval(function() {
-		var feverTimeMessage = $(".play-ground");
-		feverTimeMessage.toggleClass("fevertime");
-	}, 300);
-	
-	
-	setTimeout(function() { // 피버 타임 메세지 스레드 제거
-		clearTimeout(startFeverTimeMessage);
-		startFeverTimeMessage = undefined;
-		var feverTimeMessage = $(".effect.fevertime");
-		feverTimeMessage.removeClass("on");
-	}, FEVER_TIME_SEC);
-	
-	*/
-
-	var startFeverTimeBackgroundChange = setInterval(function(){
-		var playGround = $('.play-ground');
-		var r =  Math.round( Math.random()*256);
-		var g =  Math.round( Math.random()*256);
-		var b =  Math.round( Math.random()*256);
-		var rgb = r + "," + g + "," + b;
-		playGround.css("background-color","rgb(" + rgb +")");
-		
-	}, 300);
-	
-	setTimeout(function() { // 피버 타임 백그라운드 색 변경 스레드 제거
-		var playGround = $('.play-ground');
-		clearTimeout(startFeverTimeBackgroundChange);
-		startFeverTimeBackgroundChange = undefined;
-		playGround.css("background-color", "rgba(0, 0, 0, 0)");
-	}, FEVER_TIME_SEC);
-
-	setTimeout(function() { stopPlayFeverTime(); }, FEVER_TIME_SEC)	// N초후 피버타임 종료
-	setTimeout(startPlayNormalTime, FEVER_TIME_SEC); //N초후 노멀타임 시작
-}
-
-function stopPlayFeverTime(){
-	stopAudio(feverTimeBackgroundAudio); // 보스 타임 백그라운드 음악 제거
-	
-	// 피버 타겟 삭제
-	var feverTarget = $(".fever-target");
-	feverTarget.remove();
-	
-	lifeRecovery(FULL_LIFE);
-}
-
 /** ============================================================================== * */
 
+function startTime(){
+	timeThread = setInterval(function(){
+		time += 0.01;
+		$(".time-board .time").text(time.toFixed(2));
+		if(time >= config.maxTime){
+			stopPlayNormalTime();
+			setTimeout(function(){
+				level += 1;
+				startPlayNormalTime();
+			}, 1000);
+		}
+	}, 100);
+}
 
-// 노말 타겟 생성 스레드
+function stopTime(){
+	clearInterval(timeThread);
+}
+
+// 타겟 생성 스레드
 function startMakeTarget() { // 재귀를 이용한 Interval
 	makeTarget();
 	makeTargetThread = setTimeout(startMakeTarget, targetMakeRate);
@@ -553,7 +511,7 @@ function startLifeDecrease() { // 재귀를 이용한 Interval
 		}
 		
 		$(".wrap-life-progress .progress-bar").stop().animate({"width" : life + "%"});
-		lifeDecreaseThread = setTimeout(startLifeDecrease, lifeDecreaseRate);
+		lifeDecreaseThread = setTimeout(startLifeDecrease, config.lifeDecreaseRate);
 	}
 }
 
@@ -622,12 +580,10 @@ $(document).ready(function(){
 		itemSound.autoPlay = false;
 	}
 	
-	startAudio(backgroundAudio);
-	
 	// 아이템 비용 표시
 	initItemCost();
 	function initItemCost(){
-		$(".power-item-cost").text(ITEM_COST_POWER);
+		$(".lime-item-cost").text(ITEM_COST_LIME);
 		$(".spray-item-cost").text(ITEM_COST_SPRAY);
 		$(".heart-item-cost").text(ITEM_COST_HEART);
 	}
@@ -651,104 +607,99 @@ $(document).ready(function(){
 			        
     	var attackedTargetNumber = 0;
     	
-    	if(timeType == PLAYTIME_NORMAL){ // 노말 타임
-    		var targets = $(".target");
-    		var checkComboflag = 0;
-    		targets.each(function(){
-    			var targetStartX= parseInt($(this).css("left"));
-    			var targetStartY= parseInt($(this).css("top"));
-    			var targetEndX	= targetStartX + TARGET_WIDTH;
-    			var targetEndY 	= targetStartY + TARGET_HEIGHT;
-    			
-    			
-    			if(targetStartX > attackStartX 
-    					&& targetEndX < attackEndX
-    					&& targetStartY > attackStartY
-    					&& targetEndY < attackEndY){
-    				attackedTargetNumber = attackedTargetNumber+1;
-    				
-    				if($(this).find(".targetType").val() ==="warning")
-    					 checkComboflag =1;
-    				 
-    				doAttackTarget(this);
- 
-    			}
-    			
-    		}); 
-    		if(checkComboflag === 0) {
-    		checkCombo();
-    		}
-    		function checkCombo(){ // 콤보 수 확인
-    			if(attackedTargetNumber >= 2){
-    				comboNumber = comboNumber + 1;
-    				
-    				if(comboNumber >= LIMIT_COMBO_NUMBER){ // 보스타임 검사
-    					comboNumber = 0;
-    					stopPlayNormalTime(); 
-    					startPlayFeverTime(); // 보스 타임 시작
-    				}
-    				
-    				else{
-    					var comboMessage = $(".combo-message");
-    					comboMessage.css("left", attackStartX);
-    					comboMessage.css("top", attackStartY);
-    					comboMessage.find(".combo-count").text(comboNumber);
-        			
-        				setTimeout(function(){comboMessage.addClass("on");}, 100);
-        				setTimeout(function(){comboMessage.removeClass("on");}, 1000);
-        				
-        				gainScore(COMBO_POINT * attackedTargetNumber); // 콤보 점수 추가 획득
-    				}
-   				}
-    		}
-    	}
-    	
-    	else if(timeType == PLAYTIME_FEVER){ // 보스 타임
-    		var feverTarget = $(".fever-target");
-    		var targetStartX= parseInt(feverTarget.css("left"));
-			var targetStartY= parseInt(feverTarget.css("top"));
-			var targetEndX	= targetStartX + FEVER_TARGET_WIDTH;
-			var targetEndY 	= targetStartY + FEVER_TARGET_HEIGHT;
+		var targets = $(".target");
+		var checkComboflag = true;
+		targets.each(function(){
+			var targetStartX= parseInt($(this).css("left"));
+			var targetStartY= parseInt($(this).css("top"));
+			var targetEndX	= targetStartX + TARGET_WIDTH;
+			var targetEndY 	= targetStartY + TARGET_HEIGHT;
+    		var attacked	= false;
 			
-			if(targetStartX < attackStartX 
-					&& targetEndX > attackEndX
-					&& targetStartY < attackStartY
-					&& targetEndY > attackEndY){
-
-				doAttackTarget(feverTarget);
+    		//case1 왼쪽에 벌레가 걸쳤다.
+			if(targetEndX > attackStartX 
+					&& targetEndX < attackEndX
+					&& targetStartY > attackStartY
+					&& targetEndY < attackEndY){
+				attacked = true;
 			}
-    	}
+			
+			//case2 오른쪽에 벌레가 걸쳤다.
+			if(targetStartX < attackEndX 
+					&& targetStartX > attackStartX
+					&& targetStartY > attackStartY
+					&& targetEndY < attackEndY){
+				attacked = true;
+			}
+			
+			//case3 위쪽에 벌레가 걸쳤다.
+			if(targetStartX > attackStartX 
+					&& targetEndX < attackEndX
+					&& targetEndY > attackStartY
+					&& targetEndY < attackEndY){
+				attacked = true;
+			}
+			
+			//case4 아래쪽에 벌레가 걸쳤다.
+			if(targetStartX > attackStartX 
+					&& targetEndX < attackEndX
+					&& targetStartY < attackEndY
+					&& targetStartY > attackStartY){
+				attacked = true;
+			}
+			
+			
+			if(attacked){
+				if(!$(this).hasClass(TARGET_WARNING)){
+					attackedTargetNumber = attackedTargetNumber+1;
+				}
+				doAttackTarget(this);
+			}
+			
+		}); 
+    		
+		checkCombo();
+		function checkCombo(){ // 콤보 수 확인
+			if(attackedTargetNumber >= 2){
+				var comboMessage = $(".combo-message");
+				comboMessage.css("left", attackStartX);
+				comboMessage.css("top", attackStartY);
+				comboMessage.find(".combo-count").text(attackedTargetNumber);
+			
+				setTimeout(function(){comboMessage.addClass("on");}, 100);
+				setTimeout(function(){comboMessage.removeClass("on");}, 1000);
+				
+				makeCoin(COMBO_COIN * attackedTargetNumber);
+			}
+		}
     });
 
-	// 오디오 버튼 활성화 , 비활성화
-	$(".bgm-source-board").on("click",function(e) {
-		
-		var audio;
-		
-		switch(timeType){
-		case PLAYTIME_NORMAL :
-			audio = backgroundAudio;
-			break;	
-		case PLAYTIME_FEVER : 
-			audio = feverTimeBackgroundAudio;
-			break;
-		}
-		
-		if($(this).attr('data-click-state') == 1) {
-			$(this).attr('data-click-state', 0);
-			startAudio(audio);			
-			$(".bgm-source-board").css({"background":"url(resources/image/sample_start_audio.png", 'background-repeat' : 'no-repeat', 'background-size' : 'contain'});} 
-		else {
-			$(this).attr('data-click-state', 1);		
-			stopAudio(audio);			
-			$(".bgm-source-board").css({"background":"url(resources/image/sample_stop_audio.png", 'background-repeat' : 'no-repeat' ,'background-size' : 'contain'});
-		}
-	});
+	// 오디오 버튼 활성화 , 비활성화, 이거는 첫화면에 있어야하는듯? (-이찬구)
+//	$(".bgm-source-board").on("click",function(e) {
+//		
+//		var audio;
+//		
+//		switch(timeType){
+//		case PLAYTIME_NORMAL :
+//			audio = backgroundAudio;
+//			break;	
+//		case PLAYTIME_FEVER : 
+//			audio = feverTimeBackgroundAudio;
+//			break;
+//		}
+//		
+//		if($(this).attr('data-click-state') == 1) {
+//			$(this).attr('data-click-state', 0);
+//			startAudio(audio);			
+//			$(".bgm-source-board").css({"background":"url(resources/image/sample_start_audio.png", 'background-repeat' : 'no-repeat', 'background-size' : 'contain'});} 
+//		else {
+//			$(this).attr('data-click-state', 1);		
+//			stopAudio(audio);			
+//			$(".bgm-source-board").css({"background":"url(resources/image/sample_stop_audio.png", 'background-repeat' : 'no-repeat' ,'background-size' : 'contain'});
+//		}
+//	});
 			
-	//타겟 체력 증가 스레드
-	setInterval(function(){	targetLife++; }, targetLifeIncTime);
-	
-	startPlayNormalTime();
+	 startPlayNormalTime();
 })
 		
 	

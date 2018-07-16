@@ -165,7 +165,7 @@
 	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ff4700), to(#a52e00));
 }
 
-.score-board .score {
+.time-board .time {
 	font-size: 2rem;
 	font-weight: bold;
 	text-align: center;
@@ -207,12 +207,12 @@
 	height: 100%;
 	background-repeat: no-repeat;
 	background-size: contain;
-	background-image: url("../image/sample_target.png");
 }
 
+.target.normal .target-icon{ background-image: url("../image/sample_target.png");}
 .target.removed .target-icon { 	background-image: url("../image/sample_target_removed.png"); }
-.target.limit .target-icon { background-image: url("../image/sample_target_limit.png"); }
 .target.warning .target-icon { background-image: url("../image/sample_target_warning.png"); }
+.target.gold .target-icon { background-image: url("../image/sample_target_gold.png"); }
 
 .fever-target {
 	margin-bottom: 20%;
@@ -235,7 +235,7 @@
 
 .attacker {
 	position: absolute;
-	background: red;
+	background: blue;
 	z-index: 4;
 	display: none;
 }
