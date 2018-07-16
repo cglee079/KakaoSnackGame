@@ -174,8 +174,10 @@ function usingItem(itemId){
 			
 			// 끈끈이 나타남
 			$(".lime_item_area").addClass("on");
+			//$(".effect.lime").addClass("on");
 			setTimeout(function() {
 				$(".lime_item_area").removeClass("on");
+				//$(".effect.lime").removeClass("on");
 			}, duration);
 			
 			// 끈끈이 범위 속하는지 검사
@@ -593,7 +595,7 @@ function startTime(){
 				startPlayNormalTime();
 			}, 1000);
 		}
-	}, 100);
+	}, 10);
 }
 
 function stopTime(){
