@@ -9,7 +9,6 @@
 	/* background-image: url("resources/image/bg_play.jpg"); */
 }
 
-
 /** ============= Foreground =============== **/
 .wrap-fg {
 	display: none;
@@ -96,8 +95,11 @@
 	align-items: center;
 }
 
-.wrap-effect { }
-.wrap-effect .effect{
+.wrap-effect {
+	
+}
+
+.wrap-effect .effect {
 	width: 100%;
 	height: 100%;
 	display: none;
@@ -108,17 +110,17 @@
 	justify-content: center;
 	align-items: center;
 }
-.wrap-effect .effect.on{
+
+.wrap-effect .effect.on {
 	display: flex;
 }
 
-.effect .effect-message{
+.effect .effect-message {
 	font-size: 2rem;
 	font-weight: bold;
 }
 
-/** ======== �긽�떒諛� 遺�遺� ======= **/
-
+/** ======== 占쎄맒占쎈뼊獄쏉옙 �겫占썽겫占� ======= **/
 .head {
 	width: 100%;
 	height: 50px;
@@ -139,7 +141,7 @@
 	margin: auto;
 }
 
-.wrap-life-progress{
+.wrap-life-progress {
 	width: 200px;
 	display: flex;
 	justify-content: center;
@@ -151,18 +153,19 @@
 	height: 80%;
 	overflow: hidden;
 	border-radius: 10px;
-    background: #e6e5e2;
-    box-shadow: 0 -1px 1px #c0bfbc inset;
+	background: #e6e5e2;
+	box-shadow: 0 -1px 1px #c0bfbc inset;
 }
 
-.wrap-life-progress .progress .progress-bar{
+.wrap-life-progress .progress .progress-bar {
 	width: 100%;
 	height: 100%;
 	/* background: red; */
 	border-radius: 10px;
 	box-shadow: 0 2px 2px #333;
-    background-color: #ff00f0;
-	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ff4700), to(#a52e00));
+	background-color: #ff00f0;
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ff4700),
+		to(#a52e00));
 }
 
 .time-board .time {
@@ -172,7 +175,6 @@
 }
 
 /** ========= Play Ground ======== **/
-
 .play-ground {
 	flex: 1;
 	position: relative;
@@ -187,7 +189,8 @@
 	position: absolute;
 	display: none;
 }
-.combo-message.on{
+
+.combo-message.on {
 	display: block;
 }
 
@@ -209,10 +212,21 @@
 	background-size: contain;
 }
 
-.target.normal .target-icon{ background-image: url("../image/sample_target.png");}
-.target.removed .target-icon { 	background-image: url("../image/sample_target_removed.png"); }
-.target.warning .target-icon { background-image: url("../image/sample_target_warning.png"); }
-.target.gold .target-icon { background-image: url("../image/sample_target_gold.png"); }
+.target.normal .target-icon {
+	background-image: url("../image/sample_target.png");
+}
+
+.target.removed .target-icon {
+	background-image: url("../image/sample_target_removed.png");
+}
+
+.target.warning .target-icon {
+	background-image: url("../image/sample_target_warning.png");
+}
+
+.target.gold .target-icon {
+	background-image: url("../image/sample_target_gold.png");
+}
 
 .fever-target {
 	margin-bottom: 20%;
@@ -241,12 +255,22 @@
 }
 
 .attacker.on {
-	display: block;
+	display: flex;
+}
+
+.lime_item_area {
+	display: none;
+	position: absolute;
+	background: green;
+	
+}
+
+.lime_item_area.on {
+	display: flex;
 }
 
 
-
-/** ==== �븘�씠�뀥 �쁺�뿭 ===== **/
+/** ==== 占쎈툡占쎌뵠占쎈�� 占쎌겫占쎈열 ===== **/
 .itembar {
 	display: flex;
 	flex-flow: column no-wrap;
@@ -257,23 +281,31 @@
 	flex: 1;
 	position: relative;
 	display: flex;
-	flex-flow : column nowrap;
+	flex-flow: column nowrap;
 	align-items: center;
-	padding : 10px;
+	padding: 10px;
 }
 
-.itembar-item .item-icon{
+.itembar-item .item-icon {
 	background-repeat: no-repeat;
 	background-size: cover;
 	height: 50px;
 	width: 50px;
 }
 
-.itembar-item .power-item-icon { background-image: url("../image/sample_power_item.JPG"); }
-.itembar-item .spray-item-icon { background-image: url("../image/sample_clean_item.JPG");}
-.itembar-item .heart-item-icon { background-image: url("../image/sample_heart_item.png"); }
+.itembar-item .power-item-icon {
+	background-image: url("../image/sample_power_item.JPG");
+}
 
-.itembar-item .item-cost{
+.itembar-item .spray-item-icon {
+	background-image: url("../image/sample_clean_item.JPG");
+}
+
+.itembar-item .heart-item-icon {
+	background-image: url("../image/sample_heart_item.png");
+}
+
+.itembar-item .item-cost {
 	text-align: center;
 }
 
@@ -286,7 +318,7 @@
 }
 
 .overlay-item {
-	position : absolute;
+	position: absolute;
 	display: none;
 	z-index: 5;
 	top: 0;
@@ -296,6 +328,6 @@
 	background-color: rgba(0, 0, 0, 0.4);
 }
 
-.overlay-item.on{
+.overlay-item.on {
 	display: block;
 }

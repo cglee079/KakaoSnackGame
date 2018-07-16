@@ -20,6 +20,8 @@ const TARGET_NORMAL_COIN	= 1;
 const TARGET_NORMAL_RECOVERY= 5;
 const TARGET_WARNING_DAMEAGE= -50;
 const TARGET_GOLD_COIN		= 10;
+const ITEM_LIME_WIDTH	= 100;
+const ITEM_LIME_HEIGHT	= 300;
 
 
 const MAX_GOLD_TARGET		= 2;
@@ -81,7 +83,7 @@ var feverTargetTouchCount= 0; 	// 보스 타겟 터치 카운트
 var attackAreaWidth 	= 150;
 var attackAreaHeight    = 150;
 
-//배경음악
+// 배경음악
 var backgroundAudio; // 노말 배경 음악
 
 // 효과음
@@ -152,42 +154,147 @@ function lifeRecovery(recover) {
 function usingItem(itemId){
 	var coin = $(".coin");
 	var coinNumber = parseInt(coin.text(), 10);
-	var duration = 3000; //아이템 지속 시간
+	var duration = 3000; // 아이템 지속 시간
 	
 	startAudio(itemSound);		
 	
 	switch(itemId){
-	case 0 : doSetLime();break;
+	case 0 : doSetLime(duration);break;
 	case 1 : doUsingSpray(); break;
 	case 2 : doRecoveryHeart(); break;
 	case 3 : doChangemoveSpeed(duration); break;
 	}
 	
-	function doSetLime(){
-		console.log("끈끈이 설치!");
-		decreaseCoin(ITEM_COST_LIME); //코인 감소
+	function doSetLime(duration){
+		
+		if(coinNumber >= ITEM_COST_LIME){// 가지고 있는 코인이 아이템 비용보다 높다면
+		
+			console.log("끈끈이 설치!");
+			var catchedtargets = new Array; // 끈끈이 잡힌 타겟 저장 리스트
+			
+			// 끈끈이 나타남
+			$(".lime_item_area").addClass("on");
+			setTimeout(function() {
+				$(".lime_item_area").removeClass("on");
+			}, duration);
+			
+			// 끈끈이 범위 속하는지 검사
+			var limeThread = setInterval(function(){setLime(), config.targetMoveSpeed});
+			
+			// 끈끈이 스레드 정지
+			setTimeout(function(){
+				// 끈끈이 스레드 초기화
+				clearInterval(limeThread); 
+				limeThread = undefined; 
+	
+				// 아이템 효과 사라진 후 move 스레드 재시작	
+				catchedtargets.forEach(function (target){
+					var moveTargetThread = setTimeout(function(){ moveTarget(target)}, 0);
+					target.find(".moveTargetThreadID").val(moveTargetThread); 	
+					target.find(".effectedItem").val("0"); 
+				});
+			
+			}, duration);
+			
+			decreaseCoin(ITEM_COST_LIME); // 코인 감소
+		}
+		
+		function setLime(){
+			
+			// 끈끈이 지역
+			var limeItemArea = $(".lime_item_area");
+			
+			limeItemArea.css("width", ITEM_LIME_WIDTH);
+			limeItemArea.css("height", ITEM_LIME_HEIGHT);
+			limeItemArea.css("left", $(window).width()/2 - ITEM_LIME_WIDTH/2);
+			var x = limeItemArea.offset().left - $(".play-ground").offset().left;
+	    	var y = limeItemArea.offset().top - $(".play-ground").offset().top;
+	    	
+	    	// 끈끈이 범위 X,Y
+	    	var limeAreaStartX = x;
+	    	var limeAreaStartY = y;
+	    	var limeAreaEndX = x + ITEM_LIME_WIDTH;
+	    	var limeAreaEndY = y + ITEM_LIME_HEIGHT;
+	    
+			var targets = $(".target");
+
+			// 끈끈이 범위 속하는지 검사 //attacker 로직 동일
+			targets.each(function(){
+				
+				if($(this).find(".effectedItem").val() == "0"){ //이미 잡힌 벌레 제외
+					var targetStartX= parseInt($(this).css("left"));
+					var targetStartY= parseInt($(this).css("top"));
+					var targetEndX	= targetStartX + TARGET_WIDTH;
+					var targetEndY 	= targetStartY + TARGET_HEIGHT;
+		    		var catched	= false;
+					
+		    		// case1 왼쪽에 벌레가 걸쳤다.
+					if(targetEndX > limeAreaStartX 
+							&& targetEndX < limeAreaEndX
+							&& targetStartY > limeAreaStartY
+							&& targetEndY < limeAreaEndY){
+						catched = true;
+					}
+					
+					// case2 오른쪽에 벌레가 걸쳤다.
+					if(targetStartX < limeAreaEndX 
+							&& targetStartX > limeAreaStartX
+							&& targetStartY > limeAreaStartY
+							&& targetEndY < limeAreaEndY){
+						catched = true;
+					}
+					
+					// case3 위쪽에 벌레가 걸쳤다.
+					if(targetStartX > limeAreaStartX 
+							&& targetEndX < limeAreaEndX
+							&& targetEndY > limeAreaStartY
+							&& targetEndY < limeAreaEndY){
+						catched = true;
+					}
+					
+					// case4 아래쪽에 벌레가 걸쳤다.
+					if(targetStartX > limeAreaStartX 
+							&& targetEndX < limeAreaEndX
+							&& targetStartY < limeAreaEndY
+							&& targetStartY > limeAreaStartY){
+						catched = true;
+					}
+					
+					// 만약 끈끈이 지역에 속한다면
+					if(catched){
+						
+						var target = $(this);
+						var moveTargetThreadID = target.find(".moveTargetThreadID").val();
+						clearTimeout(moveTargetThreadID); // 쓰레드종료
+						
+						catchedtargets.push(target); // 정지된 타겟 리스트 저장
+						target.find(".effectedItem").val("1"); // 이미 정지된 타겟				
+					}
+				}			
+			}); 			
+		}
 	}
 	
 	function doUsingSpray(){
-		if(coinNumber >= ITEM_COST_SPRAY){//가지고 있는 코인이 아이템 비용보다 높다면
+		if(coinNumber >= ITEM_COST_SPRAY){// 가지고 있는 코인이 아이템 비용보다 높다면
 			$(".effect.spray").addClass("on");
 			setTimeout(function() {
 				$(".effect.spray").removeClass("on");
 			}, 1000)
 			removeAllTarget(".target", true)// 모든 타겟 삭제
-			decreaseCoin(ITEM_COST_SPRAY); //코인 감소
+			decreaseCoin(ITEM_COST_SPRAY); // 코인 감소
 		}
 	}
 	
 	function doRecoveryHeart(){
-		if(coinNumber >= ITEM_COST_HEART){ //가지고 있는 코인이 아이템 비용보다 높다면
+		if(coinNumber >= ITEM_COST_HEART){ // 가지고 있는 코인이 아이템 비용보다 높다면
 			$(".effect.heart").addClass("on");
 			setTimeout(function() {
 				$(".effect.heart").removeClass("on");
 			}, 1000)
 			
 			lifeRecovery(30);
-			decreaseCoin(ITEM_COST_HEART); //코인 감소
+			decreaseCoin(ITEM_COST_HEART); // 코인 감소
 		}	
 	}
 	
@@ -255,6 +362,7 @@ function makeTarget(){
 	target.append($("<input>", {"class" : "angle", type : "hidden"}));
 	target.append($("<input>", {"class" : "toLeftDistance", type : "hidden"}));
 	target.append($("<input>", {"class" : "toTopDistance", type : "hidden"}));
+	target.append($("<input>", {"class" : "effectedItem", type : "hidden", value : "0"}));
 	
 	target.appendTo(playGround);
 	target.css("width", TARGET_WIDTH);
@@ -293,106 +401,113 @@ function makeTarget(){
 	target.css("top", top);
 
 	randAngle(target);
-	function randAngle(target){
-		var currentAngle = 	target.find(".angle").val();
-		var angle 	= (Math.floor(Math.random() * 90) + currentAngle) % 360;
-		var tangent	=  Math.abs(Math.tan(angle * (3.14/180)).toFixed(2)) ;
-		var toLeftDistance;
-		var toTopDistance;
-		
-		// x + , y +
-		if(angle == 0){
-			toLeftDistance = 0;
-			toTopDistance = moveDistance * -1;
-		}
-		
-		if(angle > 0 &&  angle < 1 * RIGHT_ANGLE){
-			// left, top 양수
-			toLeftDistance = moveDistance;
-			toTopDistance = tangent * moveDistance * -1;
-			angle = 1 * RIGHT_ANGLE - angle;
-		}
-		
-		if(angle == 1 * RIGHT_ANGLE){
-			toLeftDistance = moveDistance;
-			toTopDistance = 0;
-		}
-		
-		// x + , y -
-		if(angle > 1 * RIGHT_ANGLE && angle < 2 * RIGHT_ANGLE ){
-			// left 양수, top 음수
-			toLeftDistance = moveDistance;
-			toTopDistance = tangent * -1 * moveDistance * -1;
-			angle = 1 * RIGHT_ANGLE + (RIGHT_ANGLE - angle % RIGHT_ANGLE);
-		}
-		
-		if(angle == 2 * RIGHT_ANGLE){
-			toLeftDistance = 0;
-			toTopDistance = moveDistance;
-		}
-		
-		// x - , y -
-		if(angle > 2 * RIGHT_ANGLE && angle < 3 * RIGHT_ANGLE){
-			// left 음수, top 음수
-			toLeftDistance = -1 * moveDistance;
-			toTopDistance = tangent * -1 * moveDistance * -1;
-			angle = 2 * RIGHT_ANGLE + (RIGHT_ANGLE - angle % RIGHT_ANGLE);
-		}
-		
-		if(angle == 3 * RIGHT_ANGLE){
-			toLeftDistance = moveDistance * -1;
-			toTopDistance = 0;
-		}
-		
-		// x - , y +
-		if(angle > 3 * RIGHT_ANGLE && angle < 4 * RIGHT_ANGLE){
-			// left 음수, top 양수
-			toLeftDistance = -1 * moveDistance;
-			toTopDistance = tangent * moveDistance * -1;
-			angle = 3 * RIGHT_ANGLE + (RIGHT_ANGLE - angle % RIGHT_ANGLE);
-		}
-		
-		if(Math.abs(toTopDistance) > moveDistance){
-			var ratio = Math.abs(toTopDistance/moveDistance); 
-			toTopDistance = 10 * Math.sign(toTopDistance);
-			toLeftDistance /= ratio; 
-		}
-		
-		target.css("transform", "rotate(" + angle + "deg)");
-		
-		target.find(".angle").val(angle);
-		target.find(".toLeftDistance").val(toLeftDistance);
-		target.find(".toTopDistance").val(toTopDistance);
-	}
-	
+
 	moveTarget(target);
-	function moveTarget(target){
-		var left= parseInt(target.css("left"));
-		var top = parseInt(target.css("top"));
-		var toLeftDistance = parseInt(target.find(".toLeftDistance").val());
-		var toTopDistance = parseInt(target.find(".toTopDistance").val());
-		
-		left= left + toLeftDistance;
-		top = top + toTopDistance;
-		
-		// 범위를 넘어간경우
-		if(left < (startX - HIDDEN_PADDING)
-				|| left > (endX - TARGET_WIDTH + HIDDEN_PADDING)
-				|| top < (startY - HIDDEN_PADDING)
-				|| top > (endY - TARGET_HEIGHT + HIDDEN_PADDING)) {
-			var moveTargetThreadID = target.find(".moveTargetThreadID").val();
-			
-			randAngle(target);
-		}  else{
-			target.css("left", left);
-			target.css("top", top);
-		}
-		
-		// 재귀를 이용한 Interval
-		var moveTargetThread = setTimeout(function(){ moveTarget(target)}, config.targetMoveSpeed);
-		target.find(".moveTargetThreadID").val(moveTargetThread); 
+	
+	
+}
+
+// 타겟 각도 변경 함수
+function randAngle(target){
+	var currentAngle = 	target.find(".angle").val();
+	var angle 	= (Math.floor(Math.random() * 90) + currentAngle) % 360;
+	var tangent	=  Math.abs(Math.tan(angle * (3.14/180)).toFixed(2)) ;
+	var toLeftDistance;
+	var toTopDistance;
+	
+	// x + , y +
+	if(angle == 0){
+		toLeftDistance = 0;
+		toTopDistance = moveDistance * -1;
 	}
 	
+	if(angle > 0 &&  angle < 1 * RIGHT_ANGLE){
+		// left, top 양수
+		toLeftDistance = moveDistance;
+		toTopDistance = tangent * moveDistance * -1;
+		angle = 1 * RIGHT_ANGLE - angle;
+	}
+	
+	if(angle == 1 * RIGHT_ANGLE){
+		toLeftDistance = moveDistance;
+		toTopDistance = 0;
+	}
+	
+	// x + , y -
+	if(angle > 1 * RIGHT_ANGLE && angle < 2 * RIGHT_ANGLE ){
+		// left 양수, top 음수
+		toLeftDistance = moveDistance;
+		toTopDistance = tangent * -1 * moveDistance * -1;
+		angle = 1 * RIGHT_ANGLE + (RIGHT_ANGLE - angle % RIGHT_ANGLE);
+	}
+	
+	if(angle == 2 * RIGHT_ANGLE){
+		toLeftDistance = 0;
+		toTopDistance = moveDistance;
+	}
+	
+	// x - , y -
+	if(angle > 2 * RIGHT_ANGLE && angle < 3 * RIGHT_ANGLE){
+		// left 음수, top 음수
+		toLeftDistance = -1 * moveDistance;
+		toTopDistance = tangent * -1 * moveDistance * -1;
+		angle = 2 * RIGHT_ANGLE + (RIGHT_ANGLE - angle % RIGHT_ANGLE);
+	}
+	
+	if(angle == 3 * RIGHT_ANGLE){
+		toLeftDistance = moveDistance * -1;
+		toTopDistance = 0;
+	}
+	
+	// x - , y +
+	if(angle > 3 * RIGHT_ANGLE && angle < 4 * RIGHT_ANGLE){
+		// left 음수, top 양수
+		toLeftDistance = -1 * moveDistance;
+		toTopDistance = tangent * moveDistance * -1;
+		angle = 3 * RIGHT_ANGLE + (RIGHT_ANGLE - angle % RIGHT_ANGLE);
+	}
+	
+	if(Math.abs(toTopDistance) > moveDistance){
+		var ratio = Math.abs(toTopDistance/moveDistance); 
+		toTopDistance = 10 * Math.sign(toTopDistance);
+		toLeftDistance /= ratio; 
+	}
+	
+	target.css("transform", "rotate(" + angle + "deg)");
+	
+	target.find(".angle").val(angle);
+	target.find(".toLeftDistance").val(toLeftDistance);
+	target.find(".toTopDistance").val(toTopDistance);
+}
+
+
+
+// 타겟 움직임 스레드
+function moveTarget(target){
+	var left= parseInt(target.css("left"));
+	var top = parseInt(target.css("top"));
+	var toLeftDistance = parseInt(target.find(".toLeftDistance").val());
+	var toTopDistance = parseInt(target.find(".toTopDistance").val());
+	
+	left= left + toLeftDistance;
+	top = top + toTopDistance;
+	
+	// 범위를 넘어간경우
+	if(left < (startX - HIDDEN_PADDING)
+			|| left > (endX - TARGET_WIDTH + HIDDEN_PADDING)
+			|| top < (startY - HIDDEN_PADDING)
+			|| top > (endY - TARGET_HEIGHT + HIDDEN_PADDING)) {
+		var moveTargetThreadID = target.find(".moveTargetThreadID").val();
+		
+		randAngle(target);
+	}  else{
+		target.css("left", left);
+		target.css("top", top);
+	}
+	
+	// 재귀를 이용한 Interval
+	var moveTargetThread = setTimeout(function(){ moveTarget(target)}, config.targetMoveSpeed);
+	target.find(".moveTargetThreadID").val(moveTargetThread); 
 }
 
 // 게임 오버
@@ -504,7 +619,10 @@ function startLifeDecrease() { // 재귀를 이용한 Interval
 		gameover();
 		lifeDecreaseThread = undefined;
 	} else {
-		if(life <= FULL_LIFE/3 && warningBackgroundChange == undefined){ // 체력이 일정수준 이하로 감소했을때 
+		if(life <= FULL_LIFE/3 && warningBackgroundChange == undefined){ // 체력이
+																			// 일정수준
+																			// 이하로
+																			// 감소했을때
 			startWarningBackgroundChange();
 		} else if(life > FULL_LIFE/3 && warningBackgroundChange != undefined){
 			stopWarningBackgroundChange();
@@ -515,7 +633,7 @@ function startLifeDecrease() { // 재귀를 이용한 Interval
 	}
 }
 
-//체력 감소 스레드 중지
+// 체력 감소 스레드 중지
 function stopLifeDecrease(){
 	clearTimeout(lifeDecreaseThread);
 	lifeDecreaseThread = undefined;
@@ -526,7 +644,8 @@ function startWarningBackgroundChange(){
 	if(warningBackgroundChange == undefined){
 		warningBackgroundChange = setInterval(function(){
 			var playGround = $('.play-ground');			
-			if(playGround.css("background-color") == "rgba(0, 0, 0, 0)"){ // 배경색 변경
+			if(playGround.css("background-color") == "rgba(0, 0, 0, 0)"){ // 배경색
+																			// 변경
 				playGround.css("background-color","red");		
 			} else {
 				playGround.css("background-color","rgba(0, 0, 0, 0)");	
@@ -587,7 +706,7 @@ $(document).ready(function(){
 		$(".spray-item-cost").text(ITEM_COST_SPRAY);
 		$(".heart-item-cost").text(ITEM_COST_HEART);
 	}
-	
+
 	// 화면 클릭 이벤트
 	 $(".play-ground").on("click",function(e) {
 		var attacker = $(".attacker");
@@ -616,7 +735,7 @@ $(document).ready(function(){
 			var targetEndY 	= targetStartY + TARGET_HEIGHT;
     		var attacked	= false;
 			
-    		//case1 왼쪽에 벌레가 걸쳤다.
+    		// case1 왼쪽에 벌레가 걸쳤다.
 			if(targetEndX > attackStartX 
 					&& targetEndX < attackEndX
 					&& targetStartY > attackStartY
@@ -624,7 +743,7 @@ $(document).ready(function(){
 				attacked = true;
 			}
 			
-			//case2 오른쪽에 벌레가 걸쳤다.
+			// case2 오른쪽에 벌레가 걸쳤다.
 			if(targetStartX < attackEndX 
 					&& targetStartX > attackStartX
 					&& targetStartY > attackStartY
@@ -632,7 +751,7 @@ $(document).ready(function(){
 				attacked = true;
 			}
 			
-			//case3 위쪽에 벌레가 걸쳤다.
+			// case3 위쪽에 벌레가 걸쳤다.
 			if(targetStartX > attackStartX 
 					&& targetEndX < attackEndX
 					&& targetEndY > attackStartY
@@ -640,7 +759,7 @@ $(document).ready(function(){
 				attacked = true;
 			}
 			
-			//case4 아래쪽에 벌레가 걸쳤다.
+			// case4 아래쪽에 벌레가 걸쳤다.
 			if(targetStartX > attackStartX 
 					&& targetEndX < attackEndX
 					&& targetStartY < attackEndY
@@ -675,29 +794,31 @@ $(document).ready(function(){
     });
 
 	// 오디오 버튼 활성화 , 비활성화, 이거는 첫화면에 있어야하는듯? (-이찬구)
-//	$(".bgm-source-board").on("click",function(e) {
+// $(".bgm-source-board").on("click",function(e) {
 //		
-//		var audio;
+// var audio;
 //		
-//		switch(timeType){
-//		case PLAYTIME_NORMAL :
-//			audio = backgroundAudio;
-//			break;	
-//		case PLAYTIME_FEVER : 
-//			audio = feverTimeBackgroundAudio;
-//			break;
-//		}
+// switch(timeType){
+// case PLAYTIME_NORMAL :
+// audio = backgroundAudio;
+// break;
+// case PLAYTIME_FEVER :
+// audio = feverTimeBackgroundAudio;
+// break;
+// }
 //		
-//		if($(this).attr('data-click-state') == 1) {
-//			$(this).attr('data-click-state', 0);
-//			startAudio(audio);			
-//			$(".bgm-source-board").css({"background":"url(resources/image/sample_start_audio.png", 'background-repeat' : 'no-repeat', 'background-size' : 'contain'});} 
-//		else {
-//			$(this).attr('data-click-state', 1);		
-//			stopAudio(audio);			
-//			$(".bgm-source-board").css({"background":"url(resources/image/sample_stop_audio.png", 'background-repeat' : 'no-repeat' ,'background-size' : 'contain'});
-//		}
-//	});
+// if($(this).attr('data-click-state') == 1) {
+// $(this).attr('data-click-state', 0);
+// startAudio(audio);
+// $(".bgm-source-board").css({"background":"url(resources/image/sample_start_audio.png",
+// 'background-repeat' : 'no-repeat', 'background-size' : 'contain'});}
+// else {
+// $(this).attr('data-click-state', 1);
+// stopAudio(audio);
+// $(".bgm-source-board").css({"background":"url(resources/image/sample_stop_audio.png",
+// 'background-repeat' : 'no-repeat' ,'background-size' : 'contain'});
+// }
+// });
 			
 	 startPlayNormalTime();
 })

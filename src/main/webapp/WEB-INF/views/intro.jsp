@@ -99,7 +99,7 @@ html, body, .wrapper {
 <script>
 	var isPlaySound = false;
 	function doStartGame(){
-		location.href = getContextPath() + "/play&isPlaySound=" + isPlaySound;
+		location.href = getContextPath() + "/play"; //&isPlaySound=" + isPlaySound; */
 	}
 	
 	function doToggleSound(tg){
