@@ -52,6 +52,7 @@
 		<div class="play-ground">
 			<div class="attacker"></div>
 			<div class="combo-message">COMBO <span class="combo-count">1</span> !!</div>
+			<div class="stage-message"></div>
 			<div class="lime_item_area"></div>
 		</div>
 		<div class="itembar">

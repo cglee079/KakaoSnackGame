@@ -28,30 +28,34 @@ const MAX_GOLD_TARGET		= 2;
 
 const LEVEL_CONFIG =[
 	{ // level1
+		stageMessage	: "STAGE 1",
 		maxWarningTarget: 2,
 		maxNormalTarget : 30,
-		maxTime			: 50,
+		maxTime			: 10,
 		targetMoveSpeed	: 60,
 		lifeDecreaseRate: 100
 	},
 	{ // level2
+		stageMessage	: "STAGE 2",
 		maxWarningTarget: 4,
 		maxNormalTarget : 25,
-		maxTime			: 100,
+		maxTime			: 50,
 		targetMoveSpeed	: 50,
 		lifeDecreaseRate: 80
 	},
 	{ // level3
+		stageMessage	: "STAGE 3",
 		maxWarningTarget: 7,
 		maxNormalTarget : 15,
-		maxTime			: 150,
+		maxTime			: 90,
 		targetMoveSpeed	: 40,
 		lifeDecreaseRate: 60
 	},
 	{ // level4
+		stageMessage	: "STAGE 4",
 		maxWarningTarget: 10,
 		maxNormalTarget : 15,
-		maxTime			: 200,
+		maxTime			: 140,
 		targetMoveSpeed	: 30,
 		lifeDecreaseRate: 50
 	}
@@ -572,6 +576,17 @@ function startPlayNormalTime(){
 	startMakeTarget(); // 타겟 생성 쓰레드
 	startLifeDecrease(); // 생명력 감소 스레드 시작
 	warningBackgroundChange = undefined; // 생명력 경고 쓰레드 초기화
+	showStageMessage();
+	
+	//스테이지 메세지 
+	function showStageMessage(){
+		var stageMsg = $(".stage-message");
+		stageMsg.html(config.stageMessage);
+		stageMsg.show();
+		setTimeout(function(){
+			stageMsg.hide();
+		}, 1000);
+	}
 }
 
 function stopPlayNormalTime(){
