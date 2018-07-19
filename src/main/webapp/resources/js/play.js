@@ -20,8 +20,8 @@ const TARGET_NORMAL_COIN	= 1;
 const TARGET_NORMAL_RECOVERY= 5;
 const TARGET_WARNING_DAMEAGE= -50;
 const TARGET_GOLD_COIN		= 10;
-const ITEM_LIME_WIDTH	= 200;
-const ITEM_LIME_HEIGHT	= 200;
+const ITEM_LIME_WIDTH	= 250;
+const ITEM_LIME_HEIGHT	= 250;
 
 
 const MAX_GOLD_TARGET		= 2;
@@ -163,18 +163,126 @@ function usingItem(itemId){
 	startAudio(itemSound);		
 	
 	switch(itemId){
-	case 0 : doSetLime();break;
+	case 0 : doSetLime(duration);break;
 	case 1 : doUsingSpray(); break;
 	case 2 : doRecoveryHeart(); break;
 	case 3 : doChangemoveSpeed(duration); break;
-	case 4 : doSetLimeStart(duration); break;
+	// case 4 : doSetLimeStart(duration); break;
 	}
 	
-	function doSetLime(){
+	function doSetLime(duration){
 		
 		if(coinNumber >= ITEM_COST_LIME){// 가지고 있는 코인이 아이템 비용보다 높다면
-			clickType = 2;
-	
+			// clickType = 2;
+		
+			// 끈끈이 지역
+			var limeItemArea = $(".lime_item_area");
+			limeItemArea.css("width",ITEM_LIME_WIDTH); 
+			limeItemArea.css("height", ITEM_LIME_HEIGHT);
+			limeItemArea.addClass("on");
+		
+			// 랜덤 위치
+			var x =  Math.random() * ((endX - ITEM_LIME_WIDTH) - startX) + startX;
+	    	var y = Math.random() * ((endY - ITEM_LIME_HEIGHT) - startY) + startY;
+	    	
+	    	// 끈끈이 위치 지정
+	    	limeItemArea.css("left", x);
+	    	limeItemArea.css("top", y) ;
+	    			
+			var catchedtargets = new Array; // 끈끈이 잡힌 타겟 저장 리스트
+
+			setTimeout(function() {
+				$(".lime_item_area").removeClass("on");
+			// $(".effect.lime").removeClass("on");
+			}, duration);
+			var limeThread = setInterval(function() {
+				setLime(), config.targetMoveSpeed
+			});
+
+			// 끈끈이 스레드 정지
+			setTimeout(function() {
+				// 끈끈이 스레드 초기화
+				clearInterval(limeThread);
+				limeThread = undefined;
+
+				// 아이템 효과 사라진 후 move 스레드 재시작
+				catchedtargets.forEach(function(target) {
+					var moveTargetThread = setTimeout(function() {
+						moveTarget(target)
+					}, 0);
+					target.find(".moveTargetThreadID").val(moveTargetThread);
+					target.find(".effectedItem").val("0");
+				});
+
+			}, duration);
+			
+			function setLime(){
+						
+		    	// 끈끈이 범위 X,Y
+		    	var limeAreaStartX = x;
+		    	var limeAreaStartY = y;
+		    	var limeAreaEndX = x + ITEM_LIME_WIDTH;
+		    	var limeAreaEndY = y + ITEM_LIME_HEIGHT;
+		    
+				var targets = $(".target");
+
+				// 끈끈이 범위 속하는지 검사 //attacker 로직 동일
+				targets.each(function(){
+					
+					if($(this).find(".effectedItem").val() == "0"){ // 이미 잡힌 벌레
+																	// 제외
+						var targetStartX= parseInt($(this).css("left"));
+						var targetStartY= parseInt($(this).css("top"));
+						var targetEndX	= targetStartX + TARGET_WIDTH;
+						var targetEndY 	= targetStartY + TARGET_HEIGHT;
+			    		var catched	= false;
+						
+			    		// case1 왼쪽에 벌레가 걸쳤다.
+						if(targetEndX > limeAreaStartX 
+								&& targetEndX < limeAreaEndX
+								&& targetStartY > limeAreaStartY
+								&& targetEndY < limeAreaEndY){
+							catched = true;
+						}
+						
+						// case2 오른쪽에 벌레가 걸쳤다.
+						if(targetStartX < limeAreaEndX 
+								&& targetStartX > limeAreaStartX
+								&& targetStartY > limeAreaStartY
+								&& targetEndY < limeAreaEndY){
+							catched = true;
+						}
+						
+						// case3 위쪽에 벌레가 걸쳤다.
+						if(targetStartX > limeAreaStartX 
+								&& targetEndX < limeAreaEndX
+								&& targetEndY > limeAreaStartY
+								&& targetEndY < limeAreaEndY){
+							catched = true;
+						}
+						
+						// case4 아래쪽에 벌레가 걸쳤다.
+						if(targetStartX > limeAreaStartX 
+								&& targetEndX < limeAreaEndX
+								&& targetStartY < limeAreaEndY
+								&& targetStartY > limeAreaStartY){
+							catched = true;
+						}
+						
+						// 만약 끈끈이 지역에 속한다면
+						if(catched){
+							
+							var target = $(this);
+							var moveTargetThreadID = target.find(".moveTargetThreadID").val();
+							clearTimeout(moveTargetThreadID); // 쓰레드종료
+							
+							catchedtargets.push(target); // 정지된 타겟 리스트 저장
+							target.find(".effectedItem").val("1"); // 이미 정지된 타겟
+						}
+					}			
+				}); 			
+			}
+		
 			decreaseCoin(ITEM_COST_LIME); // 코인 감소
 		}
 	}
@@ -212,107 +320,7 @@ function usingItem(itemId){
 		}, duration)
 		
 	}
-	
-	function doSetLimeStart(duration) {
-		var catchedtargets = new Array; // 끈끈이 잡힌 타겟 저장 리스트
 
-		setTimeout(function() {
-			$(".lime_item_area").removeClass("on");
-		//$(".effect.lime").removeClass("on");
-		}, duration);
-		var limeThread = setInterval(function() {
-			setLime(), config.targetMoveSpeed
-		});
-
-		// 끈끈이 스레드 정지
-		setTimeout(function() {
-			// 끈끈이 스레드 초기화
-			clearInterval(limeThread);
-			limeThread = undefined;
-
-			// 아이템 효과 사라진 후 move 스레드 재시작	
-			catchedtargets.forEach(function(target) {
-				var moveTargetThread = setTimeout(function() {
-					moveTarget(target)
-				}, 0);
-				target.find(".moveTargetThreadID").val(moveTargetThread);
-				target.find(".effectedItem").val("0");
-			});
-
-		}, duration);
-		
-		function setLime(){
-			
-			// 끈끈이 지역
-			var limeItemArea = $(".lime_item_area");
-			var x = limeItemArea.offset().left - $(".play-ground").offset().left;
-	    	var y = limeItemArea.offset().top - $(".play-ground").offset().top;
-	    	
-	    	// 끈끈이 범위 X,Y
-	    	var limeAreaStartX = x;
-	    	var limeAreaStartY = y;
-	    	var limeAreaEndX = x + ITEM_LIME_WIDTH;
-	    	var limeAreaEndY = y + ITEM_LIME_HEIGHT;
-	    
-			var targets = $(".target");
-
-			// 끈끈이 범위 속하는지 검사 //attacker 로직 동일
-			targets.each(function(){
-				
-				if($(this).find(".effectedItem").val() == "0"){ //이미 잡힌 벌레 제외
-					var targetStartX= parseInt($(this).css("left"));
-					var targetStartY= parseInt($(this).css("top"));
-					var targetEndX	= targetStartX + TARGET_WIDTH;
-					var targetEndY 	= targetStartY + TARGET_HEIGHT;
-		    		var catched	= false;
-					
-		    		// case1 왼쪽에 벌레가 걸쳤다.
-					if(targetEndX > limeAreaStartX 
-							&& targetEndX < limeAreaEndX
-							&& targetStartY > limeAreaStartY
-							&& targetEndY < limeAreaEndY){
-						catched = true;
-					}
-					
-					// case2 오른쪽에 벌레가 걸쳤다.
-					if(targetStartX < limeAreaEndX 
-							&& targetStartX > limeAreaStartX
-							&& targetStartY > limeAreaStartY
-							&& targetEndY < limeAreaEndY){
-						catched = true;
-					}
-					
-					// case3 위쪽에 벌레가 걸쳤다.
-					if(targetStartX > limeAreaStartX 
-							&& targetEndX < limeAreaEndX
-							&& targetEndY > limeAreaStartY
-							&& targetEndY < limeAreaEndY){
-						catched = true;
-					}
-					
-					// case4 아래쪽에 벌레가 걸쳤다.
-					if(targetStartX > limeAreaStartX 
-							&& targetEndX < limeAreaEndX
-							&& targetStartY < limeAreaEndY
-							&& targetStartY > limeAreaStartY){
-						catched = true;
-					}
-					
-					// 만약 끈끈이 지역에 속한다면
-					if(catched){
-						
-						var target = $(this);
-						var moveTargetThreadID = target.find(".moveTargetThreadID").val();
-						clearTimeout(moveTargetThreadID); // 쓰레드종료
-						
-						catchedtargets.push(target); // 정지된 타겟 리스트 저장
-						target.find(".effectedItem").val("1"); // 이미 정지된 타겟				
-					}
-				}			
-			}); 			
-		}
-
-	}
 }
 
 
@@ -578,7 +586,7 @@ function startPlayNormalTime(){
 	warningBackgroundChange = undefined; // 생명력 경고 쓰레드 초기화
 	showStageMessage();
 	
-	//스테이지 메세지 
+	// 스테이지 메세지
 	function showStageMessage(){
 		var stageMsg = $(".stage-message");
 		stageMsg.html(config.stageMessage);
@@ -728,7 +736,7 @@ $(document).ready(function(){
 
 	// 화면 클릭 이벤트
 	$(".play-ground").on("click", function(e) {
-		if (clickType === 1) {
+		// if (clickType === 1) {
 			var attacker = $(".attacker");
 			attacker.addClass("on");
 
@@ -818,29 +826,28 @@ $(document).ready(function(){
 				}
 			}
 
-		} else {
+		// 끈끈이 터치 위치 발생 ->랜덤 위치로 변경
+		// } else {
 			
-			var limeAttack = $(".lime_item_area");
-			limeAttack.css("width", ITEM_LIME_WIDTH);
-			limeAttack.css("height", ITEM_LIME_HEIGHT);
-			limeAttack.addClass("on");
-
-			var x = e.pageX - $(".play-ground").offset().left;
-			var y = e.pageY - $(".play-ground").offset().top;
-
-			var attackStartX = x - (ITEM_LIME_WIDTH / 2);
-			var attackStartY = y - (ITEM_LIME_HEIGHT / 2);
-			var attackEndX = x + (ITEM_LIME_WIDTH / 2);
-			var attackEndY = y + (ITEM_LIME_HEIGHT / 2);
-
-			limeAttack.css("left", attackStartX);
-			limeAttack.css("top", attackStartY);
-			
-			usingItem(4);
-			clickType = 1;
-			
-
-		}
+		/*
+		 * var limeAttack = $(".lime_item_area"); limeAttack.css("width",
+		 * ITEM_LIME_WIDTH); limeAttack.css("height", ITEM_LIME_HEIGHT);
+		 * limeAttack.addClass("on");
+		 * 
+		 * var x = e.pageX - $(".play-ground").offset().left; var y = e.pageY -
+		 * $(".play-ground").offset().top;
+		 * 
+		 * var attackStartX = x - (ITEM_LIME_WIDTH / 2); var attackStartY = y -
+		 * (ITEM_LIME_HEIGHT / 2); var attackEndX = x + (ITEM_LIME_WIDTH / 2);
+		 * var attackEndY = y + (ITEM_LIME_HEIGHT / 2);
+		 * 
+		 * limeAttack.css("left", attackStartX); limeAttack.css("top",
+		 * attackStartY);
+		 * 
+		 * usingItem(4); clickType = 1;
+		 * 
+		 *  }
+		 */
 
 	});
 
