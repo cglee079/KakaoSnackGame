@@ -15,7 +15,7 @@ html, body, .wrapper {
 	width: 100%;
 	background-repeat: no-repeat;
 	background-size: cover;
-	background-image: url("resources/image/intro_back.jpg");
+	background-image: url("resources/image/intro/bg_intro.jpg");
 }
 
 /* @media screen and (min-width: 751px) {
@@ -31,87 +31,53 @@ html, body, .wrapper {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 10px;
+	padding: 15px;
 }
 
 .head .icon-help {
-	width: 50px;
-	height: 50px;
+	width: 40px;
+	height: 40px;
 	background-repeat: no-repeat;
 	background-size: contain;
-	background-image: url("resources/image/help_button.png");
+	background-image: url("resources/image/intro/btn_intro_help.png");
 }
 
 .head .icon-sound {
-	width: 50px;
-	height: 50px;
-	background-repeat: no-repeat;
-	background-size: contain;
-	background-image: url("resources/image/start_audio.png");
-}
-
-.head .info {
-	flex: 1;
+	width: 40px;
 	height: 40px;
-	background: rgba(0, 0, 0, 0.4);
-	margin: 0px 5px;
-	border-radius: 5px;
-}
-
-.start-button {
-	width: 50px;
-	height: 50px;
 	background-repeat: no-repeat;
 	background-size: contain;
-	z-index: 1;
-	background-image: url("resources/image/sample_start_button.png");
+	background-image: url("resources/image/intro/btn_intro_sound_on.png");
 }
 
 .title {
-	flex: 1;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	height: 20px;
-	margin: 0px;
+	margin-top : -20;
+	height : 160px;
 	background-size: contain;
 	background-repeat: no-repeat;
 	background-position: center center;
-	background-image: url("resources/image/main_title.png");
-}
-
-.contents {
-	flex: 1;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	height: 50px;
-	border-radius: 10px;
-	background: rgba(0, 0, 0, 0.4);
-	margin: 10px;
+	background-image: url("resources/image/intro/icon_intro_title.png");
 }
 
 .footer {
-	width: 100%;
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	margin : 0px 15px;
+	padding-bottom: 20px;	
 }
 
 .footer .btn {
 	border-radius: 10px;
-	height: 70px;
-	margin: 10px;
+	height: 80px;
+	margin: 5px;
 	flex: 1;
 }
 
 .footer .btn.btn-start {
 	background-size: contain;
-	background-image: url("resources/image/start_button.png");
+	background-image: url("resources/image/intro/btn_intro_start.png");
 	background-repeat: no-repeat;
-	background-position: center center;
-	min-width: 329px;
-	min-height: 145px;
 }
 
 .footer .btn.btn-send-to {
@@ -140,16 +106,13 @@ html, body, .wrapper {
 	<div class="wrapper">
 		<div class="head">
 			<div class="icon-help"></div>
-			<!-- 	<div class="info info1"></div>
-			<div class="info info2"></div> -->
 			<div class="icon-sound on" onclick="toToggleSound(this)"></div>
 		</div>
 		<div class="title"></div>
 		<div class="empty" style="flex: 1"></div>
-		<!-- <div class="contents"></div> -->
 		<div class="footer">
 			<div class="btn btn-start" onclick="doStartGame()"></div>
-			<!-- <div class="btn btn-send-to"></div> -->
+			<div class="btn btn-start" onclick="doStartGame()"></div>
 		</div>
 	</div>
 </body>

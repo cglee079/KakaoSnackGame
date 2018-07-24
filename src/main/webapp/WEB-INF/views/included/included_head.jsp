@@ -46,10 +46,7 @@ $(window).resize(function(){
 })
 
 $(document).ready(function(){
-	//$("*").css("font-family", "Nanum Gothic");
 	$("html, body").css("font-family", "BM_Jua, serif");
-	//$("*").css("font-family", "MBKCorporateACon");
-
 })
 
 </script>

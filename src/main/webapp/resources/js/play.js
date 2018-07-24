@@ -1,5 +1,5 @@
-const TARGET_WIDTH			= 50;		// 타겟 넓이
-const TARGET_HEIGHT			= 50;		// 타겟 높이
+const TARGET_WIDTH			= 40;		// 타겟 넓이
+const TARGET_HEIGHT			= 40;		// 타겟 높이
 const HIDDEN_PADDING		= 50;		// 숨겨진 공간
 const RIGHT_ANGLE 			= 90;
 const RECOVERY_DEGREE   	= 10;     // 체력 회복 수치
@@ -156,7 +156,7 @@ function lifeRecovery(recover) {
 }
 
 function usingItem(itemId){
-	var coin = $(".coin");
+	var coin = $(".info-board .info.coin .value");
 	var coinNumber = parseInt(coin.text(), 10);
 	var duration = 3000; // 아이템 지속 시간
 	
@@ -558,19 +558,19 @@ function initCoin(){
 }
 
 function drawCoin(coin){
-	$(".coin").text(coin);
+	$(".info-board .info.coin .value").text(coin);
 }
 
 // 아이템 활성화 체크
 function checkItemCost(){
-	if(totalCoin >= ITEM_COST_SPRAY){ $(".spray-item .overlay-item").removeClass("on"); }
+/*	if(totalCoin >= ITEM_COST_SPRAY){ $(".spray-item .overlay-item").removeClass("on"); }
 	else { $(".spray-item .overlay-item").addClass("on"); }
 
 	if(totalCoin >= ITEM_COST_LIME){ $(".lime-item .overlay-item").removeClass("on"); }
 	else { $(".lime-item .overlay-item").addClass("on"); }
 	
 	if(totalCoin >= ITEM_COST_HEART){ $(".heart-item .overlay-item").removeClass("on"); }
-	else { $(".heart-item .overlay-item").addClass("on"); }
+	else { $(".heart-item .overlay-item").addClass("on"); }*/
 }
 
 
@@ -585,6 +585,10 @@ function startPlayNormalTime(){
 	startLifeDecrease(); // 생명력 감소 스레드 시작
 	warningBackgroundChange = undefined; // 생명력 경고 쓰레드 초기화
 	showStageMessage();
+	
+	//스테이지 라벨 리드로우.
+	var stage = $(".info-board .info.stage .value");
+	stage.text(level+1 + "/4");
 	
 	// 스테이지 메세지
 	function showStageMessage(){
@@ -612,7 +616,7 @@ function stopPlayNormalTime(){
 function startTime(){
 	timeThread = setInterval(function(){
 		time += 0.01;
-		$(".time-board .time").text(time.toFixed(2));
+		$(".info-board .info.time .value").text(time.toFixed(2));
 		if(time >= config.maxTime){
 			stopPlayNormalTime();
 			setTimeout(function(){
@@ -693,8 +697,8 @@ $(document).ready(function(){
 	attacker.css("width", attackAreaWidth);
 	attacker.css("height", attackAreaHeight);
 	
-	$(".coin").text(totalCoin);
-	
+	var coin = $(".info-board .info.coin .value");
+	coin.text(totalCoin);
 	
 	// 초기화 (좌표)
 	initXY();
