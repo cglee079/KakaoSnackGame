@@ -66,7 +66,6 @@ var startX;
 var startY;
 var endX;
 var endY;
-var clickType           = 1; // 1 = 기본공격 , 2 = 끈끈이공격
 var level				= 0;
 var config				= undefined;
 var time				= 0;
@@ -82,6 +81,7 @@ var timeThread;
 var warningBackgroundChange;
 var moveDistance 		= 10;
 var feverTargetTouchCount= 0; 	// 보스 타겟 터치 카운트
+var checkMoveSpeed      = 0; // 무브 스피드가 바뀌었는지 체크
 
 // targeting 범위
 var attackAreaWidth 	= 150;
@@ -91,8 +91,14 @@ var attackAreaHeight    = 150;
 var backgroundAudio; // 노말 배경 음악
 
 // 효과음
-var removeSound; // 클릭시 소리
-var itemSound;	// 아이템 소리
+var AttackSound; // 공격시 소리
+var HeartitemSound;	// 체력회복 아이템 소리
+var SprayitemSound; // 스프레이 아이템 소리
+var LimeitemSound; // 끈적이 아이템 소리
+var CoinSound;     // 동전 소리
+var MulticoinSound;// 많은 동전 소리
+var WrongAttacksound; // 잘못된 공격 소리
+
 
 // 체력
 var life = FULL_LIFE;
@@ -122,8 +128,17 @@ function doAttackTarget(target){
 
 function removeTarget(target, doEffect){
 	if(doEffect){ // 소리, 제거 효과
-		startAudio(removeSound);			
-		removeSound.currentTime = 0;
+		if(target.hasClass(TARGET_WARNING)) {
+			startAudio(WrongAttacksound);
+			WrongAttacksound.currentTime = 0;
+		} else if (target.hasClass(TARGET_GOLD)){
+			startAudio(MulticoinSound);
+			MulticoinSound.currentTime = 0;
+		} else {
+			startAudio(CoinSound);
+			CoinSound.currentTime = 0;
+		}
+		
 		target.removeClass('limit');
 		target.addClass('removed'); // 이미지 변경
 		target.find(".toLeftDistance").val(0);
@@ -158,23 +173,21 @@ function lifeRecovery(recover) {
 function usingItem(itemId){
 	var coin = $(".info-board .info.coin .value");
 	var coinNumber = parseInt(coin.text(), 10);
-	var duration = 3000; // 아이템 지속 시간
-	
-	startAudio(itemSound);		
+	var duration = 3000; // 아이템 지속 시간		
 	
 	switch(itemId){
 	case 0 : doSetLime(duration);break;
 	case 1 : doUsingSpray(); break;
 	case 2 : doRecoveryHeart(); break;
-	case 3 : doChangemoveSpeed(duration); break;
-	// case 4 : doSetLimeStart(duration); break;
 	}
 	
 	function doSetLime(duration){
 		
 		if(coinNumber >= ITEM_COST_LIME){// 가지고 있는 코인이 아이템 비용보다 높다면
-			// clickType = 2;
-		
+			
+			startAudio(LimeitemSound);
+			LimeitemSound.currentTime = 0;
+			
 			// 끈끈이 지역
 			var limeItemArea = $(".lime_item_area");
 			limeItemArea.css("width",ITEM_LIME_WIDTH); 
@@ -289,12 +302,18 @@ function usingItem(itemId){
 	
 	function doUsingSpray(){
 		if(coinNumber >= ITEM_COST_SPRAY){// 가지고 있는 코인이 아이템 비용보다 높다면
+			
+			startAudio(SprayitemSound);
+			SprayitemSound.currentTime = 0;
+			
+			changeMoveSpeed(10000);
+			
+			
 			stopLifeDecrease();
 			$(".effect.spray").addClass("on");
 			setTimeout(function() {
 				startLifeDecrease();
 				$(".effect.spray").removeClass("on");
-				removeAllTarget(".target", true)// 모든 타겟 삭제
 			}, 3000)
 			
 			decreaseCoin(ITEM_COST_SPRAY); // 코인 감소
@@ -303,6 +322,10 @@ function usingItem(itemId){
 	
 	function doRecoveryHeart(){
 		if(coinNumber >= ITEM_COST_HEART){ // 가지고 있는 코인이 아이템 비용보다 높다면
+			
+			startAudio(HeartitemSound);
+			HeartitemSound.currentTime = 0;
+			
 			$(".effect.heart").addClass("on");
 			setTimeout(function() {
 				$(".effect.heart").removeClass("on");
@@ -311,14 +334,6 @@ function usingItem(itemId){
 			lifeRecovery(30);
 			decreaseCoin(ITEM_COST_HEART); // 코인 감소
 		}	
-	}
-	
-	function doChangemoveSpeed(duration) {
-		targetMoveSpeed = targetMoveSpeed - 40;
-		setTimeout(function() {
-			targetMoveSpeed = targetMoveSpeed + 40;
-		}, duration)
-		
 	}
 
 }
@@ -618,6 +633,7 @@ function startTime(){
 		time += 0.01;
 		$(".info-board .info.time .value").text(time.toFixed(2));
 		if(time >= config.maxTime){
+			changeMoveSpeed(1);
 			stopPlayNormalTime();
 			setTimeout(function(){
 				level += 1;
@@ -642,6 +658,7 @@ function stopMakeTarget() {
 	clearTimeout(makeTargetThread);
 	makeTargetThread = undefined; // 쓰레드 변수 초기화
 }
+
 
 // 체력 감소 스레드 시작
 function startLifeDecrease() { // 재귀를 이용한 Interval
@@ -672,6 +689,10 @@ function stopLifeDecrease(){
 
 // 경고 백그라운드 스레드 시작
 function startWarningBackgroundChange(){
+	
+	startAudio(WarningSound);
+	WarningSound.currentTime = 0;
+	
 	if(warningBackgroundChange == undefined){
 		warningBackgroundChange = setInterval(function(){
 			var playGround = $('.play-ground');			
@@ -691,6 +712,23 @@ function stopWarningBackgroundChange(){
 	warningBackgroundChange = undefined; // 쓰레드 변수 초기화
 }
 
+// 타겟 속도 감소
+function changeMoveSpeed(duration) {
+	
+	if(checkMoveSpeed === 1) { // 타겟 속도 감소가 실행중
+		clearTimeout(changeThread);
+		checkMoveSpeed = 0;
+	} else { // 타겟 속도 감소가 실행중 아님
+		config.targetMoveSpeed = config.targetMoveSpeed + 300;
+		checkMoveSpeed = 1;
+		
+		changeThread =  setTimeout(() => {
+			config.targetMoveSpeed = config.targetMoveSpeed - 300;
+		}, duration);
+	}
+	
+	
+}
 
 $(document).ready(function(){
 	var attacker = $(".attacker");
@@ -716,18 +754,56 @@ $(document).ready(function(){
 		backgroundAudio = new Audio(getContextPath() + '/resources/audio/sample_bgm.mp3');
 		// 피버 타임 백그라운드 음악
 		feverTimeBackgroundAudio = new Audio(getContextPath() + '/resources/audio/sample_fever_bgm.mp3');
-		// 제거 소리
-		removeSound = new Audio();
-		removeSound.src = getContextPath() + "/resources/audio/sample_remove_sound.wav";
-		removeSound.preLoad = true;
-		removeSound.controls = true;
-		removeSound.autoPlay = false;
-		// 아이템 사용 소리
-		itemSound = new Audio();
-		itemSound.src = getContextPath() + "/resources/audio/sample_item.wav";
-		itemSound.preLoad = true;
-		itemSound.controls = true;
-		itemSound.autoPlay = false;
+		// 공격 소리
+		AttackSound = new Audio();
+		AttackSound.src = getContextPath() + "/resources/audio/sample_attack_sound.mp3";
+		AttackSound.preLoad = true;
+		AttackSound.controls = true;
+		AttackSound.autoPlay = false;
+		// 잘못된 제거 소리
+		WrongAttacksound = new Audio();
+		WrongAttacksound.src = getContextPath() + "/resources/audio/sample_wrong_attack.mp3";
+		WrongAttacksound.preLoad = true;
+		WrongAttacksound.controls = true;
+		WrongAttacksound.autoPlay = false;
+		// 하트 아이템 사용 소리
+		HeartitemSound = new Audio();
+		HeartitemSound.src = getContextPath() + "/resources/audio/sample_heart_item.wav";
+		HeartitemSound.preLoad = true;
+		HeartitemSound.controls = true;
+		HeartitemSound.autoPlay = false;
+		// 스프레이 아이템 사용 소리
+		SprayitemSound = new Audio();
+		SprayitemSound.src = getContextPath() + "/resources/audio/sample_spray_sound.mp3";
+		SprayitemSound.preLoad = true;
+		SprayitemSound.controls = true;
+		SprayitemSound.autoPlay = false;
+		// 끈적이 아이템 사용 소리
+		LimeitemSound = new Audio();
+		LimeitemSound.src = getContextPath() + "/resources/audio/sample_lime_sound.mp3";
+		LimeitemSound.preLoad = true;
+		LimeitemSound.controls = true;
+		LimeitemSound.autoPlay = false;	
+		// 동전소리
+		CoinSound = new Audio();
+		CoinSound.src = getContextPath() + "/resources/audio/sample_money_sound.mp3";
+		CoinSound.preLoad = true;
+		CoinSound.controls = true;
+		CoinSound.autoPlay = false;
+		// 많은 동전 소리
+		MulticoinSound = new Audio();
+		MulticoinSound.src = getContextPath() + "/resources/audio/sample_multimoney_sound.mp3";
+		MulticoinSound.preLoad = true;
+		MulticoinSound.controls = true;
+		MulticoinSound.autoPlay = false;
+		// 체력 경고음
+		WarningSound = new Audio();
+		WarningSound.src = getContextPath() + "/resources/audio/sample_warning_sound.mp3";
+		WarningSound.preLoad = true;
+		WarningSound.controls = true;
+		WarningSound.autoPlay = false;
+		
+		
 	}
 	
 	// 아이템 비용 표시
@@ -741,6 +817,11 @@ $(document).ready(function(){
 	// 화면 클릭 이벤트
 	$(".play-ground").on("click", function(e) {
 		// if (clickType === 1) {
+			
+			startAudio(AttackSound);
+			AttackSound.currentTime = 0;
+		
+		
 			var attacker = $(".attacker");
 			attacker.addClass("on");
 
@@ -830,28 +911,6 @@ $(document).ready(function(){
 				}
 			}
 
-		// 끈끈이 터치 위치 발생 ->랜덤 위치로 변경
-		// } else {
-			
-		/*
-		 * var limeAttack = $(".lime_item_area"); limeAttack.css("width",
-		 * ITEM_LIME_WIDTH); limeAttack.css("height", ITEM_LIME_HEIGHT);
-		 * limeAttack.addClass("on");
-		 * 
-		 * var x = e.pageX - $(".play-ground").offset().left; var y = e.pageY -
-		 * $(".play-ground").offset().top;
-		 * 
-		 * var attackStartX = x - (ITEM_LIME_WIDTH / 2); var attackStartY = y -
-		 * (ITEM_LIME_HEIGHT / 2); var attackEndX = x + (ITEM_LIME_WIDTH / 2);
-		 * var attackEndY = y + (ITEM_LIME_HEIGHT / 2);
-		 * 
-		 * limeAttack.css("left", attackStartX); limeAttack.css("top",
-		 * attackStartY);
-		 * 
-		 * usingItem(4); clickType = 1;
-		 * 
-		 *  }
-		 */
 
 	});
 
