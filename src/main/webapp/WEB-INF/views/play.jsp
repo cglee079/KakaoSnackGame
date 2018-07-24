@@ -56,14 +56,16 @@
 				</div>	
 			</div>
 			
-			<div class="wrap-life-progress">
-				<div class="progress">
-					<div class="progress-bar">
-						<div class="crop-progress-bar"></div>
-					</div>
+		</div>
+		
+		<div class="wrap-life-progress">
+			<div class="progress">
+				<div class="progress-bar">
+					<div class="crop-progress-bar"></div>
 				</div>
 			</div>
 		</div>
+			
 		<div class="play-ground">
 			<div class="attacker"></div>
 			<div class="combo-message">
