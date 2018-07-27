@@ -22,7 +22,8 @@ public class HomeController {
 	}
 	
 	@RequestMapping(value = "/play")
-	public String init(Locale locale, Model model) {
+	public String init(Locale locale, Model model, String sound) {
+		model.addAttribute("sound", sound);
 		return "play";
 	}
 	

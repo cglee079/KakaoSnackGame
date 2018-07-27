@@ -9,7 +9,7 @@ const ITEM_COST_LIME = 10;	// 파워 아이템 비용
 const ITEM_COST_SPRAY = 1;	// 스프레이 아이템 비용
 const ITEM_COST_HEART = 20;
 
-const COMBO_COIN 			= 2;1
+const COMBO_COIN 			= 2;
 
 const TARGET_NORMAL			= "normal";
 const TARGET_WARNING 		= "warning";
@@ -31,7 +31,7 @@ const LEVEL_CONFIG =[
 		stageMessage	: "STAGE 1",
 		maxWarningTarget: 2,
 		maxNormalTarget : 30,
-		maxTime			: 10,
+		maxTime			: 30,
 		targetMoveSpeed	: 60,
 		lifeDecreaseRate: 100
 	},
@@ -39,7 +39,7 @@ const LEVEL_CONFIG =[
 		stageMessage	: "STAGE 2",
 		maxWarningTarget: 4,
 		maxNormalTarget : 25,
-		maxTime			: 50,
+		maxTime			: 60,
 		targetMoveSpeed	: 50,
 		lifeDecreaseRate: 80
 	},
@@ -73,32 +73,30 @@ var targetMakeRate 		= 500; 	// 타겟이 생성되는 간격 , 1000 = 1초
 var wariningTargetRate  = 0.3;  // Warning 타겟이 생성되는 확률
 var goldTargetRate  	= 0.01;  // 골드 타겟이 생성되는 확률
 var totalCoin           = 0;    // 코인 숫자
+var moveDistance 		= 10;
+var feverTargetTouchCount= 0; 	// 보스 타겟 터치 카운트
+/*var checkMoveSpeed      = 0; // 무브 스피드가 바뀌었는지 체크
+*/
+// targeting 범위
+var attackAreaWidth 	= 200;
+var attackAreaHeight    = 200;
+
+// 효과음
+var attackSound; // 공격시 소리
+var heartItemSound;	// 체력회복 아이템 소리
+var sprayItemSound; // 스프레이 아이템 소리
+var limeItemSound; // 끈적이 아이템 소리
+var coinSound;     // 동전 소리
+var multiCoinSound;// 많은 동전 소리
+var wrongAttackSound; // 잘못된 공격 소리
+
+
+// 쓰레드
 var makeTargetThread;
-var checkTargetThread;
 var fallingSpeedUpThread;
 var makeFeverTargetThread;
 var timeThread;
 var warningBackgroundChange;
-var moveDistance 		= 10;
-var feverTargetTouchCount= 0; 	// 보스 타겟 터치 카운트
-var checkMoveSpeed      = 0; // 무브 스피드가 바뀌었는지 체크
-
-// targeting 범위
-var attackAreaWidth 	= 150;
-var attackAreaHeight    = 150;
-
-// 배경음악
-var backgroundAudio; // 노말 배경 음악
-
-// 효과음
-var AttackSound; // 공격시 소리
-var HeartitemSound;	// 체력회복 아이템 소리
-var SprayitemSound; // 스프레이 아이템 소리
-var LimeitemSound; // 끈적이 아이템 소리
-var CoinSound;     // 동전 소리
-var MulticoinSound;// 많은 동전 소리
-var WrongAttacksound; // 잘못된 공격 소리
-
 
 // 체력
 var life = FULL_LIFE;
@@ -129,14 +127,14 @@ function doAttackTarget(target){
 function removeTarget(target, doEffect){
 	if(doEffect){ // 소리, 제거 효과
 		if(target.hasClass(TARGET_WARNING)) {
-			startAudio(WrongAttacksound);
-			WrongAttacksound.currentTime = 0;
+			startAudio(wrongAttackSound);
+			wrongAttackSound.currentTime = 0;
 		} else if (target.hasClass(TARGET_GOLD)){
-			startAudio(MulticoinSound);
-			MulticoinSound.currentTime = 0;
+			startAudio(multiCoinSound);
+			multiCoinSound.currentTime = 0;
 		} else {
-			startAudio(CoinSound);
-			CoinSound.currentTime = 0;
+			startAudio(coinSound);
+			coinSound.currentTime = 0;
 		}
 		
 		target.removeClass('limit');
@@ -185,8 +183,8 @@ function usingItem(itemId){
 		
 		if(coinNumber >= ITEM_COST_LIME){// 가지고 있는 코인이 아이템 비용보다 높다면
 			
-			startAudio(LimeitemSound);
-			LimeitemSound.currentTime = 0;
+			startAudio(limeItemSound);
+			limeItemSound.currentTime = 0;
 			
 			// 끈끈이 지역
 			var limeItemArea = $(".lime_item_area");
@@ -302,29 +300,26 @@ function usingItem(itemId){
 	
 	function doUsingSpray(){
 		if(coinNumber >= ITEM_COST_SPRAY){// 가지고 있는 코인이 아이템 비용보다 높다면
-			
-			startAudio(SprayitemSound);
-			SprayitemSound.currentTime = 0;
-			
-			changeMoveSpeed(10000);
-			
+			startAudio(sprayItemSound);
+			sprayItemSound.currentTime = 0;
 			
 			stopLifeDecrease();
 			$(".effect.spray").addClass("on");
 			setTimeout(function() {
 				startLifeDecrease();
 				$(".effect.spray").removeClass("on");
-			}, 3000)
+			}, 2000)
 			
 			decreaseCoin(ITEM_COST_SPRAY); // 코인 감소
+			
 		}
 	}
 	
 	function doRecoveryHeart(){
 		if(coinNumber >= ITEM_COST_HEART){ // 가지고 있는 코인이 아이템 비용보다 높다면
 			
-			startAudio(HeartitemSound);
-			HeartitemSound.currentTime = 0;
+			startAudio(heartItemSound);
+			heartItemSound.currentTime = 0;
 			
 			$(".effect.heart").addClass("on");
 			setTimeout(function() {
@@ -338,24 +333,6 @@ function usingItem(itemId){
 
 }
 
-
-// 음악 시작
-function startAudio(playtimeType){  
-	if($(".bgm-source-board").attr('data-click-state') == 1){ // 지금 정지 중이라면
-		playtimeType.play(); 
-		playtimeType.volume = 0.0;
-	}
-	else { // 지금 재생중이라면
-		playtimeType.play(); 
-		playtimeType.volume = 0.5;
-	}
-	
-}
-
-// 음악 정지
-function stopAudio(playtimeType){ 
-	playtimeType.pause(); 
-}
 
 // 타겟을 만들어 떨어트림
 function makeTarget(){
@@ -592,7 +569,7 @@ function checkItemCost(){
 /** ** ========== 플레이 타임에 시작/정지 로직 =================== * */
 
 function startPlayNormalTime(){
-	startAudio(backgroundAudio); // 보스 타임 백그라운드 음악 제거
+	startBGM();
 	
 	config = LEVEL_CONFIG[level];
 	startTime();
@@ -618,8 +595,8 @@ function startPlayNormalTime(){
 
 function stopPlayNormalTime(){
 	removeAllTarget(".target", false)// 모든 타겟 삭제
-	stopAudio(backgroundAudio);
 	
+	stopBGM();
 	stopTime();
 	stopMakeTarget();
 	stopLifeDecrease();
@@ -633,7 +610,6 @@ function startTime(){
 		time += 0.01;
 		$(".info-board .info.time .value").text(time.toFixed(2));
 		if(time >= config.maxTime){
-			changeMoveSpeed(1);
 			stopPlayNormalTime();
 			setTimeout(function(){
 				level += 1;
@@ -667,10 +643,7 @@ function startLifeDecrease() { // 재귀를 이용한 Interval
 		gameover();
 		lifeDecreaseThread = undefined;
 	} else {
-		if(life <= FULL_LIFE/3 && warningBackgroundChange == undefined){ // 체력이
-																			// 일정수준
-																			// 이하로
-																			// 감소했을때
+		if(life <= FULL_LIFE/3 && warningBackgroundChange == undefined){ // 체력이  일정수준 이하로 감소했을때
 			startWarningBackgroundChange();
 		} else if(life > FULL_LIFE/3 && warningBackgroundChange != undefined){
 			stopWarningBackgroundChange();
@@ -690,8 +663,8 @@ function stopLifeDecrease(){
 // 경고 백그라운드 스레드 시작
 function startWarningBackgroundChange(){
 	
-	startAudio(WarningSound);
-	WarningSound.currentTime = 0;
+	startAudio(warningSound);
+	warningSound.currentTime = 0;
 	
 	if(warningBackgroundChange == undefined){
 		warningBackgroundChange = setInterval(function(){
@@ -712,25 +685,116 @@ function stopWarningBackgroundChange(){
 	warningBackgroundChange = undefined; // 쓰레드 변수 초기화
 }
 
-// 타겟 속도 감소
-function changeMoveSpeed(duration) {
+function doAttack(e){
+	startAudio(attackSound);
+	attackSound.currentTime = 0;
+
+	var attacker = $(".attacker");
+	attacker.addClass("on");
+
+	var x = e.pageX - $(".play-ground").offset().left;
+	var y = e.pageY - $(".play-ground").offset().top;
+
+	var attackStartX = x - (attackAreaWidth / 2);
+	var attackStartY = y - (attackAreaHeight / 2);
+	var attackEndX = x + (attackAreaWidth / 2) - (attackAreaWidth*(3/10));
+	var attackEndY = y + (attackAreaHeight / 2) - (attackAreaHeight*(3/10));
+
+	attacker.css("left", attackStartX + (attackAreaWidth*(2/10)));
+	attacker.css("top", attackStartY + (attackAreaHeight*(2/10)));
+	setTimeout(function() {
+		attacker.removeClass("on")
+	}, 100);
 	
-	if(checkMoveSpeed === 1) { // 타겟 속도 감소가 실행중
-		clearTimeout(changeThread);
-		checkMoveSpeed = 0;
-	} else { // 타겟 속도 감소가 실행중 아님
-		config.targetMoveSpeed = config.targetMoveSpeed + 300;
-		checkMoveSpeed = 1;
-		
-		changeThread =  setTimeout(() => {
-			config.targetMoveSpeed = config.targetMoveSpeed - 300;
-		}, duration);
+	var attackerTemp = $(".attacker-temp");
+	attackerTemp.css("left", attackStartX + (attackAreaWidth*(1/5)));
+	attackerTemp.css("top", attackStartY + (attackAreaHeight*(1/5)));
+	attackerTemp.css("width", attackEndX - attackStartX);
+	attackerTemp.css("height", attackEndY - attackStartY);
+	
+	var attackedTargetNumber = 0;
+
+	var targets = $(".target");
+	var checkComboflag = true;
+	targets.each(function() {
+		var targetStartX = parseInt($(this).css("left"));
+		var targetStartY = parseInt($(this).css("top"));
+		var targetEndX = targetStartX + TARGET_WIDTH;
+		var targetEndY = targetStartY + TARGET_HEIGHT;
+		var attacked = false;
+
+		// case1 왼쪽에 벌레가 걸쳤다.
+		if (targetEndX > attackStartX
+			&& targetEndX < attackEndX
+			&& targetStartY > attackStartY
+			&& targetEndY < attackEndY) {
+			attacked = true;
+		}
+
+		// case2 오른쪽에 벌레가 걸쳤다.
+		if (targetStartX < attackEndX
+			&& targetStartX > attackStartX
+			&& targetStartY > attackStartY
+			&& targetEndY < attackEndY) {
+			attacked = true;
+		}
+
+		// case3 위쪽에 벌레가 걸쳤다.
+		if (targetStartX > attackStartX
+			&& targetEndX < attackEndX
+			&& targetEndY > attackStartY
+			&& targetEndY < attackEndY) {
+			attacked = true;
+		}
+
+		// case4 아래쪽에 벌레가 걸쳤다.
+		if (targetStartX > attackStartX
+			&& targetEndX < attackEndX
+			&& targetStartY < attackEndY
+			&& targetStartY > attackStartY) {
+			attacked = true;
+		}
+
+
+		if (attacked) {
+			if (!$(this).hasClass(TARGET_WARNING)) {
+				attackedTargetNumber = attackedTargetNumber + 1;
+			}
+			doAttackTarget(this);
+		}
+
+	});
+
+	checkCombo();
+	function checkCombo() { // 콤보 수 확인
+		if (attackedTargetNumber >= 2) {
+			var comboMessage = $(".combo-message");
+			comboMessage.css("left", attackStartX);
+			comboMessage.css("top", attackStartY);
+			comboMessage.find(".combo-count").text(attackedTargetNumber);
+
+			setTimeout(function() {
+				comboMessage.addClass("on");
+			}, 100);
+			setTimeout(function() {
+				comboMessage.removeClass("on");
+			}, 1000);
+
+			makeCoin(COMBO_COIN * attackedTargetNumber);
+		}
 	}
-	
-	
 }
 
 $(document).ready(function(){
+	//BGM 설정
+	var bgm = new Audio(getContextPath() + '/resources/audio/play/bgm_play.mp3');
+	setBGM(bgm);
+	
+	//SOUND ON/OFF
+	var sound = $("#sound").val();
+	if(sound == "on"){ doSoundOn();}
+	if(sound == "off"){ doSoundOff();}
+	
 	var attacker = $(".attacker");
 	attacker.css("width", attackAreaWidth);
 	attacker.css("height", attackAreaHeight);
@@ -750,60 +814,14 @@ $(document).ready(function(){
 	
 	initAudio();
 	function initAudio(){
-		// 노말 타임 백그라운드 음악
-		backgroundAudio = new Audio(getContextPath() + '/resources/audio/sample_bgm.mp3');
-		// 피버 타임 백그라운드 음악
-		feverTimeBackgroundAudio = new Audio(getContextPath() + '/resources/audio/sample_fever_bgm.mp3');
-		// 공격 소리
-		AttackSound = new Audio();
-		AttackSound.src = getContextPath() + "/resources/audio/sample_attack_sound.mp3";
-		AttackSound.preLoad = true;
-		AttackSound.controls = true;
-		AttackSound.autoPlay = false;
-		// 잘못된 제거 소리
-		WrongAttacksound = new Audio();
-		WrongAttacksound.src = getContextPath() + "/resources/audio/sample_wrong_attack.mp3";
-		WrongAttacksound.preLoad = true;
-		WrongAttacksound.controls = true;
-		WrongAttacksound.autoPlay = false;
-		// 하트 아이템 사용 소리
-		HeartitemSound = new Audio();
-		HeartitemSound.src = getContextPath() + "/resources/audio/sample_heart_item.wav";
-		HeartitemSound.preLoad = true;
-		HeartitemSound.controls = true;
-		HeartitemSound.autoPlay = false;
-		// 스프레이 아이템 사용 소리
-		SprayitemSound = new Audio();
-		SprayitemSound.src = getContextPath() + "/resources/audio/sample_spray_sound.mp3";
-		SprayitemSound.preLoad = true;
-		SprayitemSound.controls = true;
-		SprayitemSound.autoPlay = false;
-		// 끈적이 아이템 사용 소리
-		LimeitemSound = new Audio();
-		LimeitemSound.src = getContextPath() + "/resources/audio/sample_lime_sound.mp3";
-		LimeitemSound.preLoad = true;
-		LimeitemSound.controls = true;
-		LimeitemSound.autoPlay = false;	
-		// 동전소리
-		CoinSound = new Audio();
-		CoinSound.src = getContextPath() + "/resources/audio/sample_money_sound.mp3";
-		CoinSound.preLoad = true;
-		CoinSound.controls = true;
-		CoinSound.autoPlay = false;
-		// 많은 동전 소리
-		MulticoinSound = new Audio();
-		MulticoinSound.src = getContextPath() + "/resources/audio/sample_multimoney_sound.mp3";
-		MulticoinSound.preLoad = true;
-		MulticoinSound.controls = true;
-		MulticoinSound.autoPlay = false;
-		// 체력 경고음
-		WarningSound = new Audio();
-		WarningSound.src = getContextPath() + "/resources/audio/sample_warning_sound.mp3";
-		WarningSound.preLoad = true;
-		WarningSound.controls = true;
-		WarningSound.autoPlay = false;
-		
-		
+		attackSound 		= makeSound(getContextPath() + "/resources/audio/play/sound_play_attack.mp3");
+		wrongAttackSound 	= makeSound(getContextPath() + "/resources/audio/play/sound_play_wrong_attack.mp3");
+		heartItemSound 		= makeSound(getContextPath() + "/resources/audio/play/sound_play_item_portion.wav");
+		sprayItemSound 		= makeSound(getContextPath() + "/resources/audio/play/sound_play_item_spray.mp3");
+		limeItemSound		= makeSound( getContextPath() + "/resources/audio/play/sound_play_item_lime.mp3");
+		coinSound 			= makeSound(getContextPath() + "/resources/audio/play/sound_play_money.mp3");
+		multiCoinSound 		= makeSound(getContextPath() + "/resources/audio/play/sound_play_multi_money.mp3");
+		warningSound 		= makeSound(getContextPath() + "/resources/audio/play/sound_play_warnig.mp3");
 	}
 	
 	// 아이템 비용 표시
@@ -814,133 +832,6 @@ $(document).ready(function(){
 		$(".heart-item-cost").text(ITEM_COST_HEART);
 	}
 
-	// 화면 클릭 이벤트
-	$(".play-ground").on("click", function(e) {
-		// if (clickType === 1) {
-			
-			startAudio(AttackSound);
-			AttackSound.currentTime = 0;
-		
-		
-			var attacker = $(".attacker");
-			attacker.addClass("on");
-
-			var x = e.pageX - $(".play-ground").offset().left;
-			var y = e.pageY - $(".play-ground").offset().top;
-
-			var attackStartX = x - (attackAreaWidth / 2);
-			var attackStartY = y - (attackAreaHeight / 2);
-			var attackEndX = x + (attackAreaWidth / 2);
-			var attackEndY = y + (attackAreaHeight / 2);
-
-			attacker.css("left", attackStartX);
-			attacker.css("top", attackStartY);
-			setTimeout(function() {
-				attacker.removeClass("on")
-			}, 100);
-
-			var attackedTargetNumber = 0;
-
-			var targets = $(".target");
-			var checkComboflag = true;
-			targets.each(function() {
-				var targetStartX = parseInt($(this).css("left"));
-				var targetStartY = parseInt($(this).css("top"));
-				var targetEndX = targetStartX + TARGET_WIDTH;
-				var targetEndY = targetStartY + TARGET_HEIGHT;
-				var attacked = false;
-
-				// case1 왼쪽에 벌레가 걸쳤다.
-				if (targetEndX > attackStartX
-					&& targetEndX < attackEndX
-					&& targetStartY > attackStartY
-					&& targetEndY < attackEndY) {
-					attacked = true;
-				}
-
-				// case2 오른쪽에 벌레가 걸쳤다.
-				if (targetStartX < attackEndX
-					&& targetStartX > attackStartX
-					&& targetStartY > attackStartY
-					&& targetEndY < attackEndY) {
-					attacked = true;
-				}
-
-				// case3 위쪽에 벌레가 걸쳤다.
-				if (targetStartX > attackStartX
-					&& targetEndX < attackEndX
-					&& targetEndY > attackStartY
-					&& targetEndY < attackEndY) {
-					attacked = true;
-				}
-
-				// case4 아래쪽에 벌레가 걸쳤다.
-				if (targetStartX > attackStartX
-					&& targetEndX < attackEndX
-					&& targetStartY < attackEndY
-					&& targetStartY > attackStartY) {
-					attacked = true;
-				}
-
-
-				if (attacked) {
-					if (!$(this).hasClass(TARGET_WARNING)) {
-						attackedTargetNumber = attackedTargetNumber + 1;
-					}
-					doAttackTarget(this);
-				}
-
-			});
-
-			checkCombo();
-			function checkCombo() { // 콤보 수 확인
-				if (attackedTargetNumber >= 2) {
-					var comboMessage = $(".combo-message");
-					comboMessage.css("left", attackStartX);
-					comboMessage.css("top", attackStartY);
-					comboMessage.find(".combo-count").text(attackedTargetNumber);
-
-					setTimeout(function() {
-						comboMessage.addClass("on");
-					}, 100);
-					setTimeout(function() {
-						comboMessage.removeClass("on");
-					}, 1000);
-
-					makeCoin(COMBO_COIN * attackedTargetNumber);
-				}
-			}
-
-
-	});
-
-	// 오디오 버튼 활성화 , 비활성화, 이거는 첫화면에 있어야하는듯? (-이찬구)
-// $(".bgm-source-board").on("click",function(e) {
-//		
-// var audio;
-//		
-// switch(timeType){
-// case PLAYTIME_NORMAL :
-// audio = backgroundAudio;
-// break;
-// case PLAYTIME_FEVER :
-// audio = feverTimeBackgroundAudio;
-// break;
-// }
-//		
-// if($(this).attr('data-click-state') == 1) {
-// $(this).attr('data-click-state', 0);
-// startAudio(audio);
-// $(".bgm-source-board").css({"background":"url(resources/image/sample_start_audio.png",
-// 'background-repeat' : 'no-repeat', 'background-size' : 'contain'});}
-// else {
-// $(this).attr('data-click-state', 1);
-// stopAudio(audio);
-// $(".bgm-source-board").css({"background":"url(resources/image/sample_stop_audio.png",
-// 'background-repeat' : 'no-repeat' ,'background-size' : 'contain'});
-// }
-// });
-			
 	 startPlayNormalTime();
 })
 		
