@@ -11,7 +11,8 @@
 		<div class="wrap-fg"></div>
 		<div class="wrap-gameover">
 			<div class="gameover">
-				<div class="gameover">GAME OVER</div>
+				<div class="gameover-message">GAME OVER</div>
+				<div class="gameover-time"></div>
 			</div>
 			<div class="gameover-menus">
 				<div class="menu btn-regame" onclick="doRegame()"></div>

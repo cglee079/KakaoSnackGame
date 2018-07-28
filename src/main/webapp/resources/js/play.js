@@ -809,6 +809,7 @@ function gameover() {
 	
 	$(".wrap-fg").addClass("on");
 	$(".wrap-gameover").addClass("on");
+	$(".wrap-gameover .gameover-time").text(time.toFixed(2));
 }
 
 
