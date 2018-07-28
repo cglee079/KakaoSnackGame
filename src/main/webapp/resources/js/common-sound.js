@@ -45,7 +45,7 @@ function startAudio(playtimeType){
 		}
 		
 		playtimeType.currentTime = 0; 
-		playtimeType.volume = 0.5;
+		playtimeType.volume = 1;
 		
 		var timeoutID = setTimeout(function(){
 			playtimeType.volume = 0;

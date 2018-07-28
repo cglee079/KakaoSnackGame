@@ -29,15 +29,15 @@ const MAX_GOLD_TARGET		= 2;
 const LEVEL_CONFIG =[
 	{ // level1
 		stageMessage	: "STAGE 1",
-		maxWarningTarget: 2,
-		maxNormalTarget : 30,
+		maxWarningTarget: 3,
+		maxNormalTarget : 27,
 		maxTime			: 30,
 		targetMoveSpeed	: 60,
 		lifeDecreaseRate: 100
 	},
 	{ // level2
 		stageMessage	: "STAGE 2",
-		maxWarningTarget: 4,
+		maxWarningTarget: 5,
 		maxNormalTarget : 25,
 		maxTime			: 60,
 		targetMoveSpeed	: 50,
@@ -45,15 +45,15 @@ const LEVEL_CONFIG =[
 	},
 	{ // level3
 		stageMessage	: "STAGE 3",
-		maxWarningTarget: 7,
-		maxNormalTarget : 15,
+		maxWarningTarget: 10,
+		maxNormalTarget : 20,
 		maxTime			: 90,
 		targetMoveSpeed	: 40,
 		lifeDecreaseRate: 60
 	},
 	{ // level4
 		stageMessage	: "STAGE 4",
-		maxWarningTarget: 10,
+		maxWarningTarget: 15,
 		maxNormalTarget : 15,
 		maxTime			: 140,
 		targetMoveSpeed	: 30,
@@ -75,9 +75,6 @@ var goldTargetRate  	= 0.01;  // 골드 타겟이 생성되는 확률
 var totalCoin           = 0;    // 코인 숫자
 var moveDistance 		= 10;
 var feverTargetTouchCount= 0; 	// 보스 타겟 터치 카운트
-/*var checkMoveSpeed      = 0; // 무브 스피드가 바뀌었는지 체크
-*/
-// targeting 범위
 var attackAreaWidth 	= 200;
 var attackAreaHeight    = 200;
 
@@ -639,30 +636,32 @@ function doAttack(e){
 	var x = e.pageX - $(".play-ground").offset().left;
 	var y = e.pageY - $(".play-ground").offset().top;
 
-	var attackStartX = x - (attackAreaWidth / 2);
-	var attackStartY = y - (attackAreaHeight / 2);
-	var attackEndX = x + (attackAreaWidth / 2) - (attackAreaWidth*(3/10));
-	var attackEndY = y + (attackAreaHeight / 2) - (attackAreaHeight*(3/10));
+	var attackAreaValidWidth 	= attackAreaWidth * (2/3);
+	var attackAreaValidHeight 	= attackAreaHeight * (2/3);
+	var attackStartX = x - (attackAreaValidWidth / 2);
+	var attackStartY = y - (attackAreaValidHeight / 2);
+	var attackEndX = x + (attackAreaValidWidth / 2) ;
+	var attackEndY = y + (attackAreaValidHeight / 2) ;
 
-	attacker.css("left", attackStartX + (attackAreaWidth*(2/10)));
-	attacker.css("top", attackStartY + (attackAreaHeight*(2/10)));
+	attacker.css("left", attackStartX);
+	attacker.css("top", attackStartY);
 	setTimeout(function() {
 		attacker.removeClass("on")
 	}, 100);
 	
+	
+//	임시로 측정을위해 만든 코딩임.
+//	var attackerTemp = $(".attacker-temp");
+//	attackerTemp.css("left", attackStartX);
+//	attackerTemp.css("top", attackStartY);
+//	attackerTemp.css("width", attackEndX - attackStartX);
+//	attackerTemp.css("height", attackEndY - attackStartY);
 	
 	// 보이지 않는 곳의 벌레가 죽게되는 것을 방지.
 	if(attackStartX < (startX + HIDDEN_PADDING) ) { attackStartX = (startX + HIDDEN_PADDING);}
 	if(attackStartY < (startY + HIDDEN_PADDING) ) { attackStartY = (startY + HIDDEN_PADDING);}
 	if(attackEndX > (endX - HIDDEN_PADDING)) { attackEndX = (endX - HIDDEN_PADDING);}
 	if(attackEndY > (endY -HIDDEN_PADDING)) { attackEndY = (endY - HIDDEN_PADDING);}
-	
-//	임시로 측정을위해 만든 코딩임.
-//	var attackerTemp = $(".attacker-temp");
-//	attackerTemp.css("left", attackStartX + (attackAreaWidth*(1/5)));
-//	attackerTemp.css("top", attackStartY + (attackAreaHeight*(1/5)));
-//	attackerTemp.css("width", attackEndX - attackStartX);
-//	attackerTemp.css("height", attackEndY - attackStartY);
 	
 	var attackedTargetNumber = 0;
 
@@ -675,6 +674,10 @@ function doAttack(e){
 		var targetEndY = targetStartY + TARGET_HEIGHT;
 		var attacked = false;
 
+		
+//		console.log ("A// " + attackStartX + "," + attackStartY + " // " + attackEndX + "," + attackEndY + " //" );
+//		console.log ("B// " + targetStartX + "," + targetStartY + " // " + targetEndX + "," + targetEndY + " //" );
+		
 		// case1 왼쪽에 벌레가 걸쳤다.
 		if (targetEndX > attackStartX
 			&& targetEndX < attackEndX
@@ -706,7 +709,6 @@ function doAttack(e){
 			&& targetStartY > attackStartY) {
 			attacked = true;
 		}
-
 
 		if (attacked) {
 			if (!$(this).hasClass(TARGET_WARNING)) {
@@ -862,7 +864,7 @@ $(document).ready(function(){
 		wrongAttackSound 	= makeSound(getContextPath() + "/resources/audio/play/sound_play_wrong_attack.mp3");
 		heartItemSound 		= makeSound(getContextPath() + "/resources/audio/play/sound_play_item_portion.wav");
 		sprayItemSound 		= makeSound(getContextPath() + "/resources/audio/play/sound_play_item_spray.mp3");
-		limeItemSound		= makeSound( getContextPath() + "/resources/audio/play/sound_play_item_lime.mp3");
+		limeItemSound		= makeSound(getContextPath() + "/resources/audio/play/sound_play_item_lime.mp3");
 		coinSound 			= makeSound(getContextPath() + "/resources/audio/play/sound_play_money.mp3");
 		multiCoinSound 		= makeSound(getContextPath() + "/resources/audio/play/sound_play_multi_money.mp3");
 		warningSound 		= makeSound(getContextPath() + "/resources/audio/play/sound_play_warnig.mp3");

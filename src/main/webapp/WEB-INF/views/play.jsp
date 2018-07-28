@@ -51,14 +51,13 @@
 		<div class="play-ground" onclick="doAttack(event)">
 			<div class="attacker"></div>
 			<!-- 공격범위 체크를 위해 임시로 만듬. 지울게 BY찬구 -->
-		<!-- 	<div class="attacker-temp"></div>
+		 	<div class="attacker-temp"></div>
 			<style>
 				.attacker-temp{
-					display : none;
 					position: absolute;
 					background: red;
 				}
-			</style> -->
+			</style>
 			<div class="combo-message"></div>
 			<div class="stage-message"></div>
 			<div class="lime_item_area"></div>

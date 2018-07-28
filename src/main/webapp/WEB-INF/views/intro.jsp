@@ -37,12 +37,12 @@
 		if (tg.hasClass("on")) {
 			doSoundOn();
 			startBGM();
+			startAudio(btnClickSound);
 		} else {
+			startAudio(btnClickSound);
 			doSoundOff();
 			stopBGM();
 		}
-		
-		startAudio(btnClickSound);
 	}
 
 	//도움말 버튼 클릭시
