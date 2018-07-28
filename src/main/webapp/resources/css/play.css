@@ -21,12 +21,12 @@
 	background: rgba(0, 0, 0, 0.6);
 }
 
-.wrap-fg.on {
+.wrap-fg.on{
 	display: block;
 }
 
 .wrap-gameover {
-	display: none;
+	display: flex;
 	z-index: 3;
 	position: absolute;
 	left: 0;
@@ -34,17 +34,23 @@
 	top: 0;
 	bottom: 0;
 	background: rgba(0, 0, 0, 0);
+	flex-flow: column nowrap;
 	justify-content: center;
 	align-items: center;
+	transform : scale(0);
+	-webkit-transition: transform 0.3s;
+	-webkit-transition-timing-function: ease-in-out;
+	transition: transform 0.3s;
+	transition-timing-function: ease-in-out;
 }
 
 .wrap-gameover.on {
-	display: flex;
+	transform : scale(1);
 }
 
 .gameover {
-	width: 300px;
-	height: 400px;
+	width: 230px;
+	height: 250px;
 	background: #FFF;
 	border-radius: 10px;
 	box-shadow: 0px 10px 20px #222;
@@ -54,34 +60,29 @@
 	align-items: center;
 }
 
-.gameover .gameover-icon {
-	width: 150px;
-	height: 150px;
-	background-repeat: no-repeat;
-	background-size: contain;
-	background-position: center;
-	margin-bottom: 10px;
-}
-
 .gameover .gameover-message {
 	font-size: 2rem;
 	font-weight: bold;
 }
 
-.restart-button {
+.gameover-menus{
+	width: 230px;
+	height: 60px;
+	margin-top : 20px;	
 	display: flex;
-	width: 30%;
 	justify-content: center;
 	align-items: center;
 }
 
-.home-button {
-	display: flex;
-	width: 30%;
-	justify-content: center;
-	align-items: center;
+.gameover-menus .menu{
+	flex : 1;
+	height : 100%;
+	background-repeat: no-repeat;
+	background-size: contain;
 }
 
+.gameover-menus .menu.btn-home{ background-image: url("../image/intro/btn_intro_start.png"); }
+.gameover-menus .menu.btn-regame{ background-image: url("../image/intro/btn_intro_start.png"); }
 
 
 .head {

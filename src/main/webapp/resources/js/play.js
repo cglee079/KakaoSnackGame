@@ -89,6 +89,8 @@ var limeItemSound; // 끈적이 아이템 소리
 var coinSound;     // 동전 소리
 var multiCoinSound;// 많은 동전 소리
 var wrongAttackSound; // 잘못된 공격 소리
+var gameoverSound;
+var btnClickSound;
 
 
 // 쓰레드
@@ -102,27 +104,6 @@ var warningBackgroundChange;
 var life = FULL_LIFE;
 var lifeDecreaseThread;
 
-
-// 타겟 삭제 - 공격당했을때
-function doAttackTarget(target){
-	var target = $(target);
-	
-	if(!target.hasClass("died")){
-		if(target.hasClass(TARGET_WARNING)){
-			lifeRecovery(TARGET_WARNING_DAMEAGE);
-			removeTarget(target,true);
-		} else if (target.hasClass(TARGET_GOLD)){
-			makeCoin(TARGET_GOLD_COIN);
-			removeTarget(target,true);
-		} else{ // 노말 타겟인 경우
-			lifeRecovery(TARGET_NORMAL_RECOVERY);
-			makeCoin(TARGET_NORMAL_COIN);
-			removeTarget(target,true);
-		}
-		
-		target.addClass("died");
-	}
-}
 
 function removeTarget(target, doEffect){
 	if(doEffect){ // 소리, 제거 효과
@@ -334,6 +315,43 @@ function usingItem(itemId){
 }
 
 
+
+/** ============== 시간 타이머 관련 =========== **/
+
+function startTime(){
+	timeThread = setInterval(function(){
+		time += 0.01;
+		$(".info-board .info.time .value").text(time.toFixed(2));
+		if(time >= config.maxTime){
+			stopPlayNormalTime();
+			setTimeout(function(){
+				level += 1;
+				startPlayNormalTime();
+			}, 1000);
+		}
+	}, 10);
+}
+
+function stopTime(){
+	clearInterval(timeThread);
+}
+
+
+
+/** ============== 타겟 생성, 이동관련 로직 ================= **/
+
+//타겟 생성 스레드
+function startMakeTarget() { // 재귀를 이용한 Interval
+	makeTarget();
+	makeTargetThread = setTimeout(startMakeTarget, targetMakeRate);
+}
+
+// 타겟 생성 스레드 정지
+function stopMakeTarget() {
+	clearTimeout(makeTargetThread);
+	makeTargetThread = undefined; // 쓰레드 변수 초기화
+}
+
 // 타겟을 만들어 떨어트림
 function makeTarget(){
 	var playGround = $(".play-ground");
@@ -518,53 +536,6 @@ function moveTarget(target){
 	target.find(".moveTargetThreadID").val(moveTargetThread); 
 }
 
-// 게임 오버
-function gameover() {
-	removeAllTarget(".target", false)// 모든 타겟 삭제
-	stopPlayNormalTime();
-	
-	$(".wrap-fg").addClass("on");
-	$(".wrap-gameover").addClass("on");
-}
-
-
-// 돈 증가
-function makeCoin(coin) {
-	totalCoin = totalCoin + coin;
-	drawCoin(totalCoin);
-	checkItemCost();
-}
-
-// 돈 감소
-function decreaseCoin(coin) {
-	totalCoin = totalCoin - coin;
-	drawCoin(totalCoin);
-	checkItemCost();
-}
-
-// 돈 초기화
-function initCoin(){
-	totalCoin = 0;
-	drawCoin(totalCoin);
-	checkItemCost();
-}
-
-function drawCoin(coin){
-	$(".info-board .info.coin .value").text(coin);
-}
-
-// 아이템 활성화 체크
-function checkItemCost(){
-/*	if(totalCoin >= ITEM_COST_SPRAY){ $(".spray-item .overlay-item").removeClass("on"); }
-	else { $(".spray-item .overlay-item").addClass("on"); }
-
-	if(totalCoin >= ITEM_COST_LIME){ $(".lime-item .overlay-item").removeClass("on"); }
-	else { $(".lime-item .overlay-item").addClass("on"); }
-	
-	if(totalCoin >= ITEM_COST_HEART){ $(".heart-item .overlay-item").removeClass("on"); }
-	else { $(".heart-item .overlay-item").addClass("on"); }*/
-}
-
 
 /** ** ========== 플레이 타임에 시작/정지 로직 =================== * */
 
@@ -603,38 +574,9 @@ function stopPlayNormalTime(){
 	stopWarningBackgroundChange();
 }
 
-/** ============================================================================== * */
 
-function startTime(){
-	timeThread = setInterval(function(){
-		time += 0.01;
-		$(".info-board .info.time .value").text(time.toFixed(2));
-		if(time >= config.maxTime){
-			stopPlayNormalTime();
-			setTimeout(function(){
-				level += 1;
-				startPlayNormalTime();
-			}, 1000);
-		}
-	}, 10);
-}
 
-function stopTime(){
-	clearInterval(timeThread);
-}
-
-// 타겟 생성 스레드
-function startMakeTarget() { // 재귀를 이용한 Interval
-	makeTarget();
-	makeTargetThread = setTimeout(startMakeTarget, targetMakeRate);
-}
-
-// 타겟 생성 스레드 정지
-function stopMakeTarget() {
-	clearTimeout(makeTargetThread);
-	makeTargetThread = undefined; // 쓰레드 변수 초기화
-}
-
+/** =============== 체력 관련 ================ * */
 
 // 체력 감소 스레드 시작
 function startLifeDecrease() { // 재귀를 이용한 Interval
@@ -662,20 +604,18 @@ function stopLifeDecrease(){
 
 // 경고 백그라운드 스레드 시작
 function startWarningBackgroundChange(){
-	
 	startAudio(warningSound);
-	warningSound.currentTime = 0;
 	
 	if(warningBackgroundChange == undefined){
 		warningBackgroundChange = setInterval(function(){
-			var playGround = $('.play-ground');			
-			if(playGround.css("background-color") == "rgba(0, 0, 0, 0)"){ // 배경색
-																			// 변경
-				playGround.css("background-color","red");		
-			} else {
-				playGround.css("background-color","rgba(0, 0, 0, 0)");	
-			}
-		}, '200');
+//			var playGround = $('.play-ground');			
+//			if(playGround.css("background-color") == "rgba(0, 0, 0, 0)"){ // 배경색
+//																			// 변경
+//				playGround.css("background-color","red");		
+//			} else {
+//				playGround.css("background-color","rgba(0, 0, 0, 0)");	
+//			}
+		}, 200);
 	}	
 }
 
@@ -684,6 +624,10 @@ function stopWarningBackgroundChange(){
 	clearTimeout(warningBackgroundChange);
 	warningBackgroundChange = undefined; // 쓰레드 변수 초기화
 }
+
+
+
+/** =============== 공격 관련 ============== */
 
 function doAttack(e){
 	startAudio(attackSound);
@@ -706,11 +650,19 @@ function doAttack(e){
 		attacker.removeClass("on")
 	}, 100);
 	
-	var attackerTemp = $(".attacker-temp");
-	attackerTemp.css("left", attackStartX + (attackAreaWidth*(1/5)));
-	attackerTemp.css("top", attackStartY + (attackAreaHeight*(1/5)));
-	attackerTemp.css("width", attackEndX - attackStartX);
-	attackerTemp.css("height", attackEndY - attackStartY);
+	
+	// 보이지 않는 곳의 벌레가 죽게되는 것을 방지.
+	if(attackStartX < (startX + HIDDEN_PADDING) ) { attackStartX = (startX + HIDDEN_PADDING);}
+	if(attackStartY < (startY + HIDDEN_PADDING) ) { attackStartY = (startY + HIDDEN_PADDING);}
+	if(attackEndX > (endX - HIDDEN_PADDING)) { attackEndX = (endX - HIDDEN_PADDING);}
+	if(attackEndY > (endY -HIDDEN_PADDING)) { attackEndY = (endY - HIDDEN_PADDING);}
+	
+//	임시로 측정을위해 만든 코딩임.
+//	var attackerTemp = $(".attacker-temp");
+//	attackerTemp.css("left", attackStartX + (attackAreaWidth*(1/5)));
+//	attackerTemp.css("top", attackStartY + (attackAreaHeight*(1/5)));
+//	attackerTemp.css("width", attackEndX - attackStartX);
+//	attackerTemp.css("height", attackEndY - attackStartY);
 	
 	var attackedTargetNumber = 0;
 
@@ -785,6 +737,98 @@ function doAttack(e){
 	}
 }
 
+//타겟 삭제 - 공격당했을때
+function doAttackTarget(target){
+	var target = $(target);
+	
+	if(!target.hasClass("died")){
+		if(target.hasClass(TARGET_WARNING)){
+			lifeRecovery(TARGET_WARNING_DAMEAGE);
+			removeTarget(target,true);
+		} else if (target.hasClass(TARGET_GOLD)){
+			makeCoin(TARGET_GOLD_COIN);
+			removeTarget(target,true);
+		} else{ // 노말 타겟인 경우
+			lifeRecovery(TARGET_NORMAL_RECOVERY);
+			makeCoin(TARGET_NORMAL_COIN);
+			removeTarget(target,true);
+		}
+		
+		target.addClass("died");
+	}
+}
+
+//돈 증가
+function makeCoin(coin) {
+	totalCoin = totalCoin + coin;
+	drawCoin(totalCoin);
+	checkItemCost();
+}
+
+// 돈 감소
+function decreaseCoin(coin) {
+	totalCoin = totalCoin - coin;
+	drawCoin(totalCoin);
+	checkItemCost();
+}
+
+// 돈 초기화
+function initCoin(){
+	totalCoin = 0;
+	drawCoin(totalCoin);
+	checkItemCost();
+}
+
+function drawCoin(coin){
+	$(".info-board .info.coin .value").text(coin);
+}
+
+// 아이템 활성화 체크
+function checkItemCost(){
+/*	if(totalCoin >= ITEM_COST_SPRAY){ $(".spray-item .overlay-item").removeClass("on"); }
+	else { $(".spray-item .overlay-item").addClass("on"); }
+
+	if(totalCoin >= ITEM_COST_LIME){ $(".lime-item .overlay-item").removeClass("on"); }
+	else { $(".lime-item .overlay-item").addClass("on"); }
+	
+	if(totalCoin >= ITEM_COST_HEART){ $(".heart-item .overlay-item").removeClass("on"); }
+	else { $(".heart-item .overlay-item").addClass("on"); }*/
+}
+
+
+
+/**================ GAMEOVER 관련  =================**/
+
+function gameover() {
+	startAudio(gameoverSound);
+	
+	removeAllTarget(".target", false)// 모든 타겟 삭제
+	stopPlayNormalTime();
+	
+	$(".wrap-fg").addClass("on");
+	$(".wrap-gameover").addClass("on");
+}
+
+
+function doRegame(){
+	startAudio(btnClickSound);
+	setTimeout(function(){
+		location.reload();
+	}, 500);
+}
+
+function doHome(){
+	startAudio(btnClickSound);
+	setTimeout(function(){
+		location.replace(getContextPath() + '/');
+	}, 500);
+	
+}
+
+
+
+/** ============= Document Ready =============== **/
+
 $(document).ready(function(){
 	//BGM 설정
 	var bgm = new Audio(getContextPath() + '/resources/audio/play/bgm_play.mp3');
@@ -822,6 +866,8 @@ $(document).ready(function(){
 		coinSound 			= makeSound(getContextPath() + "/resources/audio/play/sound_play_money.mp3");
 		multiCoinSound 		= makeSound(getContextPath() + "/resources/audio/play/sound_play_multi_money.mp3");
 		warningSound 		= makeSound(getContextPath() + "/resources/audio/play/sound_play_warnig.mp3");
+		gameoverSound		= makeSound(getContextPath() + "/resources/audio/play/sound_play_gameover.mp3");
+		btnClickSound		= makeSound(getContextPath() + "/resources/audio/sound_common_button.mp3");
 	}
 	
 	// 아이템 비용 표시

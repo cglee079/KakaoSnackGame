@@ -11,13 +11,11 @@
 		<div class="wrap-fg"></div>
 		<div class="wrap-gameover">
 			<div class="gameover">
-				<div class="gameover-icon"
-					style="background-image: url('${pageContext.request.contextPath}/resources/image/icon_play_gameover.gif');"></div>
-				<div class="gameover-message">GAME OVER</div>
-				<input type="button" class="home-button" value="홈"
-					onclick="location.replace(getContextPath() + '/');" /> <input
-					type="button" class="restart-button" value="다시하기"
-					onclick="location.reload();" />
+				<div class="gameover">GAME OVER</div>
+			</div>
+			<div class="gameover-menus">
+				<div class="menu btn-regame" onclick="doRegame()"></div>
+				<div class="menu btn-home" onclick="doHome()"></div>
 			</div>
 		</div>
 		<div class="head">
@@ -52,17 +50,16 @@
 			
 		<div class="play-ground" onclick="doAttack(event)">
 			<div class="attacker"></div>
-			<div class="attacker-temp"></div>
+			<!-- 공격범위 체크를 위해 임시로 만듬. 지울게 BY찬구 -->
+		<!-- 	<div class="attacker-temp"></div>
 			<style>
 				.attacker-temp{
 					display : none;
 					position: absolute;
 					background: red;
 				}
-			</style>
-			<div class="combo-message">
-				<!-- COMBO <span class="combo-count">1</span> !! -->
-			</div>
+			</style> -->
+			<div class="combo-message"></div>
 			<div class="stage-message"></div>
 			<div class="lime_item_area"></div>
 			
