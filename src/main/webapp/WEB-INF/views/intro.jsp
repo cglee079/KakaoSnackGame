@@ -136,7 +136,6 @@
 		<div class="empty" style="flex: 1"></div>
 		<div class="footer">
 			<div class="btn btn-start" onclick="doStartGame()"></div>
-			<div class="btn btn-start" onclick="doStartGame()"></div>
 		</div>
 	</div>
 </body>

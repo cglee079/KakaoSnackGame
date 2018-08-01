@@ -12,8 +12,8 @@
 /** ============= Foreground =============== **/
 .wrap-fg {
 	display: none;
-	z-index: 1;
-	position: absolute;
+	z-index: 300;
+	position: fixed;
 	left: 0;
 	right: 0;
 	top: 0;
@@ -27,8 +27,8 @@
 
 .wrap-gameover {
 	display: flex;
-	z-index: 3;
-	position: absolute;
+	z-index: 400;
+	position: fixed;
 	left: 0;
 	right: 0;
 	top: 0;
@@ -49,32 +49,30 @@
 }
 
 .gameover {
-	width: 230px;
-	height: 200px;
-	background: #FFF;
-	border-radius: 10px;
-	box-shadow: 0px 10px 20px #222;
+	width: 300px;
+	height: 400px;
+	margin-top : -60px;
+	margin-bottom : -60px;
+	
 	display: flex;
 	flex-flow: column nowrap;
 	align-items: center;
-	padding : 20px 0;
-}
-
-.gameover .gameover-message {
-	font-size: 2rem;
-	font-weight: bold;
-	margin-bottom: 10px;
+	
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("../image/play/bg_play_gameover.png");
 }
 
 .gameover .gameover-time{
 	font-size: 1.7rem;
 	font-weight: bold;
+	margin-top: 170px;
 }
 
 .gameover-menus{
 	width: 230px;
 	height: 60px;
-	margin-top : 20px;	
+	margin-top : 10px;	
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -87,139 +85,286 @@
 	background-size: contain;
 }
 
-.gameover-menus .menu.btn-home{ background-image: url("../image/intro/btn_intro_start.png"); }
-.gameover-menus .menu.btn-regame{ background-image: url("../image/intro/btn_intro_start.png"); }
+.gameover-menus .menu.btn-restart{ background-image: url("../image/play/btn_play_gameover_restart.png"); }
+.gameover-menus .menu.btn-exit{ background-image: url("../image/play/btn_play_gameover_exit.png"); }
 
 
-.head {
+.wrap-stageup{
+	display : none;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	position : fixed;
+	z-index : 100;
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-image: url("../image/play/bg_play_stageup.png");
+	
+	justify-content: center;
+	align-items: center; 
+}
+
+.wrap-stageup.on{
+	display: flex;
+}
+
+.wrap-stageup .value{
+	display : none;
+	width: 200px;
+	height : 200px;
+	background-repeat: no-repeat;
+	background-size: contain;
+}
+
+.wrap-stageup .value.on{
+	display: block;
+}
+
+.wrap-stageup .value.stage1{ background-image: url("../image/play/icon_play_stage1.png"); }
+.wrap-stageup .value.stage2 { background-image: url("../image/play/icon_play_stage2.png"); }
+.wrap-stageup .value.stage3 { background-image: url("../image/play/icon_play_stage3.png"); }
+.wrap-stageup .value.stage4 { background-image: url("../image/play/icon_play_stage4.png"); }
+
+.wrap-pause {
+	display: none;
+	z-index: 400;
+	position: fixed;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0);
+	flex-flow: column nowrap;
+	justify-content: center;
+	align-items: center;
+	/* transform : scale(0);
+	-webkit-transition: transform 0.2s;
+	-webkit-transition-timing-function: ease-in-out;
+	transition: transform 0.2s;
+	transition-timing-function: ease-in-out; */
+}
+
+.wrap-pause.on{
+	display: flex;
+}
+
+.wrap-pause .pause-title{
+	width: 400px;
+	height: 500px;
+	
+	display: flex;
+	flex-flow: column nowrap;
+	align-items: center;
+	
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("../image/play/icon_play_pause_title.png");
+}
+
+.pause-menus {
+	display:  flex;
+	margin-top : -130px;
+}
+.pause-menus .menu{
+	width : 70px;
+	height : 70px;
+	background-repeat: no-repeat;
+	background-size: contain;
+	margin: 5px;
+}
+
+.pause-menus .menu.btn-regame{ background-image: url("../image/play/btn_play_pause_start.png"); }
+.pause-menus .menu.btn-restart{ background-image: url("../image/play/btn_play_pause_restart.png"); }
+.pause-menus .menu.btn-home{ background-image: url("../image/play/btn_play_pause_home.png"); }
+
+
+/** ========== Header ================= **/
+
+.header {
 	width: 100%;
-	height: 120px;
+	height: 150px;
 	background-repeat: no-repeat;
 	background-size: cover;
 	background-image: url("../image/play/bg_play_header.png");
 	position: relative;
 }
 
-.info-board {
+.info-board-t{
 	display: flex;
-	margin-top : 20px;
-	justify-content: center;
-	color : #FFF;
+	margin-top: 12px;
 }
 
-.info-board .info{
-	display: flex;
-	flex-flow : column nowrap;
-	justify-content: center;
-	align-content: center;
-	text-align: center;
-}
-
-.info-board .info.time{
-	margin: 0px 40px;
-	width: 100px;
-}
-
-.info-board .info.time .value{
-	font-size: 30px;
-}
-
-.info-board .info .title{
-	font-size : 9px;
-	margin-bottom: 3px;
-}
-
-.move_friends {
-	bottom: 1px;
-	position: absolute;
-	width: 40px;
-	height: 40px;
-	background-repeat: no-repeat;
-	background-size: contain;
-	background-image: url("../image/play/icon_play_friend.png");
-	animation-name: move;
-    animation-duration: 150s;
-}
-
-@keyframes move {
-    0%   {right : 0px;}
-    100% {right : 80%;}
-}
-
-.wrap-life-progress {
-	width : 100%;
-	height: 30px;
-	padding-top : 5px;
-	background-repeat: no-repeat;
-	background-size: cover;
-	background-image: url("../image/play/bg_play_progress.png");
-}
-
-.wrap-life-progress .progress {
-	width : 300px;
-	margin : auto;
+.progress {
+	margin-left : 15px;
+	position : relative;
+	width : 220px;
+	height : 50px;
 	background-repeat: no-repeat;
 	background-size: contain;
 	background-image: url("../image/play/icon_play_progress.png");
 }
 
-.wrap-life-progress .progress .progress-bar {
-	width : 300px;
-	height : 100%;
+.progress .progress-bar {
+	position : absolute;
+	width : 220px;
+	height : 50px;
 	overflow: hidden;
 }
 
-.wrap-life-progress .progress .progress-bar .crop-progress-bar{
-	width : 300px;
-	height : 100%;
+.progress .progress-bar .crop-progress-bar{
+	width : 220px;
+	height : 50px;
 	background-repeat: no-repeat;
 	background-size: contain;
 	background-image: url("../image/play/icon_play_progressbar.png");
 }
 
+.progress .progress-marking{
+	position : absolute;
+	width : 220px;
+	height : 50px;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("../image/play/icon_play_progress_marking.png");
+}
+
+.progress .progress-apple{
+	position : absolute;
+	width : 220px;
+	height : 50px;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("../image/play/icon_play_progress_fg.png");
+}
+
+.info.wrap-coin{
+	position: relative;
+	width : 110px;
+	height: 40px;
+	margin-top  : 3px;
+	margin-left : 5px;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("../image/play/icon_play_header_coin.png");
+	
+}
+
+.info.wrap-coin .value{
+    position: absolute;
+    width : 50px;
+    left: 10px;
+    top: 13px;
+    text-align : center;
+    font-size: 13;
+    color: #FFF;
+}
+
+.info-board-c{
+	margin-top : 3px;
+	display : flex;
+	justify-content:space-between;
+}
+
+.info-board-c .info.stage, .info-board-c .info.empty{
+	margin: 0px 15px;
+	width : 40px;
+	height: 40px;
+}
+
+.info-board-c .info.stage .value{
+	width : 100%;
+	height: 100%;
+	background-repeat: no-repeat;
+	background-size: contain;
+}
+
+.info-board-c .info.stage .value.stage1.on{background-image: url("../image/play/icon_play_header_stage1.png");}
+.info-board-c .info.stage .value.stage2.on{background-image: url("../image/play/icon_play_header_stage2.png");}
+.info-board-c .info.stage .value.stage3.on{background-image: url("../image/play/icon_play_header_stage3.png");}
+.info-board-c .info.stage .value.stage4.on{background-image: url("../image/play/icon_play_header_stage4.png");}
+
+.info-board-c .info.time {
+	width : 120px;
+	font-size: 2.1rem;
+	color : #FFF;
+	text-align: center;
+}
+
+
+.move-friends {
+	bottom: 1px;
+	left : 85%;
+	position: absolute;
+	width: 70px;
+	height: 70px;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("../image/play/icon_play_header_friend.png");
+}
+
+.btn-pause{
+	position: absolute;
+	right : 10px;
+	top : 10px;
+	width: 40px;
+	height: 40px;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("../image/play/btn_play_pause.png");
+}
+
 /** ========= Play Ground ======== **/
-.play-ground {
+.wrap-play-ground{
 	flex: 1;
 	position: relative;
+}
+
+.play-ground {
+	position: absolute;
+	left : 0;
+	right : 0;
+	top : 0;
+	bottom : 0;
+	
 	overflow: hidden;
 	z-index: 1;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("../image/play/bg_play_playground.png");
 }
 
 .combo-message {
-	/* font-size: 1.5rem;
-	font-weight: bold;
-	text-align: center; */
 	width: 200px;
-	height: 120px;
+	height: 72px;
 	position: absolute;
 	display: none;
-	background-image: url("../image/combo_2.png");
-	background-repeat: no-repeat;
-	background-size: cover;
-	background-position: center center;
 }
 
 .combo-message.on {
 	display: block;
 }
 
-.stage-message {
-	font-size: 4em;
-	font-weight: bold;
-	position: absolute;
-	z-index: 2;
-	text-align: center;
-	width: 60%;
-	height: 16%;
-	top: 42%;
-	left: 20%;
-	margin: auto;
-	display: none;
+.combo-message .value{
+	display : none;
+	width : 100%;
+	height : 100%;
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: center center;
 }
 
-.stage-message.on {
-	display: flex;
+.combo-message .value.on{
+	display: block;
 }
+
+.combo-message .value.combo1{ background-image: url("../image/play/icon_play_combo1.png"); }
+.combo-message .value.combo2{ background-image: url("../image/play/icon_play_combo2.png"); }
+.combo-message .value.combo3{ background-image: url("../image/play/icon_play_combo3.png"); }
+.combo-message .value.combo4{ background-image: url("../image/play/icon_play_combo4.png"); }
+.combo-message .value.combo5{ background-image: url("../image/play/icon_play_combo5.png"); }
+.combo-message .value.combo6{ background-image: url("../image/play/icon_play_combo6.png"); }
+.combo-message .value.combo7{ background-image: url("../image/play/icon_play_combo7.png"); }
 
 .target {
 	position: absolute;
@@ -261,6 +406,14 @@
 	background-repeat: no-repeat;
 	background-size: contain;
 	background-image: url("../image/play/icon_play_attacker.png");
+}
+
+.attacker.left{
+	 transform: rotate(10deg);
+}
+
+.attacker.right{
+	transform: rotate(-10deg);
 }
 
 .attacker.on {
@@ -315,44 +468,68 @@
 }
 
 
-/**============== FOOTER ===============**/
-.footer{
-	position : relative;
+.wrap-item{
+	position : absolute;
+	bottom : 0;
+	left : 0;
+	right : 0;
+	z-index : 2;
+	height : 100px;
+	
 	background-repeat: no-repeat;
 	background-size: contain;
 	background-image: url("../image/play/bg_play_footer.png");
 	background-position: center bottom;	
-	width: 100%;
-	height : 100px;
 }
 
 .itembar {
 	display: flex;
-	justify-content :flex-end; 
+	justify-content :flex-end;
+	align-items : baseline; 
 	position : absolute;
-	bottom:  20px;
+	bottom:  5px;
 	left : 0;
 	right : 0;
 }
 
+.itembar .icon-basket{
+	position : relative;
+	margin-left : 10px;
+	height: 170px;
+	width: 170px;
+}
+
+.itembar .icon-basket .value{
+	position :absolute;
+	height: 100%;
+	width: 100%;
+	background-repeat: no-repeat;
+	background-size: contain;
+	display: none;
+}
+
+.itembar .icon-basket .value.on{
+	display: block;
+}
+
+.itembar .icon-basket .value.status100	{ background-image: url("../image/play/icon_play_basket100.png");}
+.itembar .icon-basket .value.status50	{ background-image: url("../image/play/icon_play_basket100.png");}
+.itembar .icon-basket .value.status0	{ background-image: url("../image/play/icon_play_basket100.png");}
+
 .itembar-item {
 	flex-flow: column nowrap;
 	padding: 10px;
-	margin-right : 20px;
-	height: 50px;
-	width: 50px;
+	margin-right : 10px;
+	height: 60px;
+	width: 60px;
 	background-repeat: no-repeat;
 	background-size: contain;
 }
 
-.itembar-item.lime-item {
-	background-image: url("../image/play/btn_play_lime.png");
-}
+.itembar-item.lime-item { 	background-image: url("../image/play/btn_play_lime_off.png"); }
+.itembar-item.spray-item { 	background-image: url("../image/play/btn_play_spray_off.png"); }
+.itembar-item.portion-item { 	background-image: url("../image/play/btn_play_potion_off.png"); }
 
-.itembar-item.spray-item {
-	background-image: url("../image/play/btn_play_potion.png");
-}
-
-.itembar-item.heart-item {
-	background-image: url("../image/play/btn_play_potion.png");
-}
+.itembar-item.lime-item.on { 	background-image: url("../image/play/btn_play_lime_on.png"); }
+.itembar-item.spray-item.on { 	background-image: url("../image/play/btn_play_spray_on.png"); }
+.itembar-item.portion-item.on { 	background-image: url("../image/play/btn_play_potion_on.png"); }

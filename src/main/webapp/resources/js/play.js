@@ -5,9 +5,9 @@ const RIGHT_ANGLE 			= 90;
 const RECOVERY_DEGREE   	= 10;     // 체력 회복 수치
 const FULL_LIFE				= 100;
 
-const ITEM_COST_LIME = 10;	// 파워 아이템 비용
-const ITEM_COST_SPRAY = 1;	// 스프레이 아이템 비용
-const ITEM_COST_HEART = 20;
+const ITEM_COST_LIME = 80;	// 파워 아이템 비용
+const ITEM_COST_SPRAY = 45;	// 스프레이 아이템 비용
+const ITEM_COST_HEART = 30;
 
 const COMBO_COIN 			= 2;
 
@@ -28,7 +28,6 @@ const MAX_GOLD_TARGET		= 2;
 
 const LEVEL_CONFIG =[
 	{ // level1
-		stageMessage	: "STAGE 1",
 		maxWarningTarget: 3,
 		maxNormalTarget : 27,
 		maxTime			: 30,
@@ -36,7 +35,6 @@ const LEVEL_CONFIG =[
 		lifeDecreaseRate: 100
 	},
 	{ // level2
-		stageMessage	: "STAGE 2",
 		maxWarningTarget: 5,
 		maxNormalTarget : 25,
 		maxTime			: 60,
@@ -44,7 +42,6 @@ const LEVEL_CONFIG =[
 		lifeDecreaseRate: 80
 	},
 	{ // level3
-		stageMessage	: "STAGE 3",
 		maxWarningTarget: 10,
 		maxNormalTarget : 20,
 		maxTime			: 90,
@@ -52,7 +49,6 @@ const LEVEL_CONFIG =[
 		lifeDecreaseRate: 60
 	},
 	{ // level4
-		stageMessage	: "STAGE 4",
 		maxWarningTarget: 15,
 		maxNormalTarget : 15,
 		maxTime			: 140,
@@ -75,8 +71,8 @@ var goldTargetRate  	= 0.01;  // 골드 타겟이 생성되는 확률
 var totalCoin           = 0;    // 코인 숫자
 var moveDistance 		= 10;
 var feverTargetTouchCount= 0; 	// 보스 타겟 터치 카운트
-var attackAreaWidth 	= 200;
-var attackAreaHeight    = 200;
+var attackAreaWidth 	= 70; //width : height = 1 : 2;
+var attackAreaHeight    = 140;
 
 // 효과음
 var attackSound; // 공격시 소리
@@ -147,7 +143,7 @@ function lifeRecovery(recover) {
 }
 
 function usingItem(itemId){
-	var coin = $(".info-board .info.coin .value");
+	var coin = $(".info.wrap-coin .value");
 	var coinNumber = parseInt(coin.text(), 10);
 	var duration = 3000; // 아이템 지속 시간		
 	
@@ -318,13 +314,13 @@ function usingItem(itemId){
 function startTime(){
 	timeThread = setInterval(function(){
 		time += 0.01;
-		$(".info-board .info.time .value").text(time.toFixed(2));
+		$(".info-board-c .info.time .value").text(time.toFixed(2));
 		if(time >= config.maxTime){
 			stopPlayNormalTime();
 			setTimeout(function(){
 				level += 1;
 				startPlayNormalTime();
-			}, 1000);
+			}, 100);
 		}
 	}, 10);
 }
@@ -537,27 +533,28 @@ function moveTarget(target){
 /** ** ========== 플레이 타임에 시작/정지 로직 =================== * */
 
 function startPlayNormalTime(){
-	startBGM();
-	
-	config = LEVEL_CONFIG[level];
-	startTime();
-	startMakeTarget(); // 타겟 생성 쓰레드
-	startLifeDecrease(); // 생명력 감소 스레드 시작
-	warningBackgroundChange = undefined; // 생명력 경고 쓰레드 초기화
-	showStageMessage();
-	
-	//스테이지 라벨 리드로우.
-	var stage = $(".info-board .info.stage .value");
-	stage.text(level+1 + "/4");
-	
 	// 스테이지 메세지
-	function showStageMessage(){
-		var stageMsg = $(".stage-message");
-		stageMsg.html(config.stageMessage);
-		stageMsg.show();
-		setTimeout(function(){
-			stageMsg.hide();
-		}, 1000);
+	var wrapStageup = $(".wrap-stageup");
+	var stages = wrapStageup.find(".value");
+	wrapStageup.addClass("on");
+	stages.removeClass("on");
+	stages.eq(level).addClass("on");
+	
+	setTimeout(function(){
+		var wrapStageup = $(".wrap-stageup");
+		wrapStageup.removeClass("on");
+		
+		startGame();
+	}, 1500);
+	
+	function startGame(){
+		startBGM();
+		
+		config = LEVEL_CONFIG[level];
+		startTime();
+		startMakeTarget(); // 타겟 생성 쓰레드
+		startLifeDecrease(); // 생명력 감소 스레드 시작
+		warningBackgroundChange = undefined; // 생명력 경고 쓰레드 초기화
 	}
 }
 
@@ -588,7 +585,8 @@ function startLifeDecrease() { // 재귀를 이용한 Interval
 			stopWarningBackgroundChange();
 		}
 		
-		$(".wrap-life-progress .progress-bar").stop().animate({"width" : life + "%"});
+		$(".progress .progress-bar").stop().animate({"width" : life + "%"});
+		$(".move-friends").stop().animate({"left" : (life-15) + "%"});
 		lifeDecreaseThread = setTimeout(startLifeDecrease, config.lifeDecreaseRate);
 	}
 }
@@ -632,12 +630,18 @@ function doAttack(e){
 
 	var attacker = $(".attacker");
 	attacker.addClass("on");
+	attacker.removeClass("left");
+	attacker.removeClass("right");
 
 	var x = e.pageX - $(".play-ground").offset().left;
 	var y = e.pageY - $(".play-ground").offset().top;
 
-	var attackAreaValidWidth 	= attackAreaWidth * (2/3);
-	var attackAreaValidHeight 	= attackAreaHeight * (2/3);
+	var centerX = (endX - startX)/2;
+	if(x < centerX){ attacker.addClass("left");}
+	else { attacker.addClass("right")};
+	
+	var attackAreaValidWidth 	= attackAreaWidth;
+	var attackAreaValidHeight 	= attackAreaHeight * (1/2);
 	var attackStartX = x - (attackAreaValidWidth / 2);
 	var attackStartY = y - (attackAreaValidHeight / 2);
 	var attackEndX = x + (attackAreaValidWidth / 2) ;
@@ -723,10 +727,12 @@ function doAttack(e){
 	function checkCombo() { // 콤보 수 확인
 		if (attackedTargetNumber >= 2) {
 			var comboMessage = $(".combo-message");
-			comboMessage.css("left", attackStartX);
+			comboMessage.css("left", attackStartX - 50);
 			comboMessage.css("top", attackStartY);
-			comboMessage.find(".combo-count").text(attackedTargetNumber);
-
+			var values = comboMessage.find(".value");
+			values.removeClass("on");
+			values.eq(attackedTargetNumber-1).addClass("on");
+			
 			setTimeout(function() {
 				comboMessage.addClass("on");
 			}, 100);
@@ -782,19 +788,19 @@ function initCoin(){
 }
 
 function drawCoin(coin){
-	$(".info-board .info.coin .value").text(coin);
+	$(".info-board-t .info.wrap-coin .value").text(coin);
 }
 
 // 아이템 활성화 체크
 function checkItemCost(){
-/*	if(totalCoin >= ITEM_COST_SPRAY){ $(".spray-item .overlay-item").removeClass("on"); }
-	else { $(".spray-item .overlay-item").addClass("on"); }
+	if(totalCoin >= ITEM_COST_LIME){  $(".itembar-item.lime-item").addClass("on"); }
+	else { $(".itembar-item.lime-item").removeClass("on"); }
 
-	if(totalCoin >= ITEM_COST_LIME){ $(".lime-item .overlay-item").removeClass("on"); }
-	else { $(".lime-item .overlay-item").addClass("on"); }
+	if(totalCoin >= ITEM_COST_SPRAY){ $(".itembar-item.spray-item").addClass("on"); }
+	else { $(".itembar-item.spray-item").removeClass("on"); }
 	
-	if(totalCoin >= ITEM_COST_HEART){ $(".heart-item .overlay-item").removeClass("on"); }
-	else { $(".heart-item .overlay-item").addClass("on"); }*/
+	if(totalCoin >= ITEM_COST_HEART){ $(".itembar-item.portion-item").addClass("on"); }
+	else { $(".itembar-item.portion-item").removeClass("on"); }
 }
 
 
@@ -813,7 +819,7 @@ function gameover() {
 }
 
 
-function doRegame(){
+function doRestart(){
 	startAudio(btnClickSound);
 	setTimeout(function(){
 		location.reload();
@@ -828,6 +834,30 @@ function doHome(){
 	
 }
 
+/** ============ Pause =============== **/
+function doPause(){
+	startAudio(btnClickSound);
+	
+	stopBGM();
+	stopTime();
+	stopMakeTarget();
+	stopLifeDecrease();
+	
+	$(".wrap-fg").addClass("on");
+	$(".wrap-pause").addClass("on");
+}
+
+function doRegame(){
+	startAudio(btnClickSound);
+	
+	startBGM();
+	startTime();
+	startMakeTarget();
+	startLifeDecrease();
+	
+	$(".wrap-fg").removeClass("on");
+	$(".wrap-pause").removeClass("on");
+}
 
 
 /** ============= Document Ready =============== **/
@@ -873,14 +903,6 @@ $(document).ready(function(){
 		btnClickSound		= makeSound(getContextPath() + "/resources/audio/sound_common_button.mp3");
 	}
 	
-	// 아이템 비용 표시
-	initItemCost();
-	function initItemCost(){
-		$(".lime-item-cost").text(ITEM_COST_LIME);
-		$(".spray-item-cost").text(ITEM_COST_SPRAY);
-		$(".heart-item-cost").text(ITEM_COST_HEART);
-	}
-
 	 startPlayNormalTime();
 })
 		

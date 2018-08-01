@@ -7,6 +7,7 @@
 	background-repeat: no-repeat;
 	background-size: cover;
 	background-image: url("../image/intro/bg_intro.jpg");
+	background-position: center;
 }
 
 /* @media screen and (min-width: 751px) {
@@ -145,14 +146,14 @@
 	justify-content: center;
 	align-items: center;
 	margin: 0px 15px;
-	padding-bottom: 20px;
+	padding-bottom: 50px;
 }
 
 .footer .btn {
 	border-radius: 10px;
-	height: 80px;
+	width : 200px;
+	height: 60px;
 	margin: 5px;
-	flex: 1;
 }
 
 .footer .btn.btn-start {
