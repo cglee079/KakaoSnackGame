@@ -5,7 +5,7 @@ const RIGHT_ANGLE 			= 90;
 const RECOVERY_DEGREE   	= 10;     // 체력 회복 수치
 const FULL_LIFE				= 90;		// 사과땜에 가려저셔 90으로바꿈..
 
-const ITEM_COST_LIME = 1;	// 파워 아이템 비용
+const ITEM_COST_LIME = 10;	// 파워 아이템 비용
 const ITEM_COST_SPRAY = 45;	// 스프레이 아이템 비용
 const ITEM_COST_HEART = 30;
 
@@ -71,8 +71,8 @@ var goldTargetRate  	= 0.01;  // 골드 타겟이 생성되는 확률
 var totalCoin           = 0;    // 코인 숫자
 var moveDistance 		= 10;
 var feverTargetTouchCount= 0; 	// 보스 타겟 터치 카운트
-var attackAreaWidth 	= 70; //width : height = 1 : 2;
-var attackAreaHeight    = 140;
+var attackAreaWidth 	= 100; //width : height = 1 : 2;
+var attackAreaHeight    = 200;
 
 // 효과음
 var attackSound; // 공격시 소리
@@ -143,6 +143,7 @@ function lifeRecovery(recover) {
 }
 
 function usingItem(itemId){
+	console.log("item");
 	var coin = $(".info.wrap-coin .value");
 	var coinNumber = parseInt(coin.text(), 10);
 	var duration = 3000; // 아이템 지속 시간		
@@ -191,7 +192,7 @@ function usingItem(itemId){
 				// 아이템 효과 사라진 후 move 스레드 재시작
 				var stopedTargets = $(".target.stoped");
 				stopedTargets.each(function() {
-					moveTarget($(this));
+					restartMoveTarget($(this));
 					$(this).removeClass("stoped");
 				});
 
@@ -205,59 +206,55 @@ function usingItem(itemId){
 		    	var limeAreaEndX = x + ITEM_LIME_WIDTH;
 		    	var limeAreaEndY = y + ITEM_LIME_HEIGHT;
 		    
-				var targets = $(".target");
+				var targets = $(".target:not(.stoped)");
 
 				// 끈끈이 범위 속하는지 검사 //attacker 로직 동일
 				targets.each(function(){
+					var targetStartX= parseInt($(this).css("left"));
+					var targetStartY= parseInt($(this).css("top"));
+					var targetEndX	= targetStartX + TARGET_WIDTH;
+					var targetEndY 	= targetStartY + TARGET_HEIGHT;
+		    		var catched	= false;
 					
-					if($(this).find(".effectedItem").val() == "0"){ // 이미 잡힌 벌레
-																	// 제외
-						var targetStartX= parseInt($(this).css("left"));
-						var targetStartY= parseInt($(this).css("top"));
-						var targetEndX	= targetStartX + TARGET_WIDTH;
-						var targetEndY 	= targetStartY + TARGET_HEIGHT;
-			    		var catched	= false;
-						
-			    		// case1 왼쪽에 벌레가 걸쳤다.
-						if(targetEndX > limeAreaStartX 
-								&& targetEndX < limeAreaEndX
-								&& targetStartY > limeAreaStartY
-								&& targetEndY < limeAreaEndY){
-							catched = true;
-						}
-						
-						// case2 오른쪽에 벌레가 걸쳤다.
-						if(targetStartX < limeAreaEndX 
-								&& targetStartX > limeAreaStartX
-								&& targetStartY > limeAreaStartY
-								&& targetEndY < limeAreaEndY){
-							catched = true;
-						}
-						
-						// case3 위쪽에 벌레가 걸쳤다.
-						if(targetStartX > limeAreaStartX 
-								&& targetEndX < limeAreaEndX
-								&& targetEndY > limeAreaStartY
-								&& targetEndY < limeAreaEndY){
-							catched = true;
-						}
-						
-						// case4 아래쪽에 벌레가 걸쳤다.
-						if(targetStartX > limeAreaStartX 
-								&& targetEndX < limeAreaEndX
-								&& targetStartY < limeAreaEndY
-								&& targetStartY > limeAreaStartY){
-							catched = true;
-						}
-						
-						// 만약 끈끈이 지역에 속한다면
-						if(catched){
-							var target = $(this);
-							stopMoveTarget(target);
-							target.addClass("stoped");
-						}
-					}			
-				}); 			
+		    		// case1 왼쪽에 벌레가 걸쳤다.
+					if(targetEndX > limeAreaStartX 
+							&& targetEndX < limeAreaEndX
+							&& targetStartY > limeAreaStartY
+							&& targetEndY < limeAreaEndY){
+						catched = true;
+					}
+					
+					// case2 오른쪽에 벌레가 걸쳤다.
+					if(targetStartX < limeAreaEndX 
+							&& targetStartX > limeAreaStartX
+							&& targetStartY > limeAreaStartY
+							&& targetEndY < limeAreaEndY){
+						catched = true;
+					}
+					
+					// case3 위쪽에 벌레가 걸쳤다.
+					if(targetStartX > limeAreaStartX 
+							&& targetEndX < limeAreaEndX
+							&& targetEndY > limeAreaStartY
+							&& targetEndY < limeAreaEndY){
+						catched = true;
+					}
+					
+					// case4 아래쪽에 벌레가 걸쳤다.
+					if(targetStartX > limeAreaStartX 
+							&& targetEndX < limeAreaEndX
+							&& targetStartY < limeAreaEndY
+							&& targetStartY > limeAreaStartY){
+						catched = true;
+					}
+					
+					// 만약 끈끈이 지역에 속한다면
+					if(catched){
+						var target = $(this);
+						stopMoveTarget(target);
+						target.addClass("stoped");
+					}
+			}); 			
 			}
 		
 			decreaseCoin(ITEM_COST_LIME); // 코인 감소
@@ -372,7 +369,8 @@ function makeTarget(){
 	target.append($("<input>", {"class" : "angle", type : "hidden"}));
 	target.append($("<input>", {"class" : "toLeftDistance", type : "hidden"}));
 	target.append($("<input>", {"class" : "toTopDistance", type : "hidden"}));
-	target.append($("<input>", {"class" : "effectedItem", type : "hidden", value : "0"}));
+	target.append($("<input>", {"class" : "saveToLeftDistance", type : "hidden"}));
+	target.append($("<input>", {"class" : "saveToTopDistance", type : "hidden"}));
 	
 	target.appendTo(playGround);
 	target.css("width", TARGET_WIDTH);
@@ -517,8 +515,29 @@ function moveTarget(target){
 }
 
 function stopMoveTarget(tg){
-	var moveTargetThreadID = tg.find(".moveTargetThreadID").val();
-	clearInterval(moveTargetThreadID);
+		var toLeftDistance 		= tg.find(".toLeftDistance");
+		var toTopDistance 		= tg.find(".toTopDistance");
+		var saveToLeftDistance 	= tg.find(".saveToLeftDistance");
+		var saveToTopDistance 	= tg.find(".saveToTopDistance");
+		
+		saveToLeftDistance.val(toLeftDistance.val());
+		saveToTopDistance.val(toTopDistance.val());
+		
+		toLeftDistance.val(0);
+		toTopDistance.val(0);
+}
+
+function restartMoveTarget(tg){
+	var toLeftDistance 		= tg.find(".toLeftDistance");
+	var toTopDistance 		= tg.find(".toTopDistance");
+	var saveToLeftDistance 	= tg.find(".saveToLeftDistance");
+	var saveToTopDistance 	= tg.find(".saveToTopDistance");
+	
+	toLeftDistance.val(saveToLeftDistance.val());
+	toTopDistance.val(saveToTopDistance.val());
+	
+	saveToLeftDistance.val('');
+	saveToTopDistance.val('');
 }
 
 /** ** ========== 플레이 타임에 시작/정지 로직 =================== * */
@@ -837,6 +856,7 @@ function doPause(){
 	targets.each(function(){
 		stopMoveTarget($(this));
 	});
+	
 	$(".wrap-fg").addClass("on");
 	$(".wrap-pause").addClass("on");
 }
@@ -851,7 +871,7 @@ function doRegame(){
 	
 	var targets = $(".target");
 	targets.each(function(target){
-		moveTarget($(this));
+		restartMoveTarget($(this));
 	});
 	
 	$(".wrap-fg").removeClass("on");
@@ -905,7 +925,16 @@ $(document).ready(function(){
 	//init move friends x
 	$(".move-friends").css("left", ((life * 0.65) + 20) + "%");
 	
-	 startPlayNormalTime();
+	//init basket xy
+	var basketOccupy = $(".icon-basket-occupy");
+	var basket  = $(".icon-basket");
+	basket.css("width", basketOccupy.width());
+	basket.css("height", basketOccupy.width());
+	
+	//init progress bar
+	$(".progress .progress-bar .crop-progress-bar").css("width", $(".progress .progress-bar").width());
+	
+	startPlayNormalTime();
 })
 		
 	

@@ -49,6 +49,8 @@
 				<div class="info wrap-coin">
 					<div class="value">0</div>
 				</div>
+				
+				<div class="btn-pause" onClick="doPause()"></div>
 			</div>
 			
 			<div class="info-board-c">
@@ -66,7 +68,6 @@
 				<div class="info empty"></div>
 			</div>
 			
-			<div class="btn-pause" onClick="doPause()"></div>
 			<div class="move-friends"></div>
 		</div>
 		
@@ -102,15 +103,17 @@
 		
 			<div class="wrap-item">
 				<div class="itembar">
-					<div class="icon-basket">
-						<div class="value status100 on"></div>
-						<div class="value status100"></div>
-						<div class="value status100"></div>
-					</div>
+					<div class="icon-basket-occupy"></div>
 					<div class="itembar-item lime-item" onclick="usingItem(0)"></div>
 					<div class="itembar-item spray-item" onclick="usingItem(1)"></div>
 					<div class="itembar-item portion-item" onclick="usingItem(2)"></div>
 				</div>
+			</div>
+			
+			<div class="icon-basket">
+				<div class="value status100 on"></div>
+				<div class="value status100"></div>
+				<div class="value status100"></div>
 			</div>
 		</div>
 	</div>

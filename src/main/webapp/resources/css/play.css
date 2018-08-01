@@ -207,13 +207,12 @@
 
 .progress .progress-bar {
 	position : absolute;
-	width : 220px;
+	width : 100%;
 	height : 50px;
 	overflow: hidden;
 }
 
 .progress .progress-bar .crop-progress-bar{
-	width : 220px;
 	height : 50px;
 	background-repeat: no-repeat;
 	background-size: contain;
@@ -222,7 +221,7 @@
 
 .progress .progress-marking{
 	position : absolute;
-	width : 220px;
+	width : 100%;
 	height : 50px;
 	background-repeat: no-repeat;
 	background-size: contain;
@@ -231,7 +230,7 @@
 
 .progress .progress-apple{
 	position : absolute;
-	width : 220px;
+	width : 100%;
 	height : 50px;
 	background-repeat: no-repeat;
 	background-size: contain;
@@ -242,7 +241,6 @@
 	position: relative;
 	width : 110px;
 	height: 40px;
-	margin-top  : 3px;
 	margin-left : 5px;
 	background-repeat: no-repeat;
 	background-size: contain;
@@ -260,10 +258,21 @@
     color: #FFF;
 }
 
+.btn-pause{
+	margin-right : 7px;
+	width: 50px;
+	height: 50px;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("../image/play/btn_play_pause.png");
+}
+
+
 .info-board-c{
 	margin-top : 3px;
 	display : flex;
 	justify-content:space-between;
+	z-index: 10;
 }
 
 .info-board-c .info.stage, .info-board-c .info.empty{
@@ -289,6 +298,7 @@
 	font-size: 2.1rem;
 	color : #FFF;
 	text-align: center;
+	z-index: 1;
 }
 
 
@@ -302,16 +312,6 @@
 	background-image: url("../image/play/icon_play_header_friend.png");
 }
 
-.btn-pause{
-	position: absolute;
-	right : 10px;
-	top : 10px;
-	width: 40px;
-	height: 40px;
-	background-repeat: no-repeat;
-	background-size: contain;
-	background-image: url("../image/play/btn_play_pause.png");
-}
 
 /** ========= Play Ground ======== **/
 .wrap-play-ground{
@@ -491,29 +491,10 @@
 	right : 0;
 }
 
-.itembar .icon-basket{
-	position : relative;
-	margin-left : 10px;
-	height: 170px;
+.itembar .icon-basket-occupy{
+	height: 60px;
 	width: 170px;
 }
-
-.itembar .icon-basket .value{
-	position :absolute;
-	height: 100%;
-	width: 100%;
-	background-repeat: no-repeat;
-	background-size: contain;
-	display: none;
-}
-
-.itembar .icon-basket .value.on{
-	display: block;
-}
-
-.itembar .icon-basket .value.status100	{ background-image: url("../image/play/icon_play_basket100.png");}
-.itembar .icon-basket .value.status50	{ background-image: url("../image/play/icon_play_basket100.png");}
-.itembar .icon-basket .value.status0	{ background-image: url("../image/play/icon_play_basket100.png");}
 
 .itembar-item {
 	flex-flow: column nowrap;
@@ -532,3 +513,32 @@
 .itembar-item.lime-item.on { 	background-image: url("../image/play/btn_play_lime_on.png"); }
 .itembar-item.spray-item.on { 	background-image: url("../image/play/btn_play_spray_on.png"); }
 .itembar-item.portion-item.on { 	background-image: url("../image/play/btn_play_potion_on.png"); }
+
+
+.icon-basket{
+	position : fixed;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("../image/play/icon_play_basket100.png");
+	z-index: 10;
+	left : 10px;
+	bottom : 5px;
+	pointer-events : none;
+}
+
+.icon-basket .value{
+	position :absolute;
+	height: 100%;
+	width: 100%;
+	background-repeat: no-repeat;
+	background-size: contain;
+	display: none;
+}
+
+.icon-basket .value.on{
+	display: block;
+}
+
+.itembar .icon-basket .value.status100	{ background-image: url("../image/play/icon_play_basket100.png");}
+.itembar .icon-basket .value.status50	{ background-image: url("../image/play/icon_play_basket100.png");}
+.itembar .icon-basket .value.status0	{ background-image: url("../image/play/icon_play_basket100.png");}
