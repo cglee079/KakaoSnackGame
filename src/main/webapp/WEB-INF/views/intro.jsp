@@ -7,7 +7,8 @@
 	var btnClickSound = undefined;
 
 	$(document).ready(function(){
-		setBGM(new Audio(getContextPath() + '/resources/audio/intro/bgm_intro.mp3'));	
+		var bgm = new Audio(getContextPath() + '/resources/audio/bgm.mp3');
+		setBGM(bgm);	
 		
 		doSoundOn();
 		startBGM();

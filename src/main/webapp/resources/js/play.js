@@ -3,9 +3,9 @@ const TARGET_HEIGHT			= 40;		// 타겟 높이
 const HIDDEN_PADDING		= 50;		// 숨겨진 공간
 const RIGHT_ANGLE 			= 90;
 const RECOVERY_DEGREE   	= 10;     // 체력 회복 수치
-const FULL_LIFE				= 100;
+const FULL_LIFE				= 90;		// 사과땜에 가려저셔 90으로바꿈..
 
-const ITEM_COST_LIME = 80;	// 파워 아이템 비용
+const ITEM_COST_LIME = 1;	// 파워 아이템 비용
 const ITEM_COST_SPRAY = 45;	// 스프레이 아이템 비용
 const ITEM_COST_HEART = 30;
 
@@ -138,8 +138,8 @@ function removeAllTarget(targetType, doEffect) {
 function lifeRecovery(recover) {
 	life += recover;
 	if(life > FULL_LIFE) {life = FULL_LIFE;}
-	$(".wrap-life-progress .progress-bar").stop();
-	$(".wrap-life-progress .progress-bar").css("width", life + "%");
+	$(".progress .progress-bar").stop();
+	$(".progress .progress-bar").css("width", life + "%");
 }
 
 function usingItem(itemId){
@@ -174,8 +174,6 @@ function usingItem(itemId){
 	    	limeItemArea.css("left", x);
 	    	limeItemArea.css("top", y) ;
 	    			
-			var catchedtargets = new Array; // 끈끈이 잡힌 타겟 저장 리스트
-
 			setTimeout(function() {
 				$(".lime_item_area").removeClass("on");
 			// $(".effect.lime").removeClass("on");
@@ -191,12 +189,10 @@ function usingItem(itemId){
 				limeThread = undefined;
 
 				// 아이템 효과 사라진 후 move 스레드 재시작
-				catchedtargets.forEach(function(target) {
-					var moveTargetThread = setTimeout(function() {
-						moveTarget(target)
-					}, 0);
-					target.find(".moveTargetThreadID").val(moveTargetThread);
-					target.find(".effectedItem").val("0");
+				var stopedTargets = $(".target.stoped");
+				stopedTargets.each(function() {
+					moveTarget($(this));
+					$(this).removeClass("stoped");
 				});
 
 			}, duration);
@@ -256,13 +252,9 @@ function usingItem(itemId){
 						
 						// 만약 끈끈이 지역에 속한다면
 						if(catched){
-							
 							var target = $(this);
-							var moveTargetThreadID = target.find(".moveTargetThreadID").val();
-							clearTimeout(moveTargetThreadID); // 쓰레드종료
-							
-							catchedtargets.push(target); // 정지된 타겟 리스트 저장
-							target.find(".effectedItem").val("1"); // 이미 정지된 타겟
+							stopMoveTarget(target);
+							target.addClass("stoped");
 						}
 					}			
 				}); 			
@@ -328,7 +320,6 @@ function startTime(){
 function stopTime(){
 	clearInterval(timeThread);
 }
-
 
 
 /** ============== 타겟 생성, 이동관련 로직 ================= **/
@@ -422,8 +413,6 @@ function makeTarget(){
 	randAngle(target);
 
 	moveTarget(target);
-	
-	
 }
 
 // 타겟 각도 변경 함수
@@ -500,35 +489,37 @@ function randAngle(target){
 }
 
 
-
 // 타겟 움직임 스레드
 function moveTarget(target){
-	var left= parseInt(target.css("left"));
-	var top = parseInt(target.css("top"));
-	var toLeftDistance = parseInt(target.find(".toLeftDistance").val());
-	var toTopDistance = parseInt(target.find(".toTopDistance").val());
-	
-	left= left + toLeftDistance;
-	top = top + toTopDistance;
-	
-	// 범위를 넘어간경우
-	if(left < (startX - HIDDEN_PADDING)
-			|| left > (endX - TARGET_WIDTH + HIDDEN_PADDING)
-			|| top < (startY - HIDDEN_PADDING)
-			|| top > (endY - TARGET_HEIGHT + HIDDEN_PADDING)) {
-		var moveTargetThreadID = target.find(".moveTargetThreadID").val();
+	var moveTargetThread = setInterval(function(){
+		var left= parseInt(target.css("left"));
+		var top = parseInt(target.css("top"));
+		var toLeftDistance = parseInt(target.find(".toLeftDistance").val());
+		var toTopDistance = parseInt(target.find(".toTopDistance").val());
 		
-		randAngle(target);
-	}  else{
-		target.css("left", left);
-		target.css("top", top);
-	}
-	
+		left= left + toLeftDistance;
+		top = top + toTopDistance;
+		
+		// 범위를 넘어간경우
+		if(left < (startX - HIDDEN_PADDING)
+				|| left > (endX - TARGET_WIDTH + HIDDEN_PADDING)
+				|| top < (startY - HIDDEN_PADDING)
+				|| top > (endY - TARGET_HEIGHT + HIDDEN_PADDING)) {
+			randAngle(target);
+		}  else{
+			target.css("left", left);
+			target.css("top", top);
+		}
+	}, config.targetMoveSpeed);
+
 	// 재귀를 이용한 Interval
-	var moveTargetThread = setTimeout(function(){ moveTarget(target)}, config.targetMoveSpeed);
 	target.find(".moveTargetThreadID").val(moveTargetThread); 
 }
 
+function stopMoveTarget(tg){
+	var moveTargetThreadID = tg.find(".moveTargetThreadID").val();
+	clearInterval(moveTargetThreadID);
+}
 
 /** ** ========== 플레이 타임에 시작/정지 로직 =================== * */
 
@@ -569,13 +560,12 @@ function stopPlayNormalTime(){
 }
 
 
-
 /** =============== 체력 관련 ================ * */
 
 // 체력 감소 스레드 시작
 function startLifeDecrease() { // 재귀를 이용한 Interval
 	life = life - 0.5;
-	if(life < 0){
+	if(life < 10){
 		gameover();
 		lifeDecreaseThread = undefined;
 	} else {
@@ -586,7 +576,7 @@ function startLifeDecrease() { // 재귀를 이용한 Interval
 		}
 		
 		$(".progress .progress-bar").stop().animate({"width" : life + "%"});
-		$(".move-friends").stop().animate({"left" : (life-15) + "%"});
+		$(".move-friends").stop().animate({"left" : ((life * 0.65) + 20) + "%"});
 		lifeDecreaseThread = setTimeout(startLifeDecrease, config.lifeDecreaseRate);
 	}
 }
@@ -843,6 +833,10 @@ function doPause(){
 	stopMakeTarget();
 	stopLifeDecrease();
 	
+	var targets = $(".target");
+	targets.each(function(){
+		stopMoveTarget($(this));
+	});
 	$(".wrap-fg").addClass("on");
 	$(".wrap-pause").addClass("on");
 }
@@ -855,6 +849,11 @@ function doRegame(){
 	startMakeTarget();
 	startLifeDecrease();
 	
+	var targets = $(".target");
+	targets.each(function(target){
+		moveTarget($(this));
+	});
+	
 	$(".wrap-fg").removeClass("on");
 	$(".wrap-pause").removeClass("on");
 }
@@ -864,7 +863,7 @@ function doRegame(){
 
 $(document).ready(function(){
 	//BGM 설정
-	var bgm = new Audio(getContextPath() + '/resources/audio/play/bgm_play.mp3');
+	var bgm = new Audio(getContextPath() + '/resources/audio/bgm.mp3');
 	setBGM(bgm);
 	
 	//SOUND ON/OFF
@@ -902,6 +901,9 @@ $(document).ready(function(){
 		gameoverSound		= makeSound(getContextPath() + "/resources/audio/play/sound_play_gameover.mp3");
 		btnClickSound		= makeSound(getContextPath() + "/resources/audio/sound_common_button.mp3");
 	}
+	
+	//init move friends x
+	$(".move-friends").css("left", ((life * 0.65) + 20) + "%");
 	
 	 startPlayNormalTime();
 })
