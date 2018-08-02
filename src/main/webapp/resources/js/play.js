@@ -546,6 +546,12 @@ function startPlayNormalTime(){
 	// 스테이지 메세지
 	var wrapStageup = $(".wrap-stageup");
 	var stages = wrapStageup.find(".value");
+	var stageBackground = $(".stage-background");
+	
+	stageBackground.animate({
+		 opacity:'100'
+		},5000);
+	
 	wrapStageup.addClass("on");
 	stages.removeClass("on");
 	stages.eq(level).addClass("on");
@@ -570,6 +576,9 @@ function startPlayNormalTime(){
 
 function stopPlayNormalTime(){
 	removeAllTarget(".target", false)// 모든 타겟 삭제
+	
+	//스테이지 배경화면 투명도 조정
+	$(".stage-background").css('opacity',0);
 	
 	stopBGM();
 	stopTime();
