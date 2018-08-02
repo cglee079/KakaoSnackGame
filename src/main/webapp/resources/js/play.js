@@ -547,7 +547,11 @@ function startPlayNormalTime(){
 	var wrapStageup = $(".wrap-stageup");
 	var stages = wrapStageup.find(".value");
 	var stageBackground = $(".stage-background");
+	// 스테이지 info board 
+	var infoBoardC = $(".info-board-c");
+	var stageInfo = infoBoardC.find(".value");
 	
+	// 스테이지 설정
 	stageBackground.animate({
 		 opacity:'100'
 		},5000);
@@ -562,6 +566,11 @@ function startPlayNormalTime(){
 		
 		startGame();
 	}, 1500);
+	
+	// 스테이지 info board 설정
+	stageInfo.removeClass("on");
+	stageInfo.eq(level).addClass("on");
+	stageInfo.first().before(stageInfo.eq(level));
 	
 	function startGame(){
 		startBGM();
