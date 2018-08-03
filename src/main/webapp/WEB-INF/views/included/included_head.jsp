@@ -1,3 +1,4 @@
+<%@ page pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <title>KakaoSnackGame</title>
@@ -32,7 +33,7 @@ var contextPath = "${pageContext.request.contextPath}";
 function getContextPath(){ return contextPath; }
 
 /* check, is mobile?*/
-var maxMobileWidth = 800;
+var maxMobileWidth = 700;
 var isMobile = false;
 var deviceWidth = undefined;
 var deviceHeight = undefined;
@@ -44,6 +45,9 @@ function checkDevice(){
 		isMobile = true;
 	}
 	
+	if(!isMobile){
+		alert("모바일 환경에서만 실행 가능합니다.");
+	}
 }
 
 checkDevice();

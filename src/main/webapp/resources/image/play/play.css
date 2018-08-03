@@ -18,7 +18,7 @@
 	right: 0;
 	top: 0;
 	bottom: 0;
-	background: rgba(0, 0, 0, 0.6);
+	background: rgba(0, 0, 0, 0.7);
 	pointer-events : none;
 }
 
@@ -49,10 +49,10 @@
 }
 
 .gameover {
-	width: 300px;
-	height: 400px;
-	margin-top : -60px;
-	margin-bottom : -60px;
+	width: 400px;
+	height: 500px;
+	margin-top : -120px;
+	margin-bottom : -50px;
 	
 	display: flex;
 	flex-flow: column nowrap;
@@ -64,14 +64,16 @@
 }
 
 .gameover .gameover-time{
-	font-size: 1.7rem;
+	font-size: 50px;
 	font-weight: bold;
-	margin-top: 170px;
+	margin-top: 210px;
+	color : #554536;
+	letter-spacing: -2px;
 }
 
 .gameover-menus{
-	width: 230px;
-	height: 60px;
+	width: 280px;
+	height: 80px;
 	margin-top : 10px;	
 	display: flex;
 	justify-content: center;
@@ -99,16 +101,14 @@
 	z-index : 100;
 	justify-content: center;
 	align-items: center; 
-	background-repeat: no-repeat;
-	background-size : cover;
-	background-image: url("../image/play/bg_play_stageup.png");
 	opacity: 0;
 	pointer-events : none;
 }
 
 .wrap-stageup.on{
 	opacity: 1;
-	pointer-events : all; 
+	pointer-events : all;
+	
 }
 
 .wrap-stageup .value{
@@ -121,6 +121,7 @@
 	opacity: 0;
 	transform : scale(2);
 	transition : transform 0.2s ease-out;
+	z-index : 11;
 }
 
 .wrap-stageup .value.on{
@@ -133,6 +134,23 @@
 .wrap-stageup .value.stage3 { background-image: url("../image/play/icon_play_stage3.png");}
 .wrap-stageup .value.stage4 { background-image: url("../image/play/icon_play_stage4.png");}
 
+.wrap-stageup .bg-stage{
+	position : absolute;
+	display : block;
+	left : 0;
+	right : 0;
+	top : 0;
+	bottom : 0;
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-image: url("../image/play/bg_play_stageup.png");
+	transform : rotate(0deg);
+	transition : transform 1s ease-out;
+}
+
+.wrap-stageup .bg-stage.on{
+	transform : rotate(360deg); 
+}
 .wrap-pause {
 	opacity : 0;
 	display : flex;
@@ -491,8 +509,8 @@
 
 .itembar .icon-basket-occupy{
 	height: 60px;
-	width: 170px;
-	left : 10px;
+	width: 250px;
+	left : 0px;
 }
 
 .itembar-item {
@@ -505,7 +523,7 @@
 	background-size: contain;
 }
 
-.itembar-item.lime-item { 	background-image: url("../image/play/btn_play_lime_off.png"); }
+.itembar-item.lime-item { margin-left : -30px;	background-image: url("../image/play/btn_play_lime_off.png"); }
 .itembar-item.spray-item { 	background-image: url("../image/play/btn_play_spray_off.png"); }
 .itembar-item.portion-item { 	background-image: url("../image/play/btn_play_potion_off.png"); }
 
@@ -519,7 +537,7 @@
 	background-repeat: no-repeat;
 	background-size: contain;
 	z-index: 10;
-	left : 10px;
+	left : 0px;
 	bottom : 5px;
 	pointer-events : none;
 }

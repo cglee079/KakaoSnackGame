@@ -6,6 +6,8 @@ function setBGM(src){
 	bgm = new Howl({
 		"src"	: [src],
 		"loop"	: "true",
+		"preload": "true",
+		"html5"	: "false",
 		"volume": 1
 	});
 }
@@ -51,6 +53,8 @@ function stopAudio(playtimeType){
 function makeSound(src){
 	var howl = new Howl({
 		"src": [src],
+		"preload": "true",
+		"html5"	: "false",
 		"volume": 1
 	});
 	return howl;

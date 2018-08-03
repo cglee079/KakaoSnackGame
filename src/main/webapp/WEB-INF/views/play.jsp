@@ -28,11 +28,12 @@
 			</div>
 		</div>
 		
-		<div class="wrap-stageup on">	
-			<div class="value stage1 on"></div>
+		<div class="wrap-stageup">	
+			<div class="value stage1"></div>
 			<div class="value stage2 "></div>
 			<div class="value stage3"></div>
 			<div class="value stage4"></div>
+			<div class="bg-stage on"></div>
 		</div>
 		
 		<div class="header">

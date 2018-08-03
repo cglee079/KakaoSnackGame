@@ -1,5 +1,5 @@
-const TARGET_WIDTH			= 40;		// 타겟 넓이
-const TARGET_HEIGHT			= 40;		// 타겟 높이
+var TARGET_WIDTH			= deviceHeight * (1/20);		// 타겟 넓이
+var TARGET_HEIGHT			= deviceHeight * (1/20);		// 타겟 높이
 const HIDDEN_PADDING		= 50;		// 숨겨진 공간
 const RIGHT_ANGLE 			= 90;
 const RECOVERY_DEGREE   	= 10;     // 체력 회복 수치
@@ -15,10 +15,9 @@ const TARGET_NORMAL			= "normal";
 const TARGET_WARNING 		= "warning";
 const TARGET_GOLD	 		= "gold";
 
-
 const TARGET_NORMAL_COIN	= 1;
 const TARGET_NORMAL_RECOVERY= 5;
-const TARGET_WARNING_DAMEAGE= -50;
+const TARGET_WARNING_DAMEAGE= -40;
 const TARGET_GOLD_COIN		= 10;
 const ITEM_LIME_WIDTH	= 250;
 const ITEM_LIME_HEIGHT	= 250;
@@ -71,8 +70,9 @@ var goldTargetRate  	= 0.01;  // 골드 타겟이 생성되는 확률
 var totalCoin           = 0;    // 코인 숫자
 var moveDistance 		= 10;
 var feverTargetTouchCount= 0; 	// 보스 타겟 터치 카운트
-var attackAreaWidth 	= 100; //width : height = 1 : 2;
-var attackAreaHeight    = 200;
+var attackAreaHeight    = deviceHeight * (1/5);
+var attackAreaWidth 	= attackAreaHeight * (1/2); //width : height = 1 : 2;
+
 
 // 효과음
 var attackSound; // 공격시 소리
@@ -517,6 +517,7 @@ function startPlayNormalTime(){
 	// 스테이지 메세지
 	var wrapStageup = $(".wrap-stageup");
 	var stages = wrapStageup.find(".value");
+	var bgStage = wrapStageup.find(".bg-stage");
 	// 스테이지 info board 
 	var infoBoardC = $(".info-board-c");
 	var stageInfo = infoBoardC.find(".value");
@@ -525,6 +526,7 @@ function startPlayNormalTime(){
 	wrapStageup.addClass("on");
 	stages.removeClass("on");
 	stages.eq(level).addClass("on");
+	bgStage.addClass("on");
 	
 	// 스테이지 info board 설정
 	stageInfo.removeClass("on");
@@ -533,7 +535,9 @@ function startPlayNormalTime(){
 	
 	setTimeout(function(){
 		var wrapStageup = $(".wrap-stageup");
+		var bgStage = wrapStageup.find(".bg-stage");
 		wrapStageup.removeClass("on");
+		bgStage.removeClass("on");
 		
 		startGame();
 	}, 1500);
