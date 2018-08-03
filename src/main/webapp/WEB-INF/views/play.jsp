@@ -28,12 +28,11 @@
 			</div>
 		</div>
 		
-		<div class="wrap-stageup">	
+		<div class="wrap-stageup on">	
 			<div class="value stage1 on"></div>
-			<div class="value stage2"></div>
+			<div class="value stage2 "></div>
 			<div class="value stage3"></div>
 			<div class="value stage4"></div>
-			<div class="stage-background"></div>
 		</div>
 		
 		<div class="header">
@@ -103,8 +102,8 @@
 				<div class="itembar">
 					<div class="icon-basket-occupy"></div>
 					<div class="itembar-item lime-item" onclick="usingItem(0)"></div>
-					<div class="itembar-item spray-item" onclick="usingItem(1)"></div>
 					<div class="itembar-item portion-item" onclick="usingItem(2)"></div>
+					<div class="itembar-item spray-item" onclick="usingItem(1)"></div>
 				</div>
 			</div>
 			

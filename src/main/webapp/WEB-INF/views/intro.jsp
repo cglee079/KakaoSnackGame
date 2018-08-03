@@ -75,7 +75,6 @@
 		})
 
 		function cancel() {
-
 			//초기화
 			$(".help-board").removeClass("on");
 			$(".swiper-wrapper").css('transform', 'translate3d(0px, 0px, 0px)'); //맨 처음 이미지로 이동 
@@ -83,17 +82,11 @@
 			//swiper-pagination-bullet 맨 처음으로 이동
 			setSwiperPaginationBullet();
 			function setSwiperPaginationBullet() {
-				var swiperPaginations = $('.swiper-pagination-bullets')
-						.children(); //모든 자식 노드 찾기
+				var swiperPaginations = $('.swiper-pagination-bullets').children(); //모든 자식 노드 찾기
 
 				for (var i = 0; i < swiperPaginations.length; i++) {
-					if (i == 0)
-						swiperPaginations[i]
-								.setAttribute('class',
-										'swiper-pagination-bullet swiper-pagination-bullet-active');
-					else
-						swiperPaginations[i].setAttribute('class',
-								'swiper-pagination-bullet');
+					if (i == 0){ swiperPaginations[i].setAttribute('class', 'swiper-pagination-bullet swiper-pagination-bullet-active'); }
+					else { swiperPaginations[i].setAttribute('class', 'swiper-pagination-bullet');}
 				}
 			}
 

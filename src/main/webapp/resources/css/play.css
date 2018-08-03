@@ -11,7 +11,7 @@
 
 /** ============= Foreground =============== **/
 .wrap-fg {
-	display: none;
+	opacity : 0;
 	z-index: 300;
 	position: fixed;
 	left: 0;
@@ -19,10 +19,12 @@
 	top: 0;
 	bottom: 0;
 	background: rgba(0, 0, 0, 0.6);
+	pointer-events : none;
 }
 
 .wrap-fg.on{
-	display: block;
+	opacity: 1;
+	pointer-events : all;
 }
 
 .wrap-gameover {
@@ -38,10 +40,8 @@
 	justify-content: center;
 	align-items: center;
 	transform : scale(0);
-	-webkit-transition: transform 0.2s;
-	-webkit-transition-timing-function: ease-in-out;
-	transition: transform 0.2s;
-	transition-timing-function: ease-in-out;
+	-webkit-transition: transform 0.2s ease-in-out;
+	transition: transform 0.2s ease-in-out; 
 }
 
 .wrap-gameover.on {
@@ -90,7 +90,7 @@
 
 
 .wrap-stageup{
-	display : none;
+	display : flex;
 	left: 0;
 	right: 0;
 	top: 0;
@@ -99,45 +99,43 @@
 	z-index : 100;
 	justify-content: center;
 	align-items: center; 
+	background-repeat: no-repeat;
+	background-size : cover;
+	background-image: url("../image/play/bg_play_stageup.png");
+	opacity: 0;
+	pointer-events : none;
 }
 
 .wrap-stageup.on{
-	display: flex;
+	opacity: 1;
+	pointer-events : all; 
 }
 
 .wrap-stageup .value{
-	display : none;
+	position : absolute;
+	display : block;
 	width: 200px;
 	height : 200px;
 	background-repeat: no-repeat;
 	background-size: contain;
+	opacity: 0;
+	transform : scale(2);
+	transition : transform 0.2s ease-out;
 }
 
 .wrap-stageup .value.on{
-	display: block;
+	opacity: 1;
+	transform: scale(1);
 }
 
-.stage-background {
-	left: 0;
-	right: 0;
-	top: 0;
-	bottom: 0;
-	position : fixed;
-	z-index : 50;
-	background-repeat: no-repeat;
-	background-size: 100% 100%;
-	background-image: url("../image/play/bg_play_stageup.png");
-	opacity: 0;
- 
-}
-
-.wrap-stageup .value.stage1{ background-image: url("../image/play/icon_play_stage1.png"); z-index : 100;}
-.wrap-stageup .value.stage2 { background-image: url("../image/play/icon_play_stage2.png"); z-index : 100;}
-.wrap-stageup .value.stage3 { background-image: url("../image/play/icon_play_stage3.png"); z-index : 100;}
-.wrap-stageup .value.stage4 { background-image: url("../image/play/icon_play_stage4.png"); z-index : 100;}
+.wrap-stageup .value.stage1{ background-image: url("../image/play/icon_play_stage1.png");}
+.wrap-stageup .value.stage2 { background-image: url("../image/play/icon_play_stage2.png");}
+.wrap-stageup .value.stage3 { background-image: url("../image/play/icon_play_stage3.png");}
+.wrap-stageup .value.stage4 { background-image: url("../image/play/icon_play_stage4.png");}
 
 .wrap-pause {
-	display: none;
+	opacity : 0;
+	display : flex;
 	z-index: 400;
 	position: fixed;
 	left: 0;
@@ -148,15 +146,12 @@
 	flex-flow: column nowrap;
 	justify-content: center;
 	align-items: center;
-	/* transform : scale(0);
-	-webkit-transition: transform 0.2s;
-	-webkit-transition-timing-function: ease-in-out;
-	transition: transform 0.2s;
-	transition-timing-function: ease-in-out; */
+	pointer-events : none;
 }
 
 .wrap-pause.on{
-	display: flex;
+	opacity : 1;
+	pointer-events : all;
 }
 
 .wrap-pause .pause-title{
@@ -330,10 +325,10 @@
 
 
 .move-friends {
-	bottom: 1px;
+	bottom: 0;
 	position: absolute;
-	width: 70px;
-	height: 70px;
+	width: 60px;
+	height: 60px;
 	background-repeat: no-repeat;
 	background-size: contain;
 	background-image: url("../image/play/icon_play_header_friend.png");

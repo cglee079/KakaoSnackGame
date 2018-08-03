@@ -82,6 +82,7 @@ var limeItemSound; // 끈적이 아이템 소리
 var coinSound;     // 동전 소리
 var multiCoinSound;// 많은 동전 소리
 var wrongAttackSound; // 잘못된 공격 소리
+var stageupSound;
 var gameoverSound;
 var btnClickSound;
 
@@ -516,19 +517,19 @@ function startPlayNormalTime(){
 	// 스테이지 메세지
 	var wrapStageup = $(".wrap-stageup");
 	var stages = wrapStageup.find(".value");
-	var stageBackground = $(".stage-background");
 	// 스테이지 info board 
 	var infoBoardC = $(".info-board-c");
 	var stageInfo = infoBoardC.find(".value");
 	
-	// 스테이지 설정
-	stageBackground.animate({
-		 opacity:'100'
-		},5000);
-	
+	startAudio(stageupSound);
 	wrapStageup.addClass("on");
 	stages.removeClass("on");
 	stages.eq(level).addClass("on");
+	
+	// 스테이지 info board 설정
+	stageInfo.removeClass("on");
+	stageInfo.eq(level).addClass("on");
+	stageInfo.first().before(stageInfo.eq(level));
 	
 	setTimeout(function(){
 		var wrapStageup = $(".wrap-stageup");
@@ -537,10 +538,6 @@ function startPlayNormalTime(){
 		startGame();
 	}, 1500);
 	
-	// 스테이지 info board 설정
-	stageInfo.removeClass("on");
-	stageInfo.eq(level).addClass("on");
-	stageInfo.first().before(stageInfo.eq(level));
 	
 	function startGame(){
 		startBGM();
@@ -555,9 +552,6 @@ function startPlayNormalTime(){
 
 function stopPlayNormalTime(){
 	removeAllTarget(".target", false)// 모든 타겟 삭제
-	
-	//스테이지 배경화면 투명도 조정
-	$(".stage-background").css('opacity',0);
 	
 	stopBGM();
 	stopTime();
@@ -896,6 +890,19 @@ $(document).ready(function(){
 	var coin = $(".info-board .info.coin .value");
 	coin.text(totalCoin);
 	
+	//init move friends x
+	$(".move-friends").css("left", ((life * 0.65) + 20) + "%");
+	
+	//init basket xy
+	var basketOccupy = $(".icon-basket-occupy");
+	var basket  = $(".icon-basket");
+	basket.css("width", basketOccupy.width());
+	basket.css("height", basketOccupy.width());
+	
+	//init progress bar
+	$(".progress .progress-bar .crop-progress-bar").css("width", $(".progress .progress-bar").width());
+	
+	
 	// 초기화 (좌표)
 	initXY();
 	function initXY(){
@@ -917,20 +924,10 @@ $(document).ready(function(){
 		multiCoinSound 		= makeSound(getContextPath() + "/resources/audio/play/sound_play_multi_money.mp3");
 		warningSound 		= makeSound(getContextPath() + "/resources/audio/play/sound_play_warnig.mp3");
 		gameoverSound		= makeSound(getContextPath() + "/resources/audio/play/sound_play_gameover.mp3");
+		stageupSound		= makeSound(getContextPath() + "/resources/audio/play/sound_play_stageup.mp3");;
 		btnClickSound		= makeSound(getContextPath() + "/resources/audio/sound_common_button.mp3");
+		
 	}
-	
-	//init move friends x
-	$(".move-friends").css("left", ((life * 0.65) + 20) + "%");
-	
-	//init basket xy
-	var basketOccupy = $(".icon-basket-occupy");
-	var basket  = $(".icon-basket");
-	basket.css("width", basketOccupy.width());
-	basket.css("height", basketOccupy.width());
-	
-	//init progress bar
-	$(".progress .progress-bar .crop-progress-bar").css("width", $(".progress .progress-bar").width());
 	
 	startPlayNormalTime();
 })
