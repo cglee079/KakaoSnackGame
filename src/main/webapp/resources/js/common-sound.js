@@ -2,14 +2,12 @@ var bgm = undefined;
 var sound = "on";
 var soundMapTimout = {};
 
-function setBGM(tg){
-	bgm = tg;
-	bgm.preLoad 	= true;
-	bgm.controls 	= true;
-	bgm.loop		= true;
-	bgm.autoPlay 	= true;
-	bgm.volume		= 0;
-	bgm.play();
+function setBGM(src){
+	bgm = new Howl({
+		"src"	: [src],
+		"loop"	: "true",
+		"volume": 1
+	});
 }
 
 function doSoundOn(){
@@ -22,12 +20,12 @@ function doSoundOff(){
 
 function startBGM(){
 	if(sound == "on"){
-		bgm.volume = 1;
+		bgm.play();
 	}
 }
 
 function stopBGM(){
-	bgm.volume = 0;
+	bgm.stop();
 }
 
 
@@ -38,37 +36,22 @@ function stopBGM(){
  * timeout으로 재생후 볼륨 0으로 하엿는데, 타임아웃이 중복되어 소리가 안나는 경우가있어
  * src를 key값으로 맵에다 넣어서 조작함.
  */
-function startAudio(playtimeType){  
+function startAudio(howl){  
 	if(sound == "on"){
-		if(soundMapTimout[playtimeType.src]) {
-			clearTimeout(soundMapTimout[playtimeType.src]);
-		}
-		
-		playtimeType.currentTime = 0; 
-		playtimeType.volume = 1;
-		
-		var timeoutID = setTimeout(function(){
-			playtimeType.volume = 0;
-		}, playtimeType.duration * 1000);
-		
-		soundMapTimout[playtimeType.src] = timeoutID;
+		howl.play();
 	}
 }
 
 // 음악 정지
 function stopAudio(playtimeType){ 
-	playtimeType.pause(); 
+	howl.pause();
 }
 
 //사운드 정의
 function makeSound(src){
-	var sound = new Audio();
-	sound.src 		= src;
-	sound.preLoad 	= true;
-	sound.controls 	= true;
-	sound.loop		= true;
-	sound.autoPlay 	= true;
-	sound.volume = 0;
-	sound.play();
-	return sound;
+	var howl = new Howl({
+		"src": [src],
+		"volume": 1
+	});
+	return howl;
 }

@@ -9,18 +9,14 @@
 <script>
 	var btnClickSound = undefined;
 	var swiper;
-	$(document).ready(
-			function() {
-				var bgm = new Audio(getContextPath()
-						+ '/resources/audio/bgm.mp3');
-				setBGM(bgm);
+	$(document).ready( function() {
+		setBGM(getContextPath() + '/resources/audio/bgm.mp3');
 
-				doSoundOn();
-				startBGM();
+		doSoundOn();
+		startBGM();
 
-				btnClickSound = makeSound(getContextPath()
-						+ "/resources/audio/sound_common_button.mp3");
-			});
+		btnClickSound = makeSound(getContextPath() + "/resources/audio/sound_common_button.mp3");
+	});
 
 	function doStartGame() {
 		startAudio(btnClickSound);

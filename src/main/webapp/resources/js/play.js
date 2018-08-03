@@ -5,9 +5,9 @@ const RIGHT_ANGLE 			= 90;
 const RECOVERY_DEGREE   	= 10;     // 체력 회복 수치
 const FULL_LIFE				= 90;		// 사과땜에 가려저셔 90으로바꿈..
 
-const ITEM_COST_LIME = 0;	// 파워 아이템 비용
-const ITEM_COST_SPRAY = 0;	// 스프레이 아이템 비용
-const ITEM_COST_HEART = 0;
+const ITEM_COST_LIME = 10;	// 파워 아이템 비용
+const ITEM_COST_SPRAY = 45;	// 스프레이 아이템 비용
+const ITEM_COST_HEART = 30;
 
 const COMBO_COIN 			= 2;
 
@@ -882,8 +882,7 @@ function doRegame(){
 
 $(document).ready(function(){
 	//BGM 설정
-	var bgm = new Audio(getContextPath() + '/resources/audio/bgm.mp3');
-	setBGM(bgm);
+	setBGM(getContextPath() + '/resources/audio/bgm.mp3');
 	
 	//SOUND ON/OFF
 	var sound = $("#sound").val();

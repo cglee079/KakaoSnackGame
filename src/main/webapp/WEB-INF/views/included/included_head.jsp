@@ -17,6 +17,10 @@
  
 <!-- lib-js -->
 <script src="${pageContext.request.contextPath}/resources/js/lib/jquery-3.2.1.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/lib/howler.core.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/lib/howler.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/lib/howler.spatial.min.js"></script>
+
 
 
 <script src="${pageContext.request.contextPath}/resources/js/common-sound.js"></script>
