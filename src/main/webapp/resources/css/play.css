@@ -247,6 +247,23 @@
 	background-image: url("../image/play/icon_play_progress_fg.png");
 }
 
+.progress .progress-portion{
+	position : absolute;
+	width : 100%;
+	height : 50px;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("../image/play/icon_play_effect_portion.png");
+	opacity : 0;
+	transform : scale(0.95);
+	transition : opacity 0.4s ease-out , transform 0.1s ease-out;
+}
+
+.progress .progress-portion.on{
+	opacity : 1;
+	transform : scale(1);
+}
+
 .info.wrap-coin{
 	position: relative;
 	width : 110px;
@@ -279,7 +296,6 @@
 
 
 .info-board-c{
-	margin-top : 3px;
 	display : flex;
 	justify-content:space-between;
 	z-index: 10;
@@ -347,6 +363,7 @@
 .combo-message {
 	width: 200px;
 	height: 72px;
+	z-index : 1;
 	position: absolute;
 	display: none;
 }
@@ -393,21 +410,13 @@
 	background-size: contain;
 }
 
-.target.normal .target-icon {
-	background-image: url("../image/play/icon_play_target.png");
-}
+.target.normal 	.target-icon { background-image: url("../image/play/icon_play_target_normal_live.png"); }
+.target.warning .target-icon { background-image: url("../image/play/icon_play_target_warning_live.png");  }
+.target.gold 	.target-icon { background-image: url("../image/play/icon_play_target_gold_live.png");  }
 
-.target.removed .target-icon {
-	background-image: url("../image/sample_target_removed.png");
-}
-
-.target.warning .target-icon {
-	background-image: url("../image/sample_target_warning.png");
-}
-
-.target.gold .target-icon {
-	background-image: url("../image/sample_target_gold.png");
-}
+.target.normal.died 	.target-icon { background-image: url("../image/play/icon_play_target_normal_died.png"); }
+.target.warning.died 	.target-icon { background-image: url("../image/play/icon_play_target_warning_died.png"); }
+.target.gold.died 		.target-icon { background-image: url("../image/play/icon_play_target_gold_died.png"); }
 
 .attacker {
 	position: absolute;
@@ -430,53 +439,37 @@
 	display: flex;
 }
 
-.lime_item_area {
+.effect.lime {
 	display: none;
 	position: absolute;
-	background: pink;
+	z-index: 0;
+	background-repeat: no-repeat;
+	background-size : contain;
+	background-image: url("../image/play/icon_play_effect_lime.png");
 }
 
-.lime_item_area.on {
-	display: flex;
+.effect.lime.on {
+	display: block;
 }
 
-.effect{
+.effect.spray{
 	position: absolute;
 	top : 0;
 	bottom : 0;
 	left : 0;
-	right : 0;	
-	display: none;
-	z-index: 5;
-}
-
-.effect.on{
-	display: block;
-}
-
-.effect.spray {
-	-webkit-animation: fadeInFromNone 2s ease-out;
+	right : 0;
+	opacity : 0;	
+	z-index: 3;
 	background-repeat: no-repeat;
-	background-image: url("../image/sample_spray_effect.png");
+	background-size : cover;
+	background-image: url("../image/play/icon_play_effect_spray.png");
+	transition : opacity 0.3s ease-out;
+	pointer-events : none;
 }
 
-@-webkit-keyframes fadeInFromNone { 
-	0% {
-		display: none;
-		opacity: 0;
-	}
-
-	1% {
-		display :block;
-		opacity : 0;
-	}
-	
-	100% {
-		display : block;
-		opacity : 1;
-	}
+.effect.spray.on{
+	opacity: 1;
 }
-
 
 .wrap-item{
 	position : absolute;
@@ -485,7 +478,6 @@
 	right : 0;
 	z-index : 2;
 	height : 100px;
-	
 	background-repeat: no-repeat;
 	background-size: contain;
 	background-image: url("../image/play/bg_play_footer.png");
@@ -505,6 +497,7 @@
 .itembar .icon-basket-occupy{
 	height: 60px;
 	width: 170px;
+	left : 10px;
 }
 
 .itembar-item {
@@ -530,7 +523,6 @@
 	position : fixed;
 	background-repeat: no-repeat;
 	background-size: contain;
-	background-image: url("../image/play/icon_play_basket100.png");
 	z-index: 10;
 	left : 10px;
 	bottom : 5px;
@@ -538,18 +530,22 @@
 }
 
 .icon-basket .value{
-	position :absolute;
-	height: 100%;
-	width: 100%;
+	position: absolute;
+	left : 0;
+	right : 0;
+	top : 0;
+	bottom : 0;
+	opacity:  0;
 	background-repeat: no-repeat;
 	background-size: contain;
-	display: none;
 }
 
-.icon-basket .value.on{
-	display: block;
-}
+.icon-basket .value.status-100	{ z-index : 11; background-image: url("../image/play/icon_play_basket_100.png");}
+.icon-basket .value.status-60	{ z-index : 12; background-image: url("../image/play/icon_play_basket_50.png");}
+.icon-basket .value.status-30	{ z-index : 13; background-image: url("../image/play/icon_play_basket_30.png");}
+.icon-basket .value.status-died	{ z-index : 14; background-image: url("../image/play/icon_play_basket_died.png");}
 
-.itembar .icon-basket .value.status100	{ background-image: url("../image/play/icon_play_basket100.png");}
-.itembar .icon-basket .value.status50	{ background-image: url("../image/play/icon_play_basket100.png");}
-.itembar .icon-basket .value.status0	{ background-image: url("../image/play/icon_play_basket100.png");}
+.icon-basket .value.status-100.on 	{ opacity: 1;}
+.icon-basket .value.status-60.on 	{ opacity: 1;}
+.icon-basket .value.status-30.on 	{ opacity: 1;}
+.icon-basket .value.status-died.on 	{ opacity: 0.5;}

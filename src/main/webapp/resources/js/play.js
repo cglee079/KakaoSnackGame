@@ -5,9 +5,9 @@ const RIGHT_ANGLE 			= 90;
 const RECOVERY_DEGREE   	= 10;     // 체력 회복 수치
 const FULL_LIFE				= 90;		// 사과땜에 가려저셔 90으로바꿈..
 
-const ITEM_COST_LIME = 10;	// 파워 아이템 비용
-const ITEM_COST_SPRAY = 45;	// 스프레이 아이템 비용
-const ITEM_COST_HEART = 30;
+const ITEM_COST_LIME = 0;	// 파워 아이템 비용
+const ITEM_COST_SPRAY = 0;	// 스프레이 아이템 비용
+const ITEM_COST_HEART = 0;
 
 const COMBO_COIN 			= 2;
 
@@ -91,7 +91,7 @@ var makeTargetThread;
 var fallingSpeedUpThread;
 var makeFeverTargetThread;
 var timeThread;
-var warningBackgroundChange;
+var warnigLifeThread;
 
 // 체력
 var life = FULL_LIFE;
@@ -112,7 +112,6 @@ function removeTarget(target, doEffect){
 		}
 		
 		target.removeClass('limit');
-		target.addClass('removed'); // 이미지 변경
 		target.find(".toLeftDistance").val(0);
 		target.find(".toTopDistance").val(5);
 		setTimeout(function(){
@@ -143,7 +142,6 @@ function lifeRecovery(recover) {
 }
 
 function usingItem(itemId){
-	console.log("item");
 	var coin = $(".info.wrap-coin .value");
 	var coinNumber = parseInt(coin.text(), 10);
 	var duration = 3000; // 아이템 지속 시간		
@@ -162,7 +160,7 @@ function usingItem(itemId){
 			limeItemSound.currentTime = 0;
 			
 			// 끈끈이 지역
-			var limeItemArea = $(".lime_item_area");
+			var limeItemArea = $(".effect.lime");
 			limeItemArea.css("width",ITEM_LIME_WIDTH); 
 			limeItemArea.css("height", ITEM_LIME_HEIGHT);
 			limeItemArea.addClass("on");
@@ -176,31 +174,11 @@ function usingItem(itemId){
 	    	limeItemArea.css("top", y) ;
 	    			
 			setTimeout(function() {
-				$(".lime_item_area").removeClass("on");
-			// $(".effect.lime").removeClass("on");
-			}, duration);
-			var limeThread = setInterval(function() {
-				setLime(), config.targetMoveSpeed
-			});
-
-			// 끈끈이 스레드 정지
-			setTimeout(function() {
-				// 끈끈이 스레드 초기화
-				clearInterval(limeThread);
-				limeThread = undefined;
-
-				// 아이템 효과 사라진 후 move 스레드 재시작
-				var stopedTargets = $(".target.stoped");
-				stopedTargets.each(function() {
-					restartMoveTarget($(this));
-					$(this).removeClass("stoped");
-				});
-
+				$(".effect.lime").removeClass("on");
 			}, duration);
 			
-			function setLime(){
-						
-		    	// 끈끈이 범위 X,Y
+			var limeThread = setInterval(function() {
+			 	// 끈끈이 범위 X,Y
 		    	var limeAreaStartX = x;
 		    	var limeAreaStartY = y;
 		    	var limeAreaEndX = x + ITEM_LIME_WIDTH;
@@ -216,35 +194,10 @@ function usingItem(itemId){
 					var targetEndY 	= targetStartY + TARGET_HEIGHT;
 		    		var catched	= false;
 					
-		    		// case1 왼쪽에 벌레가 걸쳤다.
-					if(targetEndX > limeAreaStartX 
-							&& targetEndX < limeAreaEndX
+					if(targetStartX > limeAreaStartX
+							&& targetEndX < limeAreaEndX 
 							&& targetStartY > limeAreaStartY
 							&& targetEndY < limeAreaEndY){
-						catched = true;
-					}
-					
-					// case2 오른쪽에 벌레가 걸쳤다.
-					if(targetStartX < limeAreaEndX 
-							&& targetStartX > limeAreaStartX
-							&& targetStartY > limeAreaStartY
-							&& targetEndY < limeAreaEndY){
-						catched = true;
-					}
-					
-					// case3 위쪽에 벌레가 걸쳤다.
-					if(targetStartX > limeAreaStartX 
-							&& targetEndX < limeAreaEndX
-							&& targetEndY > limeAreaStartY
-							&& targetEndY < limeAreaEndY){
-						catched = true;
-					}
-					
-					// case4 아래쪽에 벌레가 걸쳤다.
-					if(targetStartX > limeAreaStartX 
-							&& targetEndX < limeAreaEndX
-							&& targetStartY < limeAreaEndY
-							&& targetStartY > limeAreaStartY){
 						catched = true;
 					}
 					
@@ -254,9 +207,24 @@ function usingItem(itemId){
 						stopMoveTarget(target);
 						target.addClass("stoped");
 					}
-			}); 			
-			}
-		
+				}); 			
+			}, config.targetMoveSpeed);
+			
+			// 끈끈이 스레드 정지
+			setTimeout(function() {
+				// 끈끈이 스레드 초기화
+				clearInterval(limeThread);
+				limeThread = undefined;
+
+				// 아이템 효과 사라진 후 move 스레드 재시작
+				var stopedTargets = $(".target.stoped");
+				stopedTargets.each(function() {
+					restartMoveTarget($(this));
+					$(this).removeClass("stoped");
+				});
+
+			}, duration);
+			
 			decreaseCoin(ITEM_COST_LIME); // 코인 감소
 		}
 	}
@@ -271,7 +239,7 @@ function usingItem(itemId){
 			setTimeout(function() {
 				startLifeDecrease();
 				$(".effect.spray").removeClass("on");
-			}, 2000)
+			}, 1000)
 			
 			decreaseCoin(ITEM_COST_SPRAY); // 코인 감소
 			
@@ -284,13 +252,15 @@ function usingItem(itemId){
 			startAudio(heartItemSound);
 			heartItemSound.currentTime = 0;
 			
-			$(".effect.heart").addClass("on");
+			$(".progress-portion").addClass("on");
 			setTimeout(function() {
-				$(".effect.heart").removeClass("on");
+				$(".progress-portion").removeClass("on");
 			}, 1000)
 			
 			lifeRecovery(30);
 			decreaseCoin(ITEM_COST_HEART); // 코인 감소
+			
+			
 		}	
 	}
 
@@ -579,7 +549,7 @@ function startPlayNormalTime(){
 		startTime();
 		startMakeTarget(); // 타겟 생성 쓰레드
 		startLifeDecrease(); // 생명력 감소 스레드 시작
-		warningBackgroundChange = undefined; // 생명력 경고 쓰레드 초기화
+		warnigLifeThread = undefined; // 생명력 경고 쓰레드 초기화
 	}
 }
 
@@ -593,7 +563,7 @@ function stopPlayNormalTime(){
 	stopTime();
 	stopMakeTarget();
 	stopLifeDecrease();
-	stopWarningBackgroundChange();
+	stopWarnigLifeThread();
 }
 
 
@@ -606,16 +576,30 @@ function startLifeDecrease() { // 재귀를 이용한 Interval
 		gameover();
 		lifeDecreaseThread = undefined;
 	} else {
-		if(life <= FULL_LIFE/3 && warningBackgroundChange == undefined){ // 체력이  일정수준 이하로 감소했을때
-			startWarningBackgroundChange();
-		} else if(life > FULL_LIFE/3 && warningBackgroundChange != undefined){
-			stopWarningBackgroundChange();
+		if(life <= 20 && warnigLifeThread == undefined){ // 체력이  일정수준 이하로 감소했을때
+			startWarnigLifeThread();
+		} else if(life > 20 && warnigLifeThread != undefined){
+			stopWarnigLifeThread();
 		}
 		
 		$(".progress .progress-bar").stop().animate({"width" : life + "%"});
 		$(".move-friends").stop().animate({"left" : ((life * 0.65) + 20) + "%"});
 		lifeDecreaseThread = setTimeout(startLifeDecrease, config.lifeDecreaseRate);
 	}
+	
+	var basket = $(".icon-basket");
+	basket.find(".value.status-100").removeClass("on");
+	basket.find(".value.status-60").removeClass("on");
+	basket.find(".value.status-30").removeClass("on");
+	
+	if( life > 60 && life <= FULL_LIFE){
+		basket.find(".value.status-100").addClass("on");
+	} else if( life > 30 && life <= 60){
+		basket.find(".value.status-60").addClass("on");
+	} else if( life <= 30){
+		basket.find(".value.status-30").addClass("on");
+	}
+
 }
 
 // 체력 감소 스레드 중지
@@ -625,26 +609,23 @@ function stopLifeDecrease(){
 }
 
 // 경고 백그라운드 스레드 시작
-function startWarningBackgroundChange(){
+function startWarnigLifeThread(){
 	startAudio(warningSound);
 	
-	if(warningBackgroundChange == undefined){
-		warningBackgroundChange = setInterval(function(){
-//			var playGround = $('.play-ground');			
-//			if(playGround.css("background-color") == "rgba(0, 0, 0, 0)"){ // 배경색
-//																			// 변경
-//				playGround.css("background-color","red");		
-//			} else {
-//				playGround.css("background-color","rgba(0, 0, 0, 0)");	
-//			}
-		}, 200);
+	if(warnigLifeThread == undefined){
+		warnigLifeThread = setInterval(function(){
+			var basket = $(".icon-basket");
+			basket.find(".value.status-died").toggleClass("on");
+		}, 100);
 	}	
 }
 
 // 경고 백그라운드 스레드 중지
-function stopWarningBackgroundChange(){
-	clearTimeout(warningBackgroundChange);
-	warningBackgroundChange = undefined; // 쓰레드 변수 초기화
+function stopWarnigLifeThread(){
+	var basket = $(".icon-basket");
+	basket.find(".value.status-died").removeClass("on");
+	clearTimeout(warnigLifeThread);
+	warnigLifeThread = undefined; // 쓰레드 변수 초기화
 }
 
 

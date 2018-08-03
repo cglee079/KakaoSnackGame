@@ -45,6 +45,7 @@
 					
 					<div class="progress-marking"></div>
 					<div class="progress-apple"></div>
+					<div class="progress-portion"></div>
 				</div>
 			
 				<div class="info wrap-coin">
@@ -94,12 +95,8 @@
 					<div class="value combo7"></div>
 				</div>
 				
-				<div class="lime_item_area"></div>
-				
-				<div class="effect spray"></div>
 				<div class="effect lime"></div>
-				<div class="effect portion"></div>
-				
+				<div class="effect spray"></div>
 			</div>
 		
 			<div class="wrap-item">
@@ -112,10 +109,12 @@
 			</div>
 			
 			<div class="icon-basket">
-				<div class="value status100 on"></div>
-				<div class="value status100"></div>
-				<div class="value status100"></div>
+				<div class="value status-100 on"></div>
+				<div class="value status-60"></div>
+				<div class="value status-30"></div>
+				<div class="value status-died"></div>
 			</div>
+				
 		</div>
 	</div>
 </body>
