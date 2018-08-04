@@ -69,6 +69,7 @@ var level;
 var config;	
 var time;
 var totalCoin;    // 코인 숫자
+var clickBlock = 0;
 
 // 쓰레드
 var makeTargetThread;
@@ -811,6 +812,7 @@ function gameover() {
 
 /** ============ Pause =============== **/
 function doPause(){
+
 	startAudio(btnClickSound);
 	
 	stopBGM();
@@ -821,9 +823,14 @@ function doPause(){
 	
 	$(".wrap-fg").addClass("on");
 	$(".wrap-pause").addClass("on");
+
 }
 
 function doRegame(){
+	
+	if(clickBlock === 1) { return 0;}
+	clickBlock = 1;
+	
 	startAudio(btnClickSound);
 	
 	stopPlay();
@@ -832,9 +839,15 @@ function doRegame(){
 	
 	$(".wrap-fg").removeClass("on");
 	$(".wrap-pause").removeClass("on");
+	
+	buttonBlock();
 }
 
 function doRestart(tg, doMortion){
+	
+	if(clickBlock === 1) { return 0;}
+	clickBlock = 1;
+	
 	var tg = $(tg);
 	if(!tg.hasClass("on")){
 		tg.addClass("on");
@@ -857,6 +870,7 @@ function doRestart(tg, doMortion){
 		}
 		
 		setTimeout(function(){
+
 			var restartMotion 	= $(".wrap-gameover .btn-restart-mortion")
 			clearInterval(mortionInterval);
 			restartMotion.removeClass("moving");
@@ -871,11 +885,24 @@ function doRestart(tg, doMortion){
 			}, 1500);
 			
 			tg.removeClass("on");
+			clickBlock === 0;
 		}, duation);
 	}
+	
+	buttonBlock();
+}
+
+function buttonBlock() {
+	setTimeout(function (){
+		clickBlock = 0;
+	},1000);
 }
 
 function doHome(tg){
+	
+	if(clickBlock === 1) { return 0;}
+	clickBlock = 1;
+	
 	var tg = $(tg);
 	if(!tg.hasClass("on")){
 		tg.addClass("on");
@@ -890,6 +917,8 @@ function doHome(tg){
 			tg.removeClass("on");
 		}, 500);
 	}
+	
+	buttonBlock();
 }
 
 

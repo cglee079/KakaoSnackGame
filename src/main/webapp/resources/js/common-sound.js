@@ -73,12 +73,19 @@ function makeSound(src){
 }
 
 $(document).ready( function() {
-	setBGM(getContextPath() + '/resources/audio/bgm.mp3');
-
-	doSoundOn();
-	startBGM();
 	
-	initAudio();
+	function initBGM(callback){
+		setBGM(getContextPath() + '/resources/audio/bgm.mp3');
+		doSoundOn();
+		startBGM();
+		callback();
+	}
+	
+	initBGM(function(){
+		initAudio();
+	});
+	
+	
 	function initAudio(){
 		attackSound 		= makeSound(getContextPath() + "/resources/audio/play/sound_play_attack.mp3");
 		wrongAttackSound 	= makeSound(getContextPath() + "/resources/audio/play/sound_play_wrong_attack.mp3");
