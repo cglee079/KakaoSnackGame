@@ -843,16 +843,22 @@ function doRestart(tg, doMortion){
 		stopBGM();
 
 		var mortionInterval;
+		var duation = 400;
 		if(doMortion){
+			var restartMotion 	= $(".wrap-gameover .btn-restart-mortion");
+			restartMotion.addClass("moving");
 			mortionInterval = setInterval(function(){
-				var restartMotion 	= $(".wrap-gameover .btn-restart-mortion");
-				restartMotion.css("left", parseInt(restartMotion.css("left")) + 10);
+				
+				restartMotion.css("left", parseInt(restartMotion.css("left")) + 15);
 				restartMotion.css("top", parseInt(restartMotion.css("top")) - 20);
 			}, 40);
+			
+			duation = 1000;
 		}
 		
 		setTimeout(function(){
 			clearInterval(mortionInterval);
+			restartMotion.removeClass("moving");
 			
 			redrawToPlay();
 			initGame();
@@ -864,7 +870,7 @@ function doRestart(tg, doMortion){
 			}, 1500);
 			
 			tg.removeClass("on");
-		}, 500);
+		}, duation);
 	}
 }
 

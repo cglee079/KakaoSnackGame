@@ -251,22 +251,22 @@
 
 .h-itembar .h-icon-basket-occupy{
 	height: 60px;
-	width: 250px;
+	flex : 3;
 	left : 0px;
 }
 
 .h-itembar-item {
-	flex-flow: column nowrap;
-	margin: -10px;
-	height: 130px;
-	width: 130px;
+	flex : 1;
+	margin: 5px;
+	margin-bottom : 12px;
+	position: relative;
 	background-repeat: no-repeat;
 	background-size: contain;
 }
 
-.h-itembar-item.h-lime-item.on 		{ 	background-image: url("../image/play/btn_play_lime_on.png"); margin-left : -30px; }
+.h-itembar-item.h-lime-item.on 		{ 	background-image: url("../image/play/btn_play_lime_on.png"); margin-left : -20px; }
 .h-itembar-item.h-portion-item.on 	{ 	background-image: url("../image/play/btn_play_potion_on.png"); }
-.h-itembar-item.h-spray-item.on 	{ 	background-image: url("../image/play/btn_play_spray_on.png"); margin-right : 0px;}
+.h-itembar-item.h-spray-item.on 	{ 	background-image: url("../image/play/btn_play_spray_on.png"); margin-right : 10px;}
 
 .h-icon-basket{
 	position : absolute;
