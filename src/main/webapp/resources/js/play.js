@@ -8,9 +8,9 @@ const RECOVERY_DEGREE   	= 10;   // 체력 회복 수치
 const FULL_LIFE				= 90;	// 사과땜에 가려저셔 90으로바꿈..
 const COMBO_COIN 			= 2;
 
-const ITEM_COST_LIME 		= 0;	// 파워 아이템 비용
-const ITEM_COST_HEART 		= 0;
-const ITEM_COST_SPRAY 		= 0;	// 스프레이 아이템 비용
+const ITEM_COST_LIME 		= 20;	// 파워 아이템 비용
+const ITEM_COST_HEART 		= 50;
+const ITEM_COST_SPRAY 		= 100;	// 스프레이 아이템 비용
 
 const TARGET_NORMAL			= "normal";
 const TARGET_WARNING 		= "warning";
