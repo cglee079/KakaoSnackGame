@@ -857,6 +857,7 @@ function doRestart(tg, doMortion){
 		}
 		
 		setTimeout(function(){
+			var restartMotion 	= $(".wrap-gameover .btn-restart-mortion")
 			clearInterval(mortionInterval);
 			restartMotion.removeClass("moving");
 			
