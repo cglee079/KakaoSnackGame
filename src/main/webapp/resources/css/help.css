@@ -1,0 +1,293 @@
+.help{
+	position : absolute;
+	left : 0;
+	right : 0;
+	top : 0;
+	bottom : 0;
+	opacity : 0;
+	z-index : 2;
+	pointer-events : none;
+	display: flex;
+	flex-flow: column nowrap;
+	height: 100%;
+	max-width: 100%;
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-image: url("../image/play/bg_play.jpg");
+}
+
+.help.on {
+	opacity: 1;
+	pointer-events : all;
+}
+
+.help .h-exit{
+	position : absolute;
+	margin : 10px;
+	right : 0;
+	top : 0;
+	z-index : 1001;
+	
+	width : 40px;
+	height : 40px;
+	
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-image: url("../image/help/btn_help_exit.png");
+}
+
+.help .h-wrap-fg {
+	opacity : 0;
+	z-index: 1000;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.7);
+}
+
+.help .h-wrap-fg.on{
+	opacity: 1;
+}
+
+.help .explain-obj{
+	z-index: 1001;
+}
+
+
+/** ========== Header ================= **/
+
+.h-header {
+	width: 100%;
+	height: 150px;
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-image: url("../image/play/bg_play_header.png");
+	position: relative;
+}
+
+.h-info-board-t{
+	display: flex;
+	margin-top: 12px;
+}
+
+.h-progress {
+	margin-left : 15px;
+	position : relative;
+	width : 220px;
+	height : 50px;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("../image/play/icon_play_progress.png");
+}
+
+.h-progress .h-progress-bar {
+	position : absolute;
+	width : 100%;
+	height : 50px;
+	overflow: hidden;
+}
+
+.h-progress .h-progress-bar .h-crop-progress-bar{
+	height : 50px;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("../image/play/icon_play_progressbar.png");
+}
+
+.h-progress .h-progress-marking{
+	position : absolute;
+	width : 100%;
+	height : 50px;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("../image/play/icon_play_progress_marking.png");
+}
+
+.h-progress .h-progress-apple{
+	position : absolute;
+	width : 100%;
+	height : 50px;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("../image/play/icon_play_progress_fg.png");
+}
+
+.h-info.h-wrap-coin{
+	position: relative;
+	width : 110px;
+	height: 40px;
+	margin-left : 5px;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("../image/play/icon_play_header_coin.png");
+	
+}
+
+.h-info.h-wrap-coin .h-value{
+    position: absolute;
+    width : 50px;
+    left: 10px;
+    top: 13px;
+    text-align : center;
+    font-size: 13;
+    color: #FFF;
+}
+
+.h-btn-pause{
+	margin-right : 7px;
+	width: 50px;
+	height: 50px;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("../image/play/btn_play_pause.png");
+}
+
+
+.h-info-board-c{
+	display : flex;
+	justify-content:space-between;
+	z-index: 10;
+}
+
+.h-info-board-c .h-info.h-stage, .h-info-board-c .h-info.h-empty{
+	margin: 0px 15px;
+	width : 40px;
+	height: 40px;
+}
+
+.h-info-board-c .h-info.h-stage .h-value{
+	position
+	width : 100%;
+	height: 100%;
+	background-repeat: no-repeat;
+	background-size: contain;
+}
+
+.h-info-board-c .h-info.h-stage .h-value.h-stage1.on{background-image: url("../image/play/icon_play_header_stage1.png");}
+
+.h-info-board-c .h-info.h-time {
+	width : 120px;
+	font-size: 2.1rem;
+	color : #FFF;
+	text-align: center;
+	z-index: 1;
+}
+
+.h-move-friends {
+	bottom: 0;
+	position: absolute;
+	width: 60px;
+	height: 60px;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("../image/play/icon_play_header_friend.png");
+}
+
+
+/** ========= Play Ground ======== **/
+.h-wrap-play-ground{
+	flex: 1;
+	position: relative;
+}
+
+.h-play-ground {
+	position: absolute;
+	left : 0;
+	right : 0;
+	top : 0;
+	bottom : 0;
+	
+	overflow: hidden;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("../image/play/bg_play_playground.png");
+}
+
+.h-target {
+	position: absolute;
+	z-index: 20;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background: rgba(0, 0, 0, 0);
+	transform-origin: 50% 50%;
+}
+
+.h-target .h-target-icon {
+	width: 100%;
+	height: 100%;
+	background-repeat: no-repeat;
+	background-size: contain;
+}
+
+.h-target.h-normal  .h-target-icon { background-image: url("../image/play/icon_play_target_normal_live.png"); }
+.h-target.h-warning .h-target-icon { background-image: url("../image/play/icon_play_target_warning_live.png");  }
+.h-target.h-gold 	  .h-target-icon { background-image: url("../image/play/icon_play_target_gold_live.png");  }
+
+
+.h-wrap-item{
+	position : absolute;
+	bottom : 0;
+	left : 0;
+	right : 0;
+	height : 100px;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("../image/play/bg_play_footer.png");
+	background-position: center bottom;	
+}
+
+.h-itembar {
+	display: flex;
+	justify-content :flex-end;
+	align-items : baseline; 
+	position : absolute;
+	bottom:  5px;
+	left : 0;
+	right : 0;
+}
+
+.h-itembar .h-icon-basket-occupy{
+	height: 60px;
+	width: 250px;
+	left : 0px;
+}
+
+.h-itembar-item {
+	flex-flow: column nowrap;
+	margin: -10px;
+	height: 130px;
+	width: 130px;
+	background-repeat: no-repeat;
+	background-size: contain;
+}
+
+.h-itembar-item.h-lime-item.on 		{ 	background-image: url("../image/play/btn_play_lime_on.png"); margin-left : -30px; }
+.h-itembar-item.h-portion-item.on 	{ 	background-image: url("../image/play/btn_play_potion_on.png"); }
+.h-itembar-item.h-spray-item.on 	{ 	background-image: url("../image/play/btn_play_spray_on.png"); margin-right : 0px;}
+
+.h-icon-basket{
+	position : absolute;
+	background-repeat: no-repeat;
+	background-size: contain;
+	z-index: 10;
+	left : 0px;
+	bottom : 5px;
+	pointer-events : none;
+}
+
+.h-icon-basket .h-value{
+	position: absolute;
+	left : 0;
+	right : 0;
+	top : 0;
+	bottom : 0;
+	background-repeat: no-repeat;
+	background-size: contain;
+}
+
+.h-icon-basket .h-value.h-status-100	{ z-index : 11; background-image: url("../image/play/icon_play_basket_100.png");}
+
+

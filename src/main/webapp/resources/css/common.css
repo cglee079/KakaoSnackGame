@@ -4,5 +4,11 @@
 }
 
 html, body, .wrapper {
-	overflow-x: hidden;
+	overflow: hidden;
+}
+
+.wrapper{
+	position: relative;
+	width : 100%;
+	height : 100%;
 }

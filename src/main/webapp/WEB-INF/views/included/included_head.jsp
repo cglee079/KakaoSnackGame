@@ -23,10 +23,6 @@
 <script src="${pageContext.request.contextPath}/resources/js/lib/howler.spatial.min.js"></script>
 
 
-
-<script src="${pageContext.request.contextPath}/resources/js/common-sound.js"></script>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common.css" />
-
 <script>
 /* context Path */
 var contextPath = "${pageContext.request.contextPath}";

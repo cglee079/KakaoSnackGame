@@ -1,5 +1,13 @@
-.wrapper {
-	position: relative;
+.play{
+	position : absolute;
+	left : 0;
+	right : 0;
+	top : 0;
+	bottom : 0;
+	opacity : 0;
+	z-index : 2;
+	pointer-events : none;
+
 	display: flex;
 	flex-flow: column nowrap;
 	height: 100%;
@@ -9,11 +17,16 @@
 	background-image: url("../image/play/bg_play.jpg");
 }
 
+.play.on {
+	opacity: 1;
+	pointer-events : all;
+}
+
 /** ============= Foreground =============== **/
 .wrap-fg {
 	opacity : 0;
 	z-index: 300;
-	position: fixed;
+	position: absolute;
 	left: 0;
 	right: 0;
 	top: 0;
@@ -30,7 +43,7 @@
 .wrap-gameover {
 	display: flex;
 	z-index: 400;
-	position: fixed;
+	position: absolute;
 	left: 0;
 	right: 0;
 	top: 0;
@@ -40,12 +53,22 @@
 	justify-content: center;
 	align-items: center;
 	transform : scale(0);
-	-webkit-transition: transform 0.2s ease-in-out;
-	transition: transform 0.2s ease-in-out; 
 }
 
 .wrap-gameover.on {
+	-webkit-transition: transform 0.2s ease-in-out;
+	transition: transform 0.2s ease-in-out; 
 	transform : scale(1);
+}
+
+.wrap-gameover .btn-restart-mortion{
+	position: fixed;
+	width : 30px;
+	height: 30px;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("../image/play/icon_play_target_normal_live.png");
+    transform: rotate(30deg);
 }
 
 .gameover {
@@ -97,7 +120,7 @@
 	right: 0;
 	top: 0;
 	bottom: 0;
-	position : fixed;
+	position : absolute;
 	z-index : 100;
 	justify-content: center;
 	align-items: center; 
@@ -129,7 +152,7 @@
 	transform: scale(1);
 }
 
-.wrap-stageup .value.stage1{ background-image: url("../image/play/icon_play_stage1.png");}
+.wrap-stageup .value.stage1	{ background-image: url("../image/play/icon_play_stage1.png");}
 .wrap-stageup .value.stage2 { background-image: url("../image/play/icon_play_stage2.png");}
 .wrap-stageup .value.stage3 { background-image: url("../image/play/icon_play_stage3.png");}
 .wrap-stageup .value.stage4 { background-image: url("../image/play/icon_play_stage4.png");}
@@ -137,25 +160,25 @@
 .wrap-stageup .bg-stage{
 	position : absolute;
 	display : block;
-	left : 0;
-	right : 0;
-	top : 0;
-	bottom : 0;
+	width : 150vmax;
+	height : 150vmax;
 	background-repeat: no-repeat;
 	background-size: cover;
+	background-position : center;
 	background-image: url("../image/play/bg_play_stageup.png");
 	transform : rotate(0deg);
-	transition : transform 1s ease-out;
+	transition : transform 0.7s ease-out;
 }
 
 .wrap-stageup .bg-stage.on{
-	transform : rotate(360deg); 
+	transform : rotate(180deg); 
 }
+
 .wrap-pause {
 	opacity : 0;
 	display : flex;
 	z-index: 400;
-	position: fixed;
+	position: absolute;
 	left: 0;
 	right: 0;
 	top: 0;
@@ -236,16 +259,34 @@
 }
 
 .progress .progress-bar .crop-progress-bar{
+	position : absolute;
 	height : 50px;
 	background-repeat: no-repeat;
 	background-size: contain;
 	background-image: url("../image/play/icon_play_progressbar.png");
+	z-index: 1;
+}
+
+.progress .progress-bar .crop-progress-bar-overlay{
+	position : absolute;
+	height : 50px;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("../image/play/icon_play_progress_portion_overalay.png");
+	z-index: 2;
+	opacity: 0;
+	transition : opacity 0.8s ease-out;
+}
+
+.progress .progress-bar .crop-progress-bar-overlay.on{
+	opacity: 1;
 }
 
 .progress .progress-marking{
 	position : absolute;
 	width : 100%;
 	height : 50px;
+	z-index : 3;
 	background-repeat: no-repeat;
 	background-size: contain;
 	background-image: url("../image/play/icon_play_progress_marking.png");
@@ -255,6 +296,7 @@
 	position : absolute;
 	width : 100%;
 	height : 50px;
+	z-index : 3;
 	background-repeat: no-repeat;
 	background-size: contain;
 	background-image: url("../image/play/icon_play_progress_fg.png");
@@ -266,16 +308,20 @@
 	height : 50px;
 	background-repeat: no-repeat;
 	background-size: contain;
-	background-image: url("../image/play/icon_play_effect_portion.png");
+	z-index: 4;
 	opacity : 0;
 	transform : scale(0.95);
-	transition : opacity 0.4s ease-out , transform 0.1s ease-out;
+	transition : opacity 0.2s ease-out , transform 0.1s ease-out;
 }
 
 .progress .progress-portion.on{
 	opacity : 1;
 	transform : scale(1);
 }
+
+.progress .progress-portion.effect1{ background-image: url("../image/play/icon_play_progress_portion_effect1.png");}
+.progress .progress-portion.effect2{ background-image: url("../image/play/icon_play_progress_portion_effect2.png");}
+.progress .progress-portion.effect3{ background-image: url("../image/play/icon_play_progress_portion_effect3.png");}
 
 .info.wrap-coin{
 	position: relative;
@@ -376,7 +422,7 @@
 .combo-message {
 	width: 200px;
 	height: 72px;
-	z-index : 1;
+	z-index : 40;
 	position: absolute;
 	display: none;
 }
@@ -408,7 +454,7 @@
 
 .target {
 	position: absolute;
-	z-index: 2;
+	z-index: 10;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -416,24 +462,41 @@
 	transform-origin: 50% 50%;
 }
 
+.target .target-icon-bg{
+	opacity : 0;
+	position: absolute;
+	left : 0;
+	right : 0;
+	bottom : 0;
+	top : 0;
+	z-index : 11;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("../image/play/icon_play_target_gold_died_bg.png");
+}
 .target .target-icon {
-	width: 100%;
-	height: 100%;
+	position: absolute;
+	left : 0;
+	right : 0;
+	bottom : 0;
+	top : 0;
+	z-index : 12;
 	background-repeat: no-repeat;
 	background-size: contain;
 }
 
-.target.normal 	.target-icon { background-image: url("../image/play/icon_play_target_normal_live.png"); }
-.target.warning .target-icon { background-image: url("../image/play/icon_play_target_warning_live.png");  }
+.target.normal 	.target-icon { background-image: url("../image/play/icon_play_target_normal_live.gif"); }
+.target.warning .target-icon { background-image: url("../image/play/icon_play_target_warning_live.gif");  }
 .target.gold 	.target-icon { background-image: url("../image/play/icon_play_target_gold_live.png");  }
 
 .target.normal.died 	.target-icon { background-image: url("../image/play/icon_play_target_normal_died.png"); }
 .target.warning.died 	.target-icon { background-image: url("../image/play/icon_play_target_warning_died.png"); }
-.target.gold.died 		.target-icon { background-image: url("../image/play/icon_play_target_gold_died.png"); }
+.target.gold.died 		.target-icon { /* GIF JS·Î ±¸Çö*/}
+.target.gold.died 		.target-icon-bg{opacity:1 ;}
 
 .attacker {
 	position: absolute;
-	z-index: 4;
+	z-index: 60;
 	display: none;
 	background-repeat: no-repeat;
 	background-size: contain;
@@ -453,16 +516,13 @@
 }
 
 .effect.lime {
-	display: none;
+	display: block;
 	position: absolute;
-	z-index: 0;
+	z-index: 20;
 	background-repeat: no-repeat;
 	background-size : contain;
 	background-image: url("../image/play/icon_play_effect_lime.png");
-}
-
-.effect.lime.on {
-	display: block;
+	opacity: 0.7;
 }
 
 .effect.spray{
@@ -472,7 +532,8 @@
 	left : 0;
 	right : 0;
 	opacity : 0;	
-	z-index: 3;
+	z-index: 50;
+	transform : scale(1.2);
 	background-repeat: no-repeat;
 	background-size : cover;
 	background-image: url("../image/play/icon_play_effect_spray.png");
@@ -502,43 +563,58 @@
 	justify-content :flex-end;
 	align-items : baseline; 
 	position : absolute;
-	bottom:  5px;
+	bottom:  0px;
 	left : 0;
 	right : 0;
 }
 
 .itembar .icon-basket-occupy{
-	height: 60px;
-	width: 250px;
+	height : 1px;
+	flex : 2.5;
 	left : 0px;
 }
 
 .itembar-item {
+	flex : 1;
 	flex-flow: column nowrap;
-	padding: 10px;
-	margin-right : 10px;
-	height: 60px;
-	width: 60px;
+	margin: 5px;
+	margin-bottom : 12px;
+	position: relative;
+}
+
+.itembar-item.lime-item 	{ margin-left : -20px; }
+.itembar-item.spray-item 	{ margin-right : 10px;}
+
+.itembar-item .icon{
+	opacity : 0;
+	position: absolute;
+	left : 0;
+	right : 0;
+	top : 0;
+	bottom : 0;
 	background-repeat: no-repeat;
 	background-size: contain;
 }
 
-.itembar-item.lime-item { margin-left : -30px;	background-image: url("../image/play/btn_play_lime_off.png"); }
-.itembar-item.spray-item { 	background-image: url("../image/play/btn_play_spray_off.png"); }
-.itembar-item.portion-item { 	background-image: url("../image/play/btn_play_potion_off.png"); }
+.itembar-item .icon.on{
+	opacity: 1;
+}
 
-.itembar-item.lime-item.on { 	background-image: url("../image/play/btn_play_lime_on.png"); }
-.itembar-item.spray-item.on { 	background-image: url("../image/play/btn_play_spray_on.png"); }
-.itembar-item.portion-item.on { 	background-image: url("../image/play/btn_play_potion_on.png"); }
+.itembar-item.lime-item 	.icon.icon-off { background-image: url("../image/play/btn_play_lime_off.png");}
+.itembar-item.portion-item 	.icon.icon-off { background-image: url("../image/play/btn_play_potion_off.png");}
+.itembar-item.spray-item 	.icon.icon-off { background-image: url("../image/play/btn_play_spray_off.png");}
+.itembar-item.lime-item 	.icon.icon-on { background-image: url("../image/play/btn_play_lime_on.png"); }
+.itembar-item.portion-item 	.icon.icon-on { background-image: url("../image/play/btn_play_potion_on.png"); }
+.itembar-item.spray-item 	.icon.icon-on { background-image: url("../image/play/btn_play_spray_on.png"); }
 
 
 .icon-basket{
-	position : fixed;
+	position : absolute;
 	background-repeat: no-repeat;
 	background-size: contain;
 	z-index: 10;
 	left : 0px;
-	bottom : 5px;
+	bottom : 3px;
 	pointer-events : none;
 }
 
@@ -562,3 +638,4 @@
 .icon-basket .value.status-60.on 	{ opacity: 1;}
 .icon-basket .value.status-30.on 	{ opacity: 1;}
 .icon-basket .value.status-died.on 	{ opacity: 0.5;}
+

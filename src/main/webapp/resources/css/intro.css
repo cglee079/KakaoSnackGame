@@ -1,24 +1,45 @@
-.wrapper {
+.splash{
+	display : none;
+	position : absolute;
+	left : 0;
+	right : 0;
+	top : 0;
+	bottom : 0;
+	opacity : 0;
+	z-index : 3;
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-image: url("../image/intro/bg_splash.jpg");
+	background-position: center;
+}
+
+.splash.on{
+	display: block;
+}
+
+.intro{
+	position : absolute;
+	left : 0;
+	right : 0;
+	top : 0;
+	bottom : 0;
+	opacity : 0;
+	z-index : 1;
+	pointer-events : none;
+	
 	display: flex;
 	flex-flow: column nowrap;
 	justify-content: space-between;
-	height: 100%;
-	width: 100%;
 	background-repeat: no-repeat;
 	background-size: cover;
 	background-image: url("../image/intro/bg_intro.jpg");
 	background-position: center;
 }
 
-/* @media screen and (min-width: 751px) {
-	.wrapper {
-		margin-top: -300px; 
-		height: 100%;
-		background-size: cover;
-	}
+.intro.on{
+	opacity: 1;
+	pointer-events : all;
 }
-
-} */
 
 .mask {
 	position: absolute;
@@ -62,63 +83,11 @@
 
 .title {
 	margin-top: -20;
-	height: 160px;
+	height: 25%;
 	background-size: contain;
 	background-repeat: no-repeat;
 	background-position: center center;
 	background-image: url("../image/intro/icon_intro_title.png");
-}
-
-.help-board {
-	display: none;
-	z-index: 3;
-	position: absolute;
-	left: 0;
-	right: 0;
-	top: 0;
-	bottom: 0;
-	background: rgba(0, 0, 0, 0);
-	justify-content: center;
-	align-items: center;
-}
-
-.help-board.on {
-	display: flex;
-}
-
-.swiper-container {
-    width: 100%;
-    height: 100%;
-}
-
-.swiper-wrapper img {
-	width:100%;
-	height:100%;
-}
-
-.swiper-slide {
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: -webkit-flex;
-      display: flex;
-      -webkit-box-pack: center;
-      -ms-flex-pack: center;
-      -webkit-justify-content: center;
-      justify-content: center;
-      -webkit-box-align: center;
-      -ms-flex-align: center;
-      -webkit-align-items: center;
-      align-items: center;
-    }
-#cancel {
-	cursor: pointer;
-	z-index: 999;
-	position: absolute;
-	top: 0px;
-	margin-top:5px;
-	width: 30px;
-	height: 30px;
-	right: 0;
 }
 
 .footer {
