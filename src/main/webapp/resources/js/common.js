@@ -11,6 +11,7 @@ function redrawToHome(){
 	$(".play").removeClass("on");
 	$(".play > .wrap").removeClass("on");
 	$(".play .itembar-item .icon-on").removeClass("on");
+	$(".info").removeClass("on");
 }
 
 function redrawToPlay(){

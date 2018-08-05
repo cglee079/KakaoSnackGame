@@ -30,7 +30,7 @@ var contextPath = "${pageContext.request.contextPath}";
 function getContextPath(){ return contextPath; }
 
 /* check, is mobile?*/
-var maxMobileWidth = 700;
+var maxMobileWidth = 500;
 var isMobile = false;
 var deviceWidth = undefined;
 var deviceHeight = undefined;
@@ -40,6 +40,7 @@ function checkDevice(){
 	deviceHeight	= Math.min(window.innerHeight || Infinity, screen.height);
 	if(deviceWidth <= maxMobileWidth){
 		isMobile = true;
+		redrawToHome();
 	}
 	
 	if(!isMobile){
@@ -54,6 +55,7 @@ $(window).resize(function(){
 
 $(document).ready(function(){
 	$("html, body").css("font-family", "BM_Jua, serif");
+	checkDevice();
 })
 
 /* if ( !!window.Worker ) {
