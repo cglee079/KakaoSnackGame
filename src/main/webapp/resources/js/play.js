@@ -81,7 +81,8 @@ var lifeDecreaseThread;
 function removeTarget(target, doEffect){
 	var moveTargetThreadID = target.find(".moveTargetThreadID").val();
 	clearInterval(moveTargetThreadID); // 쓰레드종료
-	
+	target.find(".moveTargetThreadID").val('');
+	 
 	if(doEffect){ // 소리, 제거 효과
 		if(target.hasClass(TARGET_WARNING)) {
 			startAudio(wrongAttackSound);
@@ -100,7 +101,12 @@ function removeTarget(target, doEffect){
 	} else{
 		target.remove();
 	}
-	
+}
+
+function removeSomeTarget(targets, doEffect){
+	targets.each(function(){
+		removeTarget($(this), doEffect);
+	})
 }
 
 // 체력 회복
@@ -217,7 +223,7 @@ function usingItem(itemId){
 				startLifeDecrease();
 				startMakeTarget();
 				
-				$(".target").remove();
+				removeSomeTarget($(".target"), false);
 				startAudio(sprayItemCompSound);
 			}, 1500)
 			
@@ -258,7 +264,7 @@ function startTime(){
 		$(".info-board-c .info.time .value").text(time.toFixed(2));
 		if(time >= config.maxTime){
 			level += 1;
-			$(".target").remove();
+			removeSomeTarget($(".target"), false);
 			$(".effect.lime").remove();
 			
 			stopPlay();
@@ -814,7 +820,7 @@ function gameover() {
 	stopBGM();
 	startAudio(gameoverSound);
 	
-	$(".target").remove()// 모든 타겟 삭제
+	removeSomeTarget($(".target"), false);// 모든 타겟 삭제
 	stopPlay();
 	
 	$(".wrap-fg").addClass("on");
