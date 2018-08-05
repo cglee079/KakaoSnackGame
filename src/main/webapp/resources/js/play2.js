@@ -75,10 +75,12 @@ var makeTargetThread;
 var timeWorker = new Worker( getContextPath() + '/resources/js/worker/timeWorker.js' );
 var warnigLifeThread;
 var lifeDecreaseThread;
-var moveTargetThread;
 
 
 function removeTarget(target, doEffect){
+	var moveTargetThreadID = target.find(".moveTargetThreadID").val();
+	clearInterval(moveTargetThreadID); // 쓰레드종료
+	target.find(".moveTargetThreadID").val('');
 	 
 	if(doEffect){ // 소리, 제거 효과
 		if(target.hasClass(TARGET_WARNING)) {
@@ -210,7 +212,7 @@ function usingItem(itemId){
 			
 			$(".target").addClass("died");
 			$(".effect.spray").addClass("on");
-			stopMoveTargetThread();
+			stopAllMoveTargetThread();
 			
 			setTimeout(function() {
 				$(".effect.spray").removeClass("on");
@@ -356,6 +358,7 @@ function makeTarget(){
 	}
 	target.append($("<div>", {"class" : "target-icon"}));
 	target.append($("<input>", {"class" : "angle", type : "hidden"}));
+	target.append($("<input>", {"class" : "moveTargetThreadID", type : "hidden"}));
 	target.append($("<input>", {"class" : "toLeftDistance", type : "hidden"}));
 	target.append($("<input>", {"class" : "toTopDistance", type : "hidden"}));
 	target.append($("<input>", {"class" : "saveToLeftDistance", type : "hidden"}));
@@ -398,6 +401,7 @@ function makeTarget(){
 	target.css("top", top);
 
 	randAngle(target);
+	startMoveTargetThread(target)
 }
 
 // 타겟 각도 변경 함수
@@ -501,21 +505,26 @@ function moveTarget(target){
 
 // 타겟 움직임 스레드
 function startMoveTargetThread(tg){
-	moveTargetThread = setInterval(function(){
-		var targets = $(".target:not(.died)");
-		targets.each(function(){
-			moveTarget($(this)).then(function (xy){
-				xy["target"].css("left", xy["left"]);
-				xy["target"].css("top", xy["top"]);
-			});
+	var moveTargetThread = setInterval(function(){
+		moveTarget(tg).then(function (xy){
+			xy["target"].css("left", xy["left"]);
+			xy["target"].css("top", xy["top"]);
 		});
-		
 	}, config.targetMoveSpeed);
+	
+	tg.find(".moveTargetThreadID").val(moveTargetThread);
 }
 
-function stopMoveTargetThread(){
-	clearInterval(moveTargetThread);
-	moveTargetThread = undefined;
+function stopMoveTargetThread(tg){
+	clearInterval(tg.find(".moveTargetThreadID").val());
+	$(this).find(".moveTargetThreadID").val('');
+}
+
+function stopAllMoveTargetThread(tg){
+	var targets = $(".target");
+	targets.each(function(){
+		stopMoveTargetThread($(this));
+	})
 }
 
 function stopMoveTarget(tg){
@@ -552,7 +561,6 @@ function startPlay(){
 	startTime();
 	startMakeTarget(); // 타겟 생성 쓰레드
 	startLifeDecrease(); // 생명력 감소 스레드 시작
-	startMoveTargetThread();
 }
 
 function stopPlay(){
@@ -560,7 +568,7 @@ function stopPlay(){
 	stopMakeTarget();
 	stopLifeDecrease();
 	stopWarnigLifeThread();
-	stopMoveTargetThread();
+	stopAllMoveTargetThread();
 }
 
 
@@ -892,7 +900,6 @@ function doRestart(tg, doMortion){
 		clearInterval(mortionInterval);
 		restartMotion.removeClass("moving");
 		
-		stopPlay();
 		redrawToPlay();
 		initGame();
 		stageEffectOn();

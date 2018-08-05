@@ -2,7 +2,7 @@
 <html>
 <head>
 <%@ include file="/WEB-INF/views/included/included_head.jsp"%>
-<script src="${pageContext.request.contextPath}/resources/js/play.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/play2.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/intro.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/help.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
@@ -153,7 +153,7 @@
 		
 		<div class="help">
 			<div class="h-exit" onClick = "doHelpExit(this)"></div>
-			<div class="h-wrap-fg">
+			<div class="h-wrap-fg" onClick = "doExplain()">
 				<div class="h-wrap-exp h-exp-1"> 
 					<div class="h-title"></div>
 				</div>
