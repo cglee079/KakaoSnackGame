@@ -23,6 +23,7 @@ function setBGM(src){
 		"html5"	: "false",
 		"volume": 1
 	});
+	
 }
 
 function doSoundOn(){
@@ -47,7 +48,6 @@ function restartBGM(){
 	stopBGM();
 	startBGM();
 }
-
 
 function startAudio(howl){  
 	if(sound == "on"){
@@ -86,11 +86,12 @@ $(document).ready( function() {
 	multiCoinSound 		= makeSound(getContextPath() + "/resources/audio/play/sound_play_multi_money.mp3");
 	warningSound 		= makeSound(getContextPath() + "/resources/audio/play/sound_play_warnig.mp3");
 	gameoverSound		= makeSound(getContextPath() + "/resources/audio/play/sound_play_gameover.mp3");
-	stageupSound		= makeSound(getContextPath() + "/resources/audio/play/sound_play_stageup.mp3");;
-	comboSound			= makeSound(getContextPath() + "/resources/audio/play/sound_play_combo.mp3");;
+	stageupSound		= makeSound(getContextPath() + "/resources/audio/play/sound_play_stageup.mp3");
+	comboSound			= makeSound(getContextPath() + "/resources/audio/play/sound_play_combo.mp3");
 	btnClickSound		= makeSound(getContextPath() + "/resources/audio/sound_common_button.mp3");
+	
+	setTimeout(function(){
+		startBGM();
+	}, 1000);
 });
 
-$(window).on("load", function(){
-	startBGM();
-})

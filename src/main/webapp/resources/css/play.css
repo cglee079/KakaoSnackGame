@@ -53,12 +53,14 @@
 	justify-content: center;
 	align-items: center;
 	transform : scale(0);
+	-webkit-transform : scale(0);
 }
 
 .wrap-gameover.on {
 	-webkit-transition: transform 0.2s ease-in-out;
 	transition: transform 0.2s ease-in-out; 
 	transform : scale(1);
+	-webkit-transform : scale(1);
 }
 
 .wrap-gameover .btn-restart-mortion{
@@ -119,64 +121,64 @@
 
 
 .wrap-stageup{
-	display : flex;
+	position : absolute;
 	left: 0;
 	right: 0;
 	top: 0;
 	bottom: 0;
-	position : absolute;
 	z-index : 100;
-	justify-content: center;
-	align-items: center; 
+	
 	opacity: 0;
 	pointer-events : none;
+	display : flex;
+	justify-content: center;
+	align-items: center;
+	
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position : center;
+	background-image: url("../image/play/bg_play_stageup.png");
+	 
 }
 
 .wrap-stageup.on{
 	opacity: 1;
 	pointer-events : all;
-	
 }
 
 .wrap-stageup .value{
 	position : absolute;
-	display : block;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	pointer-events : none;
+	display : flex;
+	justify-content: center;
+	align-items: center;
+	
+	z-index : 11;
+}
+
+.wrap-stageup .value .icon{
 	width: 200px;
 	height : 200px;
 	background-repeat: no-repeat;
 	background-size: contain;
-	opacity: 0;
 	transform : scale(2);
-	transition : transform 0.2s ease-out;
-	z-index : 11;
+	opacity: 0;
 }
 
-.wrap-stageup .value.on{
+.wrap-stageup .value.on .icon{
 	opacity: 1;
 	transform: scale(1);
+	transition : transform 0.2s ease-out;
 }
 
-.wrap-stageup .value.stage1	{ background-image: url("../image/play/icon_play_stage1.png");}
-.wrap-stageup .value.stage2 { background-image: url("../image/play/icon_play_stage2.png");}
-.wrap-stageup .value.stage3 { background-image: url("../image/play/icon_play_stage3.png");}
-.wrap-stageup .value.stage4 { background-image: url("../image/play/icon_play_stage4.png");}
-
-.wrap-stageup .bg-stage{
-	position : absolute;
-	display : block;
-	width : 150vmax;
-	height : 150vmax;
-	background-repeat: no-repeat;
-	background-size: cover;
-	background-position : center;
-	background-image: url("../image/play/bg_play_stageup.png");
-	transform : rotate(0deg);
-	transition : transform 0.7s ease-out;
-}
-
-.wrap-stageup .bg-stage.on{
-	transform : rotate(180deg); 
-}
+.wrap-stageup .value.stage1 .icon { background-image: url("../image/play/icon_play_stage1.png");}
+.wrap-stageup .value.stage2 .icon { background-image: url("../image/play/icon_play_stage2.png");}
+.wrap-stageup .value.stage3 .icon { background-image: url("../image/play/icon_play_stage3.png");}
+.wrap-stageup .value.stage4 .icon { background-image: url("../image/play/icon_play_stage4.png");}
 
 .wrap-pause {
 	opacity : 0;

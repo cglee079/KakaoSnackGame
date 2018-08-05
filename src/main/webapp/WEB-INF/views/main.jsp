@@ -58,11 +58,10 @@
 			</div>
 			
 			<div class="wrap wrap-stageup">	
-				<div class="value stage1"></div>
-				<div class="value stage2 "></div>
-				<div class="value stage3"></div>
-				<div class="value stage4"></div>
-				<div class="bg-stage"></div>
+				<div class="value stage1"><div class="icon"></div></div>
+				<div class="value stage2"><div class="icon"></div></div>
+				<div class="value stage3"><div class="icon"></div></div>
+				<div class="value stage4"><div class="icon"></div></div>
 			</div>
 			
 			<div class="header">
@@ -154,7 +153,7 @@
 		
 		<div class="help">
 			<div class="h-exit" onClick = "doHelpExit(this)"></div>
-			<div class="h-wrap-fg" onClick="doExplain()">
+			<div class="h-wrap-fg">
 				<div class="h-wrap-exp h-exp-1"> 
 					<div class="h-title"></div>
 				</div>
@@ -168,6 +167,12 @@
 					<div class="h-exp-spray"></div>
 					<div class="h-coin-mortion"></div>
 				</div>
+			</div>
+			
+			<div class="h-tab-status">
+				<div class="h-value"></div>
+				<div class="h-value"></div>
+				<div class="h-value"></div>
 			</div>
 			
 			<div class="h-header">

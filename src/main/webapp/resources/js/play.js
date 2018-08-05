@@ -72,8 +72,7 @@ var totalCoin;    // 코인 숫자
 
 // 쓰레드
 var makeTargetThread;
-var fallingSpeedUpThread;
-var timeThread;
+var timeWorker = new Worker( getContextPath() + '/resources/js/worker/timeWorker.js' );
 var warnigLifeThread;
 var lifeDecreaseThread;
 
@@ -213,6 +212,7 @@ function usingItem(itemId){
 			
 			$(".target").addClass("died");
 			$(".effect.spray").addClass("on");
+			stopAllMoveTargetThread();
 			
 			setTimeout(function() {
 				$(".effect.spray").removeClass("on");
@@ -259,8 +259,9 @@ function usingItem(itemId){
 /** ============== 시간 타이머 관련 =========== **/
 
 function startTime(){
-	timeThread = setInterval(function(){
-		time += 0.01;
+	timeWorker.postMessage('start');    // 워커에 메시지를 보낸다.
+	timeWorker.onmessage = function( e ) {
+		time = e.data;
 		$(".info-board-c .info.time .value").text(time.toFixed(2));
 		if(time >= config.maxTime){
 			level += 1;
@@ -276,18 +277,16 @@ function startTime(){
 				startBGM();
 			}, 1500);
 		}
-	}, 10);
-	
+  };
 }
 
 function stopTime(){
-	clearInterval(timeThread);
+	timeWorker.postMessage('stop');
 }
 
 function stageEffectOn(){
 	var wrapStageup = $(".wrap-stageup");
 	var stages = wrapStageup.find(".value");
-	var bgStage = wrapStageup.find(".bg-stage");
 	var infoBoardC = $(".info-board-c");
 	var stageInfo = infoBoardC.find(".value");
 	
@@ -295,7 +294,6 @@ function stageEffectOn(){
 	wrapStageup.addClass("on");
 	stages.removeClass("on");
 	stages.eq(level).addClass("on");
-	bgStage.addClass("on");
 	
 	// 스테이지 info board 설정
 	stageInfo.removeClass("on");
@@ -948,11 +946,12 @@ function initGame(){
 
 	makeTargetThread		= undefined;
 	moveTargetThread		= undefined;
-	fallingSpeedUpThread	= undefined;
 	timeThread				= undefined;
 	warnigLifeThread		= undefined;
 	lifeDecreaseThread 		= undefined;
 	
+	
+	timeWorker.postMessage("init");
 	
 	/*-----  좌표 초기화 -------- */
 	var playGround = $(".play-ground");
@@ -962,8 +961,8 @@ function initGame(){
 	endY	= playGround.height() + HIDDEN_PADDING;
 	
 	/*---- 값, 위치, 너비, 높이 초기화 ----*/
-	$(".target").remove();
-	$(".info.time .value").text(time);
+	removeSomeTarget($(".target"), false);
+	$(".info.time .value").text(time.toFixed(2));
 	$(".info.wrap-coin .value").text(totalCoin);
 	
 	var attacker = $(".attacker");
@@ -974,7 +973,11 @@ function initGame(){
 	var moveFriends = $(".move-friends");
 	moveFriends.removeAttr("style");
 	moveFriends.css("left", ((life * 0.65) + 20) + "%");
-	
+
+	redrawTag();
+}
+
+function redrawTag(){
 	var basketOccupy = $(".icon-basket-occupy");
 	var basket  = $(".icon-basket");
 	basket.removeAttr("style");
@@ -999,4 +1002,6 @@ function initGame(){
 	restartMotion.css("top", restartBtn[0].offsetTop);
 }
 		
-	
+$(window).resize(function(){
+	redrawTag();
+})

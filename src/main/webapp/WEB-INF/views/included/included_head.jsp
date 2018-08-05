@@ -18,6 +18,7 @@
  
 <!-- lib-js -->
 <script src="${pageContext.request.contextPath}/resources/js/lib/jquery-3.2.1.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/lib/jquery.touchwipe.1.1.1.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/lib/howler.core.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/lib/howler.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/lib/howler.spatial.min.js"></script>
@@ -54,5 +55,11 @@ $(window).resize(function(){
 $(document).ready(function(){
 	$("html, body").css("font-family", "BM_Jua, serif");
 })
+
+/* if ( !!window.Worker ) {
+    alert('웹 워커를 지원하는 브라우저입니다.');
+} else {
+    alert( '웹 워커를 지원하지 않는 브라우저입니다.' );
+} */
 
 </script>

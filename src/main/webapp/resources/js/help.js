@@ -1,4 +1,35 @@
-var tapNumber = 0;
+var tabNumber = 0;
+
+$(window).resize(function(){
+	initHelp();
+});
+
+$(document).ready(function(){
+	$(".h-wrap-fg").touchwipe({
+		wipeLeft: function() { 
+	    	startAudio(btnClickSound);
+			tabNumber += 1;
+			if(tabNumber > 2) {
+				helpExit();
+			} else{
+				explain();
+			}
+    	},
+	    wipeRight: function() {
+	    	startAudio(btnClickSound);
+	    	
+			tabNumber -= 1; 
+			if(tabNumber < 0) {
+				helpExit();
+			} else{
+				explain();
+			}
+	    },
+	    min_move_x: 20,
+	    min_move_y: 20,
+	    preventDefaultEvents: true
+	});
+})
 
 function initHelp(){
 	var moveFriends = $(".h-move-friends");
@@ -16,14 +47,6 @@ function initHelp(){
 	progressBar.removeAttr("style");
 	cropProgressBar.removeAttr("style");
 	cropProgressBar.css("width", progressBar.width());
-	
-	var targets = $(".h-target");
-	targets.css("width", TARGET_WIDTH);
-	targets.css("height", TARGET_HEIGHT);
-	targets.css("top", 100);
-	targets.eq(0).css("left", (deviceWidth/2) - 100 - (TARGET_WIDTH/2));
-	targets.eq(1).css("left", (deviceWidth/2) - (TARGET_WIDTH/2));
-	targets.eq(2).css("left", (deviceWidth/2) + 100 - (TARGET_WIDTH/2));
 	
 	var items = $(".h-itembar-item");
 	items.css("height", items.width());
@@ -52,6 +75,10 @@ function initHelp(){
 
 function doHelpExit(tg){
 	startAudio(btnClickSound);
+	helpExit();
+}
+
+function helpExit(){
 	$(".help").removeClass("on");
 	$(".help .h-wrap-fg").removeClass("on");
 	$(".help .explain-obj").removeClass("on");
@@ -60,16 +87,22 @@ function doHelpExit(tg){
 function doExplain(isStart){
 	startAudio(btnClickSound);
 	
-	var help = $(".help");
-	var explainObj = $(".exp");
-	
-	explainObj.removeClass("exp");
-	
 	if(isStart){
 		tabNumber = 0;
 	} else{
 		tabNumber += 1;
 	}
+	
+	explain();
+}
+
+function explain(){
+	var help = $(".help");
+	var explainObj = $(".exp");
+	
+	explainObj.removeClass("exp");
+	$(".help .h-tab-status .h-value").removeClass("on");
+	$(".help .h-tab-status .h-value").eq(tabNumber).addClass("on");
 	
 	switch(tabNumber){
 	case 0: explainLayout0();break;
@@ -92,5 +125,4 @@ function doExplain(isStart){
 		help.find(".h-info.h-wrap-coin").addClass("exp");
 		help.find(".h-wrap-fg .h-wrap-exp.h-exp-3").addClass("exp");
 	}
-	
 }
