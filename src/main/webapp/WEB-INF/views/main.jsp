@@ -11,6 +11,7 @@
 <link rel="stylesheet" 	href="${pageContext.request.contextPath}/resources/css/intro.css" />
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/play.css" />
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/help.css" />
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/info.css" />
 
 <body>
 	<div class="wrapper">
@@ -219,6 +220,18 @@
 				</div>
 			</div>
 		</div>
+		
+		<!-- ================================================-->
+		<!-- =================== INFO =======================-->
+		<!-- ================================================-->
+		
+		<div class="info">
+			<div class="i-header"></div>
+			<div class="i-image"></div>
+			<div class="i-message"></div>
+			<div class="i-logo"></div>
+		</div>
+		
 	</div>
 </body>
 </html>
