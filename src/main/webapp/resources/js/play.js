@@ -613,6 +613,8 @@ function startWarnigLifeThread(){
 		warnigLifeThread = setInterval(function(){
 			var basket = $(".icon-basket");
 			basket.find(".value.status-died").toggleClass("on");
+			var progressbarWarningOverlay = $(".crop-progress-bar-overlay-warning");
+			progressbarWarningOverlay.toggleClass("on");
 		}, 100);
 	}	
 }
@@ -621,11 +623,11 @@ function startWarnigLifeThread(){
 function stopWarnigLifeThread(){
 	var basket = $(".icon-basket");
 	basket.find(".value.status-died").removeClass("on");
+	var progressbarWarningOverlay = $(".crop-progress-bar-overlay-warning");
+	progressbarWarningOverlay.removeClass("on");
 	clearTimeout(warnigLifeThread);
 	warnigLifeThread = undefined; // 쓰레드 변수 초기화
 }
-
-
 
 /** =============== 공격 관련 ============== */
 
@@ -981,11 +983,14 @@ function redrawTag(){
 	var progressBar = $(".progress .progress-bar");
 	var cropProgressBar = $(".progress .progress-bar .crop-progress-bar");
 	var cropProgressBarOvelay = $(".progress .progress-bar .crop-progress-bar-overlay");
+	var cropProgressBarOvelayWarning = $(".progress .progress-bar .crop-progress-bar-overlay-warning");
 	progressBar.removeAttr("style");
 	cropProgressBar.removeAttr("style");
 	cropProgressBar.css("width", progressBar.width());
 	cropProgressBarOvelay.removeAttr("style");
 	cropProgressBarOvelay.css("width", progressBar.width());
+	cropProgressBarOvelayWarning.removeAttr("style");
+	cropProgressBarOvelayWarning.css("width", progressBar.width());
 	
 	var items = $(".itembar-item");
 	items.css("height", items.width());

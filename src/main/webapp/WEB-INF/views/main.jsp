@@ -71,8 +71,8 @@
 						<div class="progress-bar">
 							<div class="crop-progress-bar"></div>
 							<div class="crop-progress-bar-overlay"></div>
+							<div class="crop-progress-bar-overlay-warning"></div>
 						</div>
-						
 						<div class="progress-marking"></div>
 						<div class="progress-apple"></div>
 						<div class="progress-portion effect1"></div>

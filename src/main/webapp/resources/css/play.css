@@ -292,6 +292,21 @@
 	opacity: 1;
 }
 
+.progress .progress-bar .crop-progress-bar-overlay-warning{
+	position : absolute;
+	height : 50px;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("../image/play/icon_play_progress_warning_overalay.png");
+	z-index: 3;
+	opacity: 0;
+	margin-top: 10px;
+}
+
+.progress .progress-bar .crop-progress-bar-overlay-warning.on{
+	opacity: 1;
+}
+
 .progress .progress-marking{
 	position : absolute;
 	width : 100%;
@@ -504,7 +519,7 @@
 
 .target.normal.died 	.target-icon { background-image: url("../image/play/icon_play_target_normal_died.png"); }
 .target.warning.died 	.target-icon { background-image: url("../image/play/icon_play_target_warning_died.png"); }
-.target.gold.died 		.target-icon { /* GIF JS·Î ±¸Çö*/}
+.target.gold.died 		.target-icon { /* GIF JSï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½*/}
 .target.gold.died 		.target-icon-bg{opacity:1 ;}
 
 .attacker {
