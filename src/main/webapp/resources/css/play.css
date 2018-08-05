@@ -373,6 +373,7 @@
 }
 
 .info-board-c .info.stage, .info-board-c .info.empty{
+	position : relative;
 	margin: 0px 15px;
 	width : 40px;
 	height: 40px;
