@@ -217,11 +217,12 @@ function usingItem(itemId){
 			}, 1000)
 			
 			setTimeout(function() {
+				removeSomeTarget($(".target"), false);
+				
 				lifeRecovery(FULL_LIFE)
 				startLifeDecrease();
 				startMakeTarget();
-				
-				removeSomeTarget($(".target"), false);
+				startMoveTargetThread();
 				startAudio(sprayItemCompSound);
 			}, 1500)
 			
