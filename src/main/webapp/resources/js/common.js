@@ -20,6 +20,13 @@ function redrawToPlay(){
 	$(".play .itembar-item .icon-on").removeClass("on");
 }
 
+function redrawToInfo(){
+	$(".intro").removeClass("on");
+	$(".info").addClass("on");
+	$(".play > .wrap").removeClass("on");
+	$(".play .itembar-item .icon-on").removeClass("on");
+}
+
 $(window).on("load", function(){
 	$(".splash").removeClass("on");
 });

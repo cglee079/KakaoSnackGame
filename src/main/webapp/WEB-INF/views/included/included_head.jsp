@@ -22,7 +22,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/lib/howler.core.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/lib/howler.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/lib/howler.spatial.min.js"></script>
-
+<script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
 
 <script>
 /* context Path */
@@ -43,7 +43,7 @@ function checkDevice(){
 	}
 	
 	if(!isMobile){
-		alert("모바일 환경에서만 실행 가능합니다.");
+		redrawToInfo();
 	}
 }
 
