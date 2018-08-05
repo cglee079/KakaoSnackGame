@@ -68,16 +68,16 @@
 }
 
 .h-wrap-fg .h-wrap-exp.h-exp-1 .h-title{
-	width: 250px;
-	height : 250px;
+	width: 75vmin;
+	height : 75vmin;
 	background-repeat: no-repeat;
 	background-size: contain;
 	background-image: url("../image/help/icon_help_explain_game.png");
 }
 
 .h-wrap-fg .h-wrap-exp.h-exp-2 .h-title{
-	width: 250px;
-	height : 250px;
+	width: 75vmin;
+	height : 75vmin;
 	margin-bottom : -50px;
 	background-repeat: no-repeat;
 	background-size: contain;
@@ -85,8 +85,8 @@
 }
 
 .h-wrap-fg .h-wrap-exp.h-exp-3 .h-title{
-	width: 250px;
-	height : 50px;
+	width: 75vmin;
+	height : 25vmin;
 	margin-bottom : -80%;
 	background-repeat: no-repeat;
 	background-size: contain;

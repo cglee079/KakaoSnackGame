@@ -2,7 +2,7 @@
 <html>
 <head>
 <%@ include file="/WEB-INF/views/included/included_head.jsp"%>
-<script src="${pageContext.request.contextPath}/resources/js/play2.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/play.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/intro.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/help.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/common.js"></script>

@@ -89,9 +89,5 @@ $(document).ready( function() {
 	stageupSound		= makeSound(getContextPath() + "/resources/audio/play/sound_play_stageup.mp3");
 	comboSound			= makeSound(getContextPath() + "/resources/audio/play/sound_play_combo.mp3");
 	btnClickSound		= makeSound(getContextPath() + "/resources/audio/sound_common_button.mp3");
-	
-	setTimeout(function(){
-		startBGM();
-	}, 1000);
 });
 

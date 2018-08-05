@@ -33,7 +33,7 @@ const LEVEL_CONFIG =[
 	{ // level1
 		maxWarningTarget: 3,
 		maxNormalTarget : 17,
-		maxTime			: 30,
+		maxTime			: 3,
 		targetMoveSpeed	: 60,
 		lifeDecreaseRate: 100
 	},
@@ -261,7 +261,7 @@ function startTime(){
 	timeWorker.onmessage = function( e ) {
 		time = e.data;
 		$(".info-board-c .info.time .value").text(time.toFixed(2));
-		if(time == config.maxTime){
+		if(time >= config.maxTime && time < config.maxTime + 0.01){
 			level += 1;
 			removeSomeTarget($(".target"), false);
 			$(".effect.lime").remove();
@@ -296,7 +296,6 @@ function stageEffectOn(){
 	// 스테이지 info board 설정
 	stageInfo.removeClass("on");
 	stageInfo.eq(level).addClass("on");
-	stageInfo.first().before(stageInfo.eq(level));
 }
 
 function stageEffectOff(){
