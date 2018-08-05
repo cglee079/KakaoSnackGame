@@ -154,7 +154,21 @@
 		
 		<div class="help">
 			<div class="h-exit" onClick = "doHelpExit(this)"></div>
-			<div class="h-wrap-fg" onClick="doExplain()"></div>
+			<div class="h-wrap-fg" onClick="doExplain()">
+				<div class="h-wrap-exp h-exp-1"> 
+					<div class="h-title"></div>
+				</div>
+				<div class="h-wrap-exp h-exp-2">
+					<div class="h-title"></div>
+				</div>
+				<div class="h-wrap-exp h-exp-3">
+					<div class="h-title"></div>
+					<div class="h-exp-lime"></div>
+					<div class="h-exp-portion"></div>
+					<div class="h-exp-spray"></div>
+					<div class="h-coin-mortion"></div>
+				</div>
+			</div>
 			
 			<div class="h-header">
 				<div class="h-info-board-t">
@@ -167,7 +181,7 @@
 					</div>
 				
 					<div class="h-info h-wrap-coin">
-						<div class="h-value">0</div>
+						<div class="h-value">23</div>
 					</div>
 					
 					<div class="h-btn-pause" onClick="doPause()"></div>
@@ -184,17 +198,6 @@
 			
 			<div class="h-wrap-play-ground">
 				<div class="h-play-ground">
-					<div class="h-target h-normal">
-						<div class="h-target-icon"></div>
-					</div>
-					
-					<div class="h-target h-warning">
-						<div class="h-target-icon"></div>
-					</div>
-					
-					<div class="h-target h-gold">
-						<div class="h-target-icon"></div>
-					</div>
 				</div>
 				
 				<div class="h-wrap-item">

@@ -2,7 +2,7 @@ const ATTACKER_HEIGHT    	= deviceHeight * (3/10);
 const ATTACKER_WIDTH 		= ATTACKER_HEIGHT * (1/2); //width : height = 1 : 2;
 const TARGET_WIDTH			= deviceHeight * (1/18);	// 타겟 넓이
 const TARGET_HEIGHT			= deviceHeight * (1/18);	// 타겟 높이
-const HIDDEN_PADDING		= 50;	// 숨겨진 공간
+const HIDDEN_PADDING		= deviceHeight * (1/18);	// 숨겨진 공간
 const RIGHT_ANGLE 			= 90;
 const RECOVERY_DEGREE   	= 10;   // 체력 회복 수치
 const FULL_LIFE				= 90;	// 사과땜에 가려저셔 90으로바꿈..
@@ -24,7 +24,7 @@ const ITEM_LIME_WIDTH		= 250;
 const ITEM_LIME_HEIGHT		= 250;
 const MAX_GOLD_TARGET		= 100;
 
-const TARGET_MAKE_SPEED 		= 500; 		// 타겟이 생성되는 간격 , 1000 = 1초
+const TARGET_MAKE_SPEED 		= 300; 		// 타겟이 생성되는 간격 , 1000 = 1초
 const WARNING_TARGET_MAKE_RATE  = 0.3;  	// Warning 타겟이 생성되는 확률
 const GOLD_TARGKET_MAKE_RATE  	= 0.02;  	// 골드 타겟이 생성되는 확률
 const TARGET_MOVE_DISTANCE 		= 10;
@@ -32,29 +32,29 @@ const TARGET_MOVE_DISTANCE 		= 10;
 const LEVEL_CONFIG =[
 	{ // level1
 		maxWarningTarget: 3,
-		maxNormalTarget : 27,
+		maxNormalTarget : 17,
 		maxTime			: 30,
 		targetMoveSpeed	: 60,
 		lifeDecreaseRate: 100
 	},
 	{ // level2
 		maxWarningTarget: 5,
-		maxNormalTarget : 25,
+		maxNormalTarget : 15,
 		maxTime			: 60,
 		targetMoveSpeed	: 50,
 		lifeDecreaseRate: 80
 	},
 	{ // level3
-		maxWarningTarget: 10,
-		maxNormalTarget : 20,
+		maxWarningTarget: 7,
+		maxNormalTarget : 13,
 		maxTime			: 90,
 		targetMoveSpeed	: 40,
 		lifeDecreaseRate: 60
 	},
 	{ // level4
-		maxWarningTarget: 15,
-		maxNormalTarget : 15,
-		maxTime			: 140,
+		maxWarningTarget: 10,
+		maxNormalTarget : 10,
+		maxTime			: 999999,
 		targetMoveSpeed	: 30,
 		lifeDecreaseRate: 50
 	}
@@ -69,11 +69,9 @@ var level;
 var config;	
 var time;
 var totalCoin;    // 코인 숫자
-var clickBlock = 0;
 
 // 쓰레드
 var makeTargetThread;
-var moveTargetThread
 var fallingSpeedUpThread;
 var timeThread;
 var warnigLifeThread;
@@ -81,6 +79,9 @@ var lifeDecreaseThread;
 
 
 function removeTarget(target, doEffect){
+	var moveTargetThreadID = target.find(".moveTargetThreadID").val();
+	clearInterval(moveTargetThreadID); // 쓰레드종료
+	
 	if(doEffect){ // 소리, 제거 효과
 		if(target.hasClass(TARGET_WARNING)) {
 			startAudio(wrongAttackSound);
@@ -100,8 +101,6 @@ function removeTarget(target, doEffect){
 		target.remove();
 	}
 	
-	var moveTargetThreadID = target.find(".moveTargetThreadID").val();
-	clearTimeout(moveTargetThreadID); // 쓰레드종료
 }
 
 // 체력 회복
@@ -355,6 +354,7 @@ function makeTarget(){
 	}
 	target.append($("<div>", {"class" : "target-icon"}));
 	target.append($("<input>", {"class" : "angle", type : "hidden"}));
+	target.append($("<input>", {"class" : "moveTargetThreadID", type : "hidden"}));
 	target.append($("<input>", {"class" : "toLeftDistance", type : "hidden"}));
 	target.append($("<input>", {"class" : "toTopDistance", type : "hidden"}));
 	target.append($("<input>", {"class" : "saveToLeftDistance", type : "hidden"}));
@@ -397,7 +397,7 @@ function makeTarget(){
 	target.css("top", top);
 
 	randAngle(target);
-
+	startMoveTargetThread(target)
 }
 
 // 타겟 각도 변경 함수
@@ -473,40 +473,54 @@ function randAngle(target){
 	target.find(".toTopDistance").val(toTopDistance);
 }
 
+function moveTarget(target){
+	return new Promise(function (resolve, reject) {
+		var left= parseInt(target.css("left"));
+		var top = parseInt(target.css("top"));
+		var toLeftDistance = parseInt(target.find(".toLeftDistance").val());
+		var toTopDistance = parseInt(target.find(".toTopDistance").val());
+		left= left + toLeftDistance;
+		top = top + toTopDistance;
+		
+		// 범위를 넘어간경우
+		if(left < (startX - HIDDEN_PADDING)
+				|| left > (endX - TARGET_WIDTH + HIDDEN_PADDING)
+				|| top < (startY - HIDDEN_PADDING)
+				|| top > (endY - TARGET_HEIGHT + HIDDEN_PADDING)) {
+			randAngle(target);
+		}  else{
+			var xy = {};
+			xy["target"] = target;
+			xy["left"] = left;
+			xy["top"] = top;
+			resolve(xy);
+		}
+	});
+}
 
 // 타겟 움직임 스레드
-function startMoveTargetThread(){
-	moveTargetThread = setInterval(function(){
-		var targets = $(".target:not(.died)");
-		targets.each(function(){
-			var target = $(this);
-			var left= parseInt(target.css("left"));
-			var top = parseInt(target.css("top"));
-			var toLeftDistance = parseInt(target.find(".toLeftDistance").val());
-			var toTopDistance = parseInt(target.find(".toTopDistance").val());
-			
-			left= left + toLeftDistance;
-			top = top + toTopDistance;
-			
-			// 범위를 넘어간경우
-			if(left < (startX - HIDDEN_PADDING)
-					|| left > (endX - TARGET_WIDTH + HIDDEN_PADDING)
-					|| top < (startY - HIDDEN_PADDING)
-					|| top > (endY - TARGET_HEIGHT + HIDDEN_PADDING)) {
-				randAngle(target);
-			}  else{
-				target.css("left", left);
-				target.css("top", top);
-			}
+function startMoveTargetThread(tg){
+	var moveTargetThread = setInterval(function(){
+		moveTarget(tg).then(function (xy){
+			xy["target"].css("left", xy["left"]);
+			xy["target"].css("top", xy["top"]);
 		});
 	}, config.targetMoveSpeed);
+	
+	tg.find(".moveTargetThreadID").val(moveTargetThread);
 }
 
 function stopMoveTargetThread(tg){
-	clearInterval(moveTargetThread);
-	moveTargetThread = undefined;
+	clearInterval(tg.find(".moveTargetThreadID").val());
+	$(this).find(".moveTargetThreadID").val('');
 }
 
+function stopAllMoveTargetThread(tg){
+	var targets = $(".target");
+	targets.each(function(){
+		stopMoveTargetThread($(this));
+	})
+}
 
 function stopMoveTarget(tg){
 	var toLeftDistance 		= tg.find(".toLeftDistance");
@@ -542,7 +556,6 @@ function startPlay(){
 	startTime();
 	startMakeTarget(); // 타겟 생성 쓰레드
 	startLifeDecrease(); // 생명력 감소 스레드 시작
-	startMoveTargetThread();
 }
 
 function stopPlay(){
@@ -550,7 +563,7 @@ function stopPlay(){
 	stopMakeTarget();
 	stopLifeDecrease();
 	stopWarnigLifeThread();
-	stopMoveTargetThread();
+	stopAllMoveTargetThread();
 }
 
 
@@ -812,35 +825,47 @@ function gameover() {
 
 /** ============ Pause =============== **/
 function doPause(){
-
+	if(clickBlock) { return ;}
+	clickBlock = true;
+	
 	startAudio(btnClickSound);
 	
 	stopBGM();
 	stopTime();
 	stopMakeTarget();
 	stopLifeDecrease();
-	stopMoveTargetThread();
+	
+	var targets = $(".target");
+	targets.each(function(){
+		stopMoveTarget($(this));
+	})
 	
 	$(".wrap-fg").addClass("on");
 	$(".wrap-pause").addClass("on");
-
+	
+	timeoutSetBlockFalse();
 }
 
 function doRegame(){
 	
-	if(clickBlock === 1) { return 0;}
-	clickBlock = 1;
+	if(clickBlock) { return ;}
+	clickBlock = true;
 	
 	startAudio(btnClickSound);
 	
-	stopPlay();
-	startPlay();
 	startBGM();
+	startTime();
+	startMakeTarget();
+	startLifeDecrease();
+	var targets = $(".target:not(.stoped)");
+	targets.each(function(){
+		restartMoveTarget($(this));
+	})
 	
 	$(".wrap-fg").removeClass("on");
 	$(".wrap-pause").removeClass("on");
 	
-	buttonBlock();
+	timeoutSetBlockFalse();
 }
 
 function doRestart(tg, doMortion){
@@ -848,77 +873,58 @@ function doRestart(tg, doMortion){
 	if(clickBlock === 1) { return 0;}
 	clickBlock = 1;
 	
-	var tg = $(tg);
-	if(!tg.hasClass("on")){
-		tg.addClass("on");
-		
-		startAudio(btnClickSound);
-		stopBGM();
+	startAudio(btnClickSound);
+	stopBGM();
 
-		var mortionInterval;
-		var duation = 400;
-		if(doMortion){
-			var restartMotion 	= $(".wrap-gameover .btn-restart-mortion");
-			restartMotion.addClass("moving");
-			mortionInterval = setInterval(function(){
-				
-				restartMotion.css("left", parseInt(restartMotion.css("left")) + 15);
-				restartMotion.css("top", parseInt(restartMotion.css("top")) - 20);
-			}, 40);
+	var mortionInterval;
+	var duation = 400;
+	if(doMortion){
+		var restartMotion 	= $(".wrap-gameover .btn-restart-mortion");
+		restartMotion.addClass("moving");
+		mortionInterval = setInterval(function(){
 			
-			duation = 1000;
-		}
+			restartMotion.css("left", parseInt(restartMotion.css("left")) + 15);
+			restartMotion.css("top", parseInt(restartMotion.css("top")) - 20);
+		}, 40);
 		
-		setTimeout(function(){
-
-			var restartMotion 	= $(".wrap-gameover .btn-restart-mortion")
-			clearInterval(mortionInterval);
-			restartMotion.removeClass("moving");
-			
-			redrawToPlay();
-			initGame();
-			stageEffectOn();
-			setTimeout(function(){
-				stageEffectOff();
-				startPlay();
-				startBGM();
-			}, 1500);
-			
-			tg.removeClass("on");
-			clickBlock === 0;
-		}, duation);
+		duation = 1000;
 	}
 	
-	buttonBlock();
+	setTimeout(function(){
+		var restartMotion 	= $(".wrap-gameover .btn-restart-mortion")
+		clearInterval(mortionInterval);
+		restartMotion.removeClass("moving");
+		
+		redrawToPlay();
+		initGame();
+		stageEffectOn();
+		setTimeout(function(){
+			stageEffectOff();
+			startPlay();
+			startBGM();
+		}, 1500);
+		
+		clickBlock = false;
+	}, duation);
 }
 
-function buttonBlock() {
-	setTimeout(function (){
-		clickBlock = 0;
-	},1000);
-}
 
 function doHome(tg){
-	
-	if(clickBlock === 1) { return 0;}
-	clickBlock = 1;
+	if(clickBlock) { return ;}
+	clickBlock = true;
 	
 	var tg = $(tg);
-	if(!tg.hasClass("on")){
-		tg.addClass("on");
-		startAudio(btnClickSound);
-		stopBGM();
-		
-		setTimeout(function(){
-			stopPlay();
-			redrawToHome();
-			startBGM();
-			
-			tg.removeClass("on");
-		}, 500);
-	}
+	startAudio(btnClickSound);
+	stopBGM();
 	
-	buttonBlock();
+	setTimeout(function(){
+		stopPlay();
+		redrawToHome();
+		startBGM();
+		
+		clickBlock = false;
+	}, 500);
+	
 }
 
 

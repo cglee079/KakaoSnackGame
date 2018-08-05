@@ -1,25 +1,23 @@
 function doStartGame(tg) {
-	var tg = $(tg);
-	if(!tg.hasClass("on")){
-		tg.addClass("on");
+	if(clickBlock) { return ;}
+	clickBlock = true;
+	
+	startAudio(btnClickSound);
+	stopBGM();
+	
+	setTimeout(function(){
+		redrawToPlay();
+		initGame();
 		
-		startAudio(btnClickSound);
-		stopBGM();
-		
+		stageEffectOn();
 		setTimeout(function(){
-			redrawToPlay();
-			initGame();
-			
-			stageEffectOn();
-			setTimeout(function(){
-				stageEffectOff();
-				startPlay();
-				startBGM();
-			}, 1500);
-			
-			tg.removeClass("on");
-		}, 500);
-	}
+			stageEffectOff();
+			startPlay();
+			startBGM();
+		}, 1500);
+		
+		clickBlock = false;
+	}, 500);
 }
 
 function doToggleSound(tg) {
@@ -39,10 +37,16 @@ function doToggleSound(tg) {
 
 //도움말 버튼 클릭시
 function doHelp() {
+	if(clickBlock) { return ;}
+	clickBlock = true;
+	
 	initHelp();
+	
 	startAudio(btnClickSound);
 	$(".help").addClass("on");
 	$(".help .h-wrap-fg").addClass("on");
 	
 	doExplain(true);
+	
+	timeoutSetBlockFalse();
 }
