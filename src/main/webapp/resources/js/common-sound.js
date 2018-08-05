@@ -75,7 +75,7 @@ function makeSound(src){
 $(document).ready( function() {
 	setBGM(getContextPath() + '/resources/audio/bgm.mp3');
 	doSoundOn();
-
+	startBGM();
 	attackSound 		= makeSound(getContextPath() + "/resources/audio/play/sound_play_attack.mp3");
 	wrongAttackSound 	= makeSound(getContextPath() + "/resources/audio/play/sound_play_wrong_attack.mp3");
 	heartItemSound 		= makeSound(getContextPath() + "/resources/audio/play/sound_play_item_portion.wav");
