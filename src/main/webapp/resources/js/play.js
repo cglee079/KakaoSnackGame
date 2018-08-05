@@ -478,8 +478,9 @@ function randAngle(target){
 	target.find(".toTopDistance").val(toTopDistance);
 }
 
-function moveTarget(target){
-	return new Promise(function (resolve, reject) {
+// 타겟 움직임 스레드
+function startMoveTargetThread(target){
+	var moveTargetThread = setInterval(function(){
 		var left= parseInt(target.css("left"));
 		var top = parseInt(target.css("top"));
 		var toLeftDistance = parseInt(target.find(".toLeftDistance").val());
@@ -494,25 +495,13 @@ function moveTarget(target){
 				|| top > (endY - TARGET_HEIGHT + HIDDEN_PADDING)) {
 			randAngle(target);
 		}  else{
-			var xy = {};
-			xy["target"] = target;
-			xy["left"] = left;
-			xy["top"] = top;
-			resolve(xy);
+			target.css("left", left);
+			target.css("top", top);
 		}
-	});
-}
-
-// 타겟 움직임 스레드
-function startMoveTargetThread(tg){
-	var moveTargetThread = setInterval(function(){
-		moveTarget(tg).then(function (xy){
-			xy["target"].css("left", xy["left"]);
-			xy["target"].css("top", xy["top"]);
-		});
+		
 	}, config.targetMoveSpeed);
 	
-	tg.find(".moveTargetThreadID").val(moveTargetThread);
+	target.find(".moveTargetThreadID").val(moveTargetThread);
 }
 
 function stopMoveTargetThread(tg){
