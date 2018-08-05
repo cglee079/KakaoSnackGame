@@ -33,7 +33,7 @@ const LEVEL_CONFIG =[
 	{ // level1
 		maxWarningTarget: 3,
 		maxNormalTarget : 17,
-		maxTime			: 3,
+		maxTime			: 30,
 		targetMoveSpeed	: 60,
 		lifeDecreaseRate: 100
 	},
