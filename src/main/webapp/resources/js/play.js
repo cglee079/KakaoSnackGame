@@ -261,7 +261,7 @@ function startTime(){
 	timeWorker.onmessage = function( e ) {
 		time = e.data;
 		$(".info-board-c .info.time .value").text(time.toFixed(2));
-		if(time >= config.maxTime){
+		if(time == config.maxTime){
 			level += 1;
 			removeSomeTarget($(".target"), false);
 			$(".effect.lime").remove();
@@ -286,7 +286,7 @@ function stageEffectOn(){
 	var wrapStageup = $(".wrap-stageup");
 	var stages = wrapStageup.find(".value");
 	var infoBoardC = $(".info-board-c");
-	var stageInfo = infoBoardC.find(".value");
+	var stageInfo = infoBoardC.find(".info.stage .value");
 	
 	startAudio(stageupSound);
 	wrapStageup.addClass("on");
