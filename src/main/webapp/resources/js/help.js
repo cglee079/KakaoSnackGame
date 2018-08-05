@@ -114,10 +114,12 @@ function explain(){
 	function explainLayout0(){
 		help.find(".h-progress").addClass("exp");
 		help.find(".h-wrap-fg .h-wrap-exp.h-exp-1").addClass("exp");
+		help.find(".h-icon-bugs").addClass("on");
 	}
 	
 	function explainLayout1(){
 		help.find(".h-wrap-fg .h-wrap-exp.h-exp-2").addClass("exp");
+		help.find(".h-icon-bugs").removeClass("on");
 	}
 	
 	function explainLayout2(){

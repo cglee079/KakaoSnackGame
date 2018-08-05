@@ -73,6 +73,7 @@
 	background-repeat: no-repeat;
 	background-size: contain;
 	background-image: url("../image/help/icon_help_explain_game.png");
+	z-index:1000;
 }
 
 .h-wrap-fg .h-wrap-exp.h-exp-2 .h-title{
@@ -393,4 +394,30 @@
 
 .h-icon-basket .h-value.h-status-100	{ z-index : 11; background-image: url("../image/play/icon_play_basket_100.png");}
 
+.h-icon-bugs{
+	width: 100%;
+    height: 100%;
+	position:absolute;
+	display:none;
+}
 
+.h-icon-bugs .bugs{
+	width: 75vmin;
+    height: 80vmin;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-image: url(../image/help/icon_help_explain_back_bugs.png);
+    position: relative;
+    margin-top: 8vmin;
+    margin-left: 20vmin;
+}
+
+@media screen and (min-height: 800px) {
+  .h-icon-bugs .bugs{
+ 	margin-top: 27vmin;
+  }
+}
+
+.h-icon-bugs.on{
+	display:flex;
+}

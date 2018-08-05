@@ -218,6 +218,9 @@
 				<div class="h-icon-basket">
 					<div class="h-value h-status-100 on"></div>
 				</div>
+				<div class="h-icon-bugs">
+					<div class="bugs"></div>
+				</div>
 			</div>
 		</div>
 		
