@@ -471,6 +471,7 @@ function randAngle(target){
 	}
 	
 	target.css("transform", "rotate(" + angle + "deg)");
+	target.css("-webkit-transform", "rotate(" + angle + "deg)");
 	
 	target.find(".angle").val(angle);
 	target.find(".toLeftDistance").val(toLeftDistance);
