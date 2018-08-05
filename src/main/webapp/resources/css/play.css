@@ -57,10 +57,10 @@
 }
 
 .wrap-gameover.on {
-	-webkit-transition: transform 0.2s ease-in-out;
-	transition: transform 0.2s ease-in-out; 
 	transform : scale(1);
+	transition: transform 0.2s ease-in-out;
 	-webkit-transform : scale(1);
+	-webkit-transition: transform 0.2s ease-in-out;
 }
 
 .wrap-gameover .btn-restart-mortion{
@@ -71,6 +71,7 @@
 	background-size: contain;
 	background-image: url("../image/play/icon_play_target_normal_live.png");
     transform: rotate(40deg);
+    -webkit-transform : rotate(40deg);
 }
 
 .wrap-gameover .btn-restart-mortion.moving{
@@ -166,6 +167,7 @@
 	background-repeat: no-repeat;
 	background-size: contain;
 	transform : scale(2);
+	-webkit-transform : scale(2);
 	opacity: 0;
 }
 
@@ -173,6 +175,8 @@
 	opacity: 1;
 	transform: scale(1);
 	transition : transform 0.2s ease-out;
+	-webkit-transform: scale(1);
+	-webkit-transition : transform 0.2s ease-out;
 }
 
 .wrap-stageup .value.stage1 .icon { background-image: url("../image/play/icon_play_stage1.png");}
@@ -318,11 +322,13 @@
 	opacity : 0;
 	transform : scale(0.95);
 	transition : opacity 0.2s ease-out , transform 0.1s ease-out;
+	-webkit-transform : scale(0.95);
+	-webkit-transition : opacity 0.2s ease-out , transform 0.1s ease-out;
 }
 
 .progress .progress-portion.on{
 	opacity : 1;
-	transform : scale(1);
+	-webkit-transform : scale(1);
 }
 
 .progress .progress-portion.effect1{ background-image: url("../image/play/icon_play_progress_portion_effect1.png");}
@@ -512,10 +518,12 @@
 
 .attacker.left{
 	 transform: rotate(10deg);
+	 -wekbit-transform: rotate(10deg);
 }
 
 .attacker.right{
 	transform: rotate(-10deg);
+	-wekbit-transform: rotate(-10deg);
 }
 
 .attacker.on {
@@ -542,10 +550,12 @@
 	opacity : 0;	
 	z-index: 50;
 	transform : scale(1.2);
+	-webkit-transform : scale(1.2);
 	background-repeat: no-repeat;
 	background-size : cover;
 	background-image: url("../image/play/icon_play_effect_spray.png");
 	transition : opacity 0.3s ease-out;
+	-webkit-transition : opacity 0.3s ease-out;
 	pointer-events : none;
 }
 
