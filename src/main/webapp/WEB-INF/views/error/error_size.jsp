@@ -7,14 +7,11 @@
 <body>
 
 	<!-- ================================================-->
-	<!-- =================== INFO =======================-->
+	<!-- =================== ERROR =======================-->
 	<!-- ================================================-->
 	
-	<div class="info">
-		<div class="i-header"></div>
-		<div class="i-image"></div>
-		<div class="i-message"></div>
-		<div class="i-logo"></div>
+	<div class="error">
+		<div class="error-image"></div>
 	</div>
 
 </body>
