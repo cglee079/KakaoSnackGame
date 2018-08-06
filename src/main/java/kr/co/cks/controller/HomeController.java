@@ -13,4 +13,10 @@ public class HomeController {
 		return "main";
 	}
 	
+	@RequestMapping(value = "/error/size")
+	public String error(Locale locale, Model model) {
+		return "error/error_size";
+	}
+	
+	
 }

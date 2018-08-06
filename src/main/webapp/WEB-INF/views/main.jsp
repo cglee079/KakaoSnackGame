@@ -1,13 +1,13 @@
 <%@ page pageEncoding="UTF-8"%>
 <html>
 <head>
+
 <%@ include file="/WEB-INF/views/included/included_head.jsp"%>
+<script src="${pageContext.request.contextPath}/resources/js/main.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/main-sound.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/play.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/intro.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/help.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/common-sound.js"></script>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common.css" />
 <link rel="stylesheet" 	href="${pageContext.request.contextPath}/resources/css/intro.css" />
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/play.css" />
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/help.css" />
@@ -222,17 +222,6 @@
 					<div class="bugs"></div>
 				</div>
 			</div>
-		</div>
-		
-		<!-- ================================================-->
-		<!-- =================== INFO =======================-->
-		<!-- ================================================-->
-		
-		<div class="info">
-			<div class="i-header"></div>
-			<div class="i-image"></div>
-			<div class="i-message"></div>
-			<div class="i-logo"></div>
 		</div>
 		
 	</div>

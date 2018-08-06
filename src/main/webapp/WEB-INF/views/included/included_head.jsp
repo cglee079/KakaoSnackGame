@@ -22,7 +22,9 @@
 <script src="${pageContext.request.contextPath}/resources/js/lib/howler.core.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/lib/howler.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/lib/howler.spatial.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
+
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common.css" />
+
 
 <script>
 /* context Path */
@@ -36,15 +38,24 @@ var deviceWidth = undefined;
 var deviceHeight = undefined;
 
 function checkDevice(){
+	isMobile = false;
+	var root = location.href.substring(location.href.indexOf( location.host ) + location.host.length, location.href.length);
+	
 	deviceWidth 	= Math.min(window.innerWidth || Infinity, screen.width);
 	deviceHeight	= Math.min(window.innerHeight || Infinity, screen.height);
+	
 	if(deviceWidth <= maxMobileWidth){
 		isMobile = true;
-		redrawToHome();
+	
+		if(root != getContextPath() + "/"){
+			location.href = getContextPath() + "/"
+		}
 	}
 	
 	if(!isMobile){
-		redrawToInfo();
+		if(root != getContextPath() + "/error/size"){
+			location.href = getContextPath() + "/error/size"
+		}
 	}
 }
 
@@ -57,6 +68,7 @@ $(document).ready(function(){
 	$("html, body").css("font-family", "BM_Jua, serif");
 	checkDevice();
 })
+
 
 /* if ( !!window.Worker ) {
     alert('웹 워커를 지원하는 브라우저입니다.');

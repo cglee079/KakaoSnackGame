@@ -1,3 +1,6 @@
+/** ============================================== **/
+
+
 var clickBlock = false;
 
 function timeoutSetBlockFalse() {
@@ -17,13 +20,6 @@ function redrawToHome(){
 function redrawToPlay(){
 	$(".intro").removeClass("on");
 	$(".play").addClass("on");
-	$(".play > .wrap").removeClass("on");
-	$(".play .itembar-item .icon-on").removeClass("on");
-}
-
-function redrawToInfo(){
-	$(".intro").removeClass("on");
-	$(".info").addClass("on");
 	$(".play > .wrap").removeClass("on");
 	$(".play .itembar-item .icon-on").removeClass("on");
 }
