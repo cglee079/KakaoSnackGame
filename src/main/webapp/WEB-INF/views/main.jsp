@@ -41,6 +41,7 @@
 			<div class="wrap wrap-gameover on">
 				<div class="gameover">
 					<div class="gameover-time"></div>
+					<div class="gameover-data"></div>
 				</div>
 				<div class="gameover-menus">
 					<div class="menu btn-restart" onclick="doRestart(this, true)"></div>

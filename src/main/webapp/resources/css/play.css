@@ -96,9 +96,18 @@
 .gameover .gameover-time{
 	font-size: 50px;
 	font-weight: bold;
-	margin-top: 210px;
+	margin-top: 200px;
 	color : #554536;
 	letter-spacing: -2px;
+}
+
+.gameover .gameover-data{
+	width : 50%;
+	height : 40%;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("../image/play/icon_play_gameover_data.png");
+	margin-top: 15px;
 }
 
 .gameover-menus{

@@ -26,12 +26,10 @@ function doToggleSound(tg) {
 
 	if (tg.hasClass("on")) {
 		doSoundOn();
-		startBGM();
 		startAudio(btnClickSound);
 	} else {
 		startAudio(btnClickSound);
 		doSoundOff();
-		stopBGM();
 	}
 }
 

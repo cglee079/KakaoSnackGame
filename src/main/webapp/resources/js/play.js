@@ -310,13 +310,16 @@ function stageEffectOff(){
 
 //타겟 생성 스레드
 function startMakeTarget() { // 재귀를 이용한 Interval
-	makeTarget();
-	makeTargetThread = setTimeout(startMakeTarget, TARGET_MAKE_SPEED);
+	if(!makeTargetThread){
+		makeTargetThread = setInterval(function(){
+			makeTarget();
+		}, TARGET_MAKE_SPEED);
+	}
 }
 
 // 타겟 생성 스레드 정지
 function stopMakeTarget() {
-	clearTimeout(makeTargetThread);
+	clearInterval(makeTargetThread);
 	makeTargetThread = undefined; // 쓰레드 변수 초기화
 }
 
@@ -501,16 +504,18 @@ function moveTarget(target){
 
 // 타겟 움직임 스레드
 function startMoveTargetThread(tg){
-	moveTargetThread = setInterval(function(){
-		var targets = $(".target:not(.died)");
-		targets.each(function(){
-			moveTarget($(this)).then(function (xy){
-				xy["target"].css("left", xy["left"]);
-				xy["target"].css("top", xy["top"]);
+	if(!moveTargetThread){
+		moveTargetThread = setInterval(function(){
+			var targets = $(".target:not(.died)");
+			targets.each(function(){
+				moveTarget($(this)).then(function (xy){
+					xy["target"].css("left", xy["left"]);
+					xy["target"].css("top", xy["top"]);
+				});
 			});
-		});
-		
-	}, config.targetMoveSpeed);
+			
+		}, config.targetMoveSpeed);
+	}
 }
 
 function stopMoveTargetThread(){
@@ -829,7 +834,7 @@ function doPause(){
 	
 	startAudio(btnClickSound);
 	
-	stopBGM();
+	pauseBGM();
 	stopTime();
 	stopMakeTarget();
 	stopLifeDecrease();
@@ -920,7 +925,6 @@ function doHome(tg){
 	setTimeout(function(){
 		stopPlay();
 		redrawToHome();
-		startBGM();
 		
 		clickBlock = false;
 	}, 500);
